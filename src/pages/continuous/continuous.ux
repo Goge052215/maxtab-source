@@ -1,0 +1,342 @@
+<template>
+  <div class="container">
+    <!-- 顶部导航栏 -->
+    <div class="top-bar">
+      <text class="back-button" onclick="goBack">返回</text>
+      <text class="page-title">连续分布</text>
+    </div>
+
+    <!-- 主内容区域 -->
+    <div class="content">
+      <!-- 分布选择区域 -->
+      <div class="section">
+        <text class="section-title">选择连续分布</text>
+        <div class="distribution-list">
+          <div class="distribution-item" onclick="selectDistribution('normal')">
+            <text class="distribution-name">正态分布</text>
+            <text class="distribution-desc">Normal(μ, σ²)</text>
+          </div>
+          <div class="distribution-item" onclick="selectDistribution('exponential')">
+            <text class="distribution-name">指数分布</text>
+            <text class="distribution-desc">Exponential(λ)</text>
+          </div>
+          <div class="distribution-item" onclick="selectDistribution('uniform')">
+            <text class="distribution-name">均匀分布</text>
+            <text class="distribution-desc">Uniform(a, b)</text>
+          </div>
+          <div class="distribution-item" onclick="selectDistribution('gamma')">
+            <text class="distribution-name">伽马分布</text>
+            <text class="distribution-desc">Gamma(α, β)</text>
+          </div>
+          <div class="distribution-item" onclick="selectDistribution('beta')">
+            <text class="distribution-name">贝塔分布</text>
+            <text class="distribution-desc">Beta(α, β)</text>
+          </div>
+        </div>
+      </div>
+
+      <!-- 参数输入区域 -->
+      <div class="section" if="selectedDistribution">
+        <text class="section-title">参数设置</text>
+        <div class="parameter-inputs">
+          <div class="parameter-item" for="{{ param in parameters }}">
+            <text class="param-label">{{ param.label }}:</text>
+            <input class="param-input" type="number" onchange="updateParameter($idx, $event.value)" value="{{ param.value }}" />
+          </div>
+        </div>
+      </div>
+
+      <!-- 计算区域 -->
+      <div class="section" if="parametersComplete">
+        <text class="section-title">计算结果</text>
+        <div class="calculation-results">
+          <div class="input-section">
+            <text class="input-label">输入值 (x):</text>
+            <input class="input-value" type="number" onchange="updateInputValue($event.value)" value="{{ inputValue }}" />
+          </div>
+          <div class="results">
+            <div class="result-item">
+              <text class="result-label">概率密度函数:</text>
+              <text class="result-value">{{ pdfResult }}</text>
+            </div>
+            <div class="result-item">
+              <text class="result-label">累积分布函数:</text>
+              <text class="result-value">{{ cdfResult }}</text>
+            </div>
+          </div>
+          <div class="calculate-button" onclick="calculate">
+            <text class="calculate-button-text">计算</text>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import router from "@system.router"
+
+export default {
+  private: {
+    selectedDistribution: null,
+    parameters: [],
+    inputValue: 0,
+    pdfResult: "-",
+    cdfResult: "-",
+    parametersComplete: false
+  },
+
+  onInit() {
+    this.$page.setTitleBar({ text: '连续分布' })
+  },
+
+  goBack() {
+    router.back()
+  },
+
+  selectDistribution(type) {
+    this.selectedDistribution = type
+    this.setupParameters(type)
+  },
+
+  setupParameters(type) {
+    switch(type) {
+      case 'normal':
+        this.parameters = [
+          { label: '均值 μ', value: 0.0, min: -1000, max: 1000 },
+          { label: '标准差 σ', value: 1.0, min: 0.01, max: 1000 }
+        ]
+        break
+      case 'exponential':
+        this.parameters = [
+          { label: '率参数 λ', value: 1.0, min: 0.01, max: 100 }
+        ]
+        break
+      case 'uniform':
+        this.parameters = [
+          { label: '下限 a', value: 0.0, min: -1000, max: 1000 },
+          { label: '上限 b', value: 1.0, min: -1000, max: 1000 }
+        ]
+        break
+      case 'gamma':
+        this.parameters = [
+          { label: '形状参数 α', value: 2.0, min: 0.01, max: 100 },
+          { label: '率参数 β', value: 1.0, min: 0.01, max: 100 }
+        ]
+        break
+      case 'beta':
+        this.parameters = [
+          { label: '形状参数 α', value: 2.0, min: 0.01, max: 100 },
+          { label: '形状参数 β', value: 2.0, min: 0.01, max: 100 }
+        ]
+        break
+    }
+    this.parametersComplete = false
+  },
+
+  updateParameter(index, value) {
+    this.parameters[index].value = parseFloat(value)
+    this.checkParametersComplete()
+  },
+
+  checkParametersComplete() {
+    this.parametersComplete = this.parameters.every(param => 
+      param.value >= param.min && param.value <= param.max
+    )
+  },
+
+  updateInputValue(value) {
+    this.inputValue = parseFloat(value) || 0
+  },
+
+  calculate() {
+    if (!this.parametersComplete) return
+    
+    // 这里应该调用实际的计算函数
+    // 暂时使用模拟结果
+    this.pdfResult = (Math.random() * 1.2).toFixed(4)
+    this.cdfResult = (Math.random() * 0.95).toFixed(4)
+  }
+}
+</script>
+
+<style>
+.container {
+  flex-direction: column;
+  background-color: #000000;
+  height: 100%;
+}
+
+.top-bar {
+  height: 70px;
+  background-color: #111111;
+  flex-direction: row;
+  align-items: center;
+  padding: 0 20px;
+  border-bottom: 1px solid #333333;
+}
+
+.back-button {
+  font-size: 16px;
+  color: #ffffff;
+  padding: 10px 15px;
+}
+
+.page-title {
+  font-size: 20px;
+  color: #ffffff;
+  font-weight: bold;
+  margin-left: 20px;
+}
+
+.content {
+  flex: 1;
+  flex-direction: column;
+  padding: 20px;
+}
+
+.section {
+  margin-bottom: 30px;
+}
+
+.section-title {
+  font-size: 18px;
+  color: #ffffff;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.distribution-list {
+  flex-direction: column;
+}
+
+.distribution-item {
+  height: 60px;
+  background-color: #222222;
+  border: 1px solid #444444;
+  border-radius: 10px;
+  padding: 10px 15px;
+  margin-bottom: 10px;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.distribution-name {
+  font-size: 16px;
+  color: #ffffff;
+  font-weight: bold;
+}
+
+.distribution-desc {
+  font-size: 12px;
+  color: #cccccc;
+  margin-top: 2px;
+}
+
+.parameter-inputs {
+  flex-direction: column;
+}
+
+.parameter-item {
+  height: 50px;
+  background-color: #222222;
+  border: 1px solid #444444;
+  border-radius: 8px;
+  padding: 0 15px;
+  margin-bottom: 10px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.param-label {
+  font-size: 14px;
+  color: #ffffff;
+}
+
+.param-input {
+  width: 100px;
+  height: 30px;
+  background-color: #333333;
+  border: 1px solid #555555;
+  border-radius: 4px;
+  color: #ffffff;
+  text-align: center;
+  font-size: 14px;
+}
+
+.calculation-results {
+  flex-direction: column;
+}
+
+.input-section {
+  height: 50px;
+  background-color: #222222;
+  border: 1px solid #444444;
+  border-radius: 8px;
+  padding: 0 15px;
+  margin-bottom: 15px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.input-label {
+  font-size: 14px;
+  color: #ffffff;
+}
+
+.input-value {
+  width: 80px;
+  height: 30px;
+  background-color: #333333;
+  border: 1px solid #555555;
+  border-radius: 4px;
+  color: #ffffff;
+  text-align: center;
+  font-size: 14px;
+}
+
+.results {
+  flex-direction: column;
+}
+
+.result-item {
+  height: 40px;
+  background-color: #222222;
+  border: 1px solid #444444;
+  border-radius: 8px;
+  padding: 0 15px;
+  margin-bottom: 10px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.result-label {
+  font-size: 14px;
+  color: #ffffff;
+}
+
+.result-value {
+  font-size: 14px;
+  color: #00ff00;
+  font-weight: bold;
+}
+
+.calculate-button {
+  height: 50px;
+  background-color: #0066cc;
+  border: none;
+  border-radius: 10px;
+  margin-top: 20px;
+  justify-content: center;
+  align-items: center;
+}
+
+.calculate-button-text {
+  font-size: 16px;
+  color: #ffffff;
+  font-weight: bold;
+}
+</style>

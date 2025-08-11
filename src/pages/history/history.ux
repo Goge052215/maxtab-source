@@ -1,0 +1,371 @@
+<template>
+  <div class="container">
+    <div class="top-bar">
+      <text class="back-button" onclick="goBack">返回</text>
+      <text class="page-title">计算历史</text>
+      <text class="clear-button" onclick="clearHistory">清空</text>
+    </div>
+
+    <div class="content">
+      <div class="stats-card" if="history.length > 0">
+        <text class="stats-title">统计信息</text>
+        <div class="stats-grid">
+          <div class="stat-item">
+            <text class="stat-value">{{ history.length }}</text>
+            <text class="stat-label">总计算次数</text>
+          </div>
+          <div class="stat-item">
+            <text class="stat-value">{{ getMostUsedDistribution() }}</text>
+            <text class="stat-label">最常用分布</text>
+          </div>
+          <div class="stat-item">
+            <text class="stat-value">{{ getTodayCalculations() }}</text>
+            <text class="stat-label">今日计算</text>
+          </div>
+        </div>
+      </div>
+
+      <div class="empty-state" if="history.length === 0">
+        <text class="empty-icon">📊</text>
+        <text class="empty-title">暂无计算历史</text>
+        <text class="empty-desc">开始计算后，历史记录将显示在这里</text>
+      </div>
+
+      <div class="history-list" if="history.length > 0">
+        <div class="history-item" for="{{ item in history }}">
+          <div class="item-header">
+            <text class="item-title">{{ item.distributionName }}</text>
+            <text class="item-time">{{ item.time }}</text>
+          </div>
+          <div class="item-params">
+            <text class="param-text" for="{{ param in item.parameters }}">
+              {{ param.name }}={{ param.value }}</text>
+          </div>
+          <div class="item-results">
+            <div class="result-cell">
+              <text class="result-label">输入值:</text>
+              <text class="result-value">{{ item.inputValue }}</text>
+            </div>
+            <div class="result-cell">
+              <text class="result-label">{{ item.densityLabel }}:</text>
+              <text class="result-value">{{ item.densityValue }}</text>
+            </div>
+            <div class="result-cell">
+              <text class="result-label">累积概率:</text>
+              <text class="result-value">{{ item.cdfValue }}</text>
+            </div>
+          </div>
+          <div class="reuse-button" onclick="reuseCalculation($idx)">
+            <text class="reuse-text">复用</text>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import router from "@system.router"
+
+export default {
+  private: {
+    history: []
+  },
+
+  onInit() {
+    this.$page.setTitleBar({ text: '计算历史' })
+    this.loadHistory()
+  },
+
+  onShow() {
+    this.loadHistory()
+  },
+
+  loadHistory() {
+    // 模拟加载历史数据
+    this.history = [
+      {
+        distributionName: '正态分布',
+        distributionType: 'normal',
+        category: 'continuous',
+        time: '今天 14:30',
+        parameters: [
+          { name: 'μ', value: 0 },
+          { name: 'σ', value: 1 }
+        ],
+        inputValue: 1.96,
+        densityLabel: '概率密度',
+        densityValue: '0.0584',
+        cdfValue: '0.9750'
+      },
+      {
+        distributionName: '二项分布',
+        distributionType: 'binomial',
+        category: 'discrete',
+        time: '今天 10:15',
+        parameters: [
+          { name: 'n', value: 20 },
+          { name: 'p', value: 0.3 }
+        ],
+        inputValue: 5,
+        densityLabel: '概率质量',
+        densityValue: '0.1789',
+        cdfValue: '0.4164'
+      },
+      {
+        distributionName: '泊松分布',
+        distributionType: 'poisson',
+        category: 'discrete',
+        time: '昨天 16:45',
+        parameters: [
+          { name: 'λ', value: 2.5 }
+        ],
+        inputValue: 3,
+        densityLabel: '概率质量',
+        densityValue: '0.2138',
+        cdfValue: '0.7576'
+      },
+      {
+        distributionName: '指数分布',
+        distributionType: 'exponential',
+        category: 'continuous',
+        time: '昨天 09:20',
+        parameters: [
+          { name: 'λ', value: 1.5 }
+        ],
+        inputValue: 2,
+        densityLabel: '概率密度',
+        densityValue: '0.3347',
+        cdfValue: '0.9502'
+      }
+    ]
+  },
+
+  goBack() {
+    router.back()
+  },
+
+  clearHistory() {
+    this.history = []
+    // 实际应用中应该清除存储的历史数据
+  },
+
+  reuseCalculation(index) {
+    const item = this.history[index]
+    // 将参数传递到计算器页面
+    router.push({
+      uri: '/pages/calculator/calculator',
+      params: {
+        category: item.category,
+        distribution: item.distributionType,
+        parameters: item.parameters,
+        inputValue: item.inputValue
+      }
+    })
+  },
+
+  getMostUsedDistribution() {
+    if (this.history.length === 0) return '-'
+    
+    const counts = {}
+    this.history.forEach(item => {
+      counts[item.distributionName] = (counts[item.distributionName] || 0) + 1
+    })
+    
+    return Object.keys(counts).reduce((a, b) => counts[a] > counts[b] ? a : b)
+  },
+
+  getTodayCalculations() {
+    // 简化的今日计算统计
+    return this.history.filter(item => item.time.includes('今天')).length
+  }
+}
+</script>
+
+<style>
+.container {
+  flex-direction: column;
+  background-color: #000000;
+  height: 100%;
+}
+
+.top-bar {
+  height: 70px;
+  background-color: #111111;
+  flex-direction: row;
+  align-items: center;
+  padding: 0 20px;
+  border-bottom: 1px solid #333333;
+}
+
+.back-button {
+  font-size: 16px;
+  color: #ffffff;
+  padding: 10px 15px;
+}
+
+.page-title {
+  font-size: 20px;
+  color: #ffffff;
+  font-weight: bold;
+  margin-left: 20px;
+  flex: 1;
+}
+
+.clear-button {
+  font-size: 14px;
+  color: #ff4444;
+  padding: 8px 12px;
+}
+
+.content {
+  flex: 1;
+  flex-direction: column;
+  padding: 20px;
+}
+
+.stats-card {
+  background-color: #222222;
+  border: 1px solid #444444;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.stats-title {
+  font-size: 16px;
+  color: #ffffff;
+  font-weight: bold;
+  margin-bottom: 15px;
+}
+
+.stats-grid {
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.stat-item {
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+}
+
+.stat-value {
+  font-size: 20px;
+  color: #00ff00;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: #cccccc;
+}
+
+.empty-state {
+  flex: 1;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.empty-icon {
+  font-size: 48px;
+  margin-bottom: 20px;
+}
+
+.empty-title {
+  font-size: 18px;
+  color: #ffffff;
+  margin-bottom: 10px;
+}
+
+.empty-desc {
+  font-size: 14px;
+  color: #cccccc;
+}
+
+.history-list {
+  flex-direction: column;
+}
+
+.history-item {
+  background-color: #222222;
+  border: 1px solid #444444;
+  border-radius: 12px;
+  padding: 15px;
+  margin-bottom: 15px;
+  flex-direction: column;
+}
+
+.item-header {
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.item-title {
+  font-size: 16px;
+  color: #ffffff;
+  font-weight: bold;
+}
+
+.item-time {
+  font-size: 12px;
+  color: #cccccc;
+}
+
+.item-params {
+  flex-direction: row;
+  flex-wrap: wrap;
+  margin-bottom: 12px;
+}
+
+.param-text {
+  font-size: 12px;
+  color: #aaaaaa;
+  margin-right: 10px;
+  margin-bottom: 2px;
+}
+
+.item-results {
+  flex-direction: row;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.result-cell {
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+}
+
+.result-label {
+  font-size: 11px;
+  color: #cccccc;
+  margin-bottom: 2px;
+}
+
+.result-value {
+  font-size: 14px;
+  color: #00ff00;
+  font-weight: bold;
+}
+
+.reuse-button {
+  height: 35px;
+  background-color: #0066cc;
+  border: none;
+  border-radius: 8px;
+  margin-top: 10px;
+  justify-content: center;
+  align-items: center;
+}
+
+.reuse-text {
+  font-size: 14px;
+  color: #ffffff;
+  font-weight: bold;
+}
+</style>
