@@ -6,19 +6,25 @@
 
     <div class="content">
       <div class="param-section">
-        <div class="param-item">
+        <div class="param-item" @click="selectInput('n')">
           <text class="param-label">试验次数 n</text>
-          <input class="param-input" type="number" @change="updateN" value="{{ n }}" />
+          <div class="param-display">
+            <text class="param-value">{{ n }}</text>
+          </div>
         </div>
         
-        <div class="param-item">
+        <div class="param-item" @click="selectInput('p')">
           <text class="param-label">成功概率 p</text>
-          <input class="param-input" type="number" @change="updateP" value="{{ p }}" />
+          <div class="param-display">
+            <text class="param-value">{{ p }}</text>
+          </div>
         </div>
         
-        <div class="param-item">
+        <div class="param-item" @click="selectInput('k')">
           <text class="param-label">计算值 k</text>
-          <input class="param-input" type="number" @change="updateK" value="{{ k }}" />
+          <div class="param-display">
+            <text class="param-value">{{ k }}</text>
+          </div>
         </div>
       </div>
 
@@ -38,12 +44,15 @@
         <text class="back-text">返回</text>
       </div>
     </div>
+
+
   </div>
 </template>
 
 <script>
 import router from "@system.router"
 import { NativeBridge } from "../../../common/native_bridge"
+import { globalState } from "../../../common/global_state.js"
 
 export default {
   private: {
@@ -60,27 +69,100 @@ export default {
     this.$page.setTitleBar({ text: '二项分布' })
   },
 
+  onShow() {
+    // Handle return from keyboard page using VelaOS protocol
+    console.log('Binomial onShow called')
+    this.handleKeyboardResult()
+  },
+
+  onReady() {
+    // Also handle on ready in case onShow doesn't fire
+    console.log('Binomial onReady called')
+    this.handleKeyboardResult()
+  },
+
+  onResume() {
+    // Handle when page becomes active again
+    console.log('Binomial onResume called')
+    this.handleKeyboardResult()
+  },
+
+  handleKeyboardResult() {
+    // Check for keyboard result multiple times to ensure we catch it
+    setTimeout(() => {
+      this.checkKeyboardResult()
+    }, 100)
+    
+    setTimeout(() => {
+      this.checkKeyboardResult()
+    }, 300)
+    
+    setTimeout(() => {
+      this.checkKeyboardResult()
+    }, 500)
+  },
+
+  checkKeyboardResult() {
+    const result = globalState.getKeyboardResult()
+    if (result) {
+      const { value, parameterType, forceBack } = result
+      
+      console.log('Binomial received result:', result) // Debug log
+      
+      // Update the parameter value
+      if (parameterType === 'n' || parameterType === 'k') {
+        this[parameterType] = parseInt(value) || 0
+      } else if (parameterType === 'p') {
+        this[parameterType] = parseFloat(value) || 0
+      }
+      
+      // Validate bounds
+      if (parameterType === 'n' && this.n <= 0) this.n = 1
+      if (parameterType === 'p') {
+        if (this.p < 0) this.p = 0
+        if (this.p > 1) this.p = 1
+      }
+      if (parameterType === 'k' && this.k < 0) this.k = 0
+      
+      console.log('Updated values:', { n: this.n, p: this.p, k: this.k })
+      
+      this.hasResult = false
+      this.errorMessage = ""
+      
+      // Force UI update
+      this.$forceUpdate()
+
+      if (forceBack) {
+        router.back()
+      }
+      
+      return true // Found and processed result
+    }
+    return false // No result found
+  },
+
   goBack() {
     router.back()
   },
 
-  updateN(e) {
-    this.n = parseInt(e.value) || 10
-    this.hasResult = false
-    this.errorMessage = ""
+  selectInput(inputType) {
+    let parameterName = ''
+    if (inputType === 'n') parameterName = '试验次数'
+    else if (inputType === 'p') parameterName = '成功概率'
+    else if (inputType === 'k') parameterName = '计算值'
+    
+    router.push({
+      uri: 'pages/keyboard',
+      params: {
+        parameterName: parameterName,
+        parameterType: inputType,
+        currentValue: this[inputType].toString(),
+        forceBack: true
+      }
+    })
   },
 
-  updateP(e) {
-    this.p = parseFloat(e.value) || 0.5
-    this.hasResult = false
-    this.errorMessage = ""
-  },
 
-  updateK(e) {
-    this.k = parseInt(e.value) || 0
-    this.hasResult = false
-    this.errorMessage = ""
-  },
 
   calculate() {
     // Validate input parameters
@@ -198,16 +280,20 @@ export default {
   font-weight: 500;
 }
 
-.param-input {
+.param-display {
   width: 65px;
   height: 35px;
   background-color: #333333;
   border: 1px solid #555555;
   border-radius: 6px;
+  justify-content: center;
+  align-items: center;
+}
+
+.param-value {
   color: #ffffff;
   text-align: center;
   font-size: 18px;
-  padding: 0 5px;
 }
 
 .calc-section {

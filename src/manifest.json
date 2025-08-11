@@ -53,6 +53,9 @@
       "pages/about": {
         "component": "about"
       },
+      "pages/keyboard": {
+        "component": "keyboard"
+      },
       "pages/distributions/binomial": {
         "component": "binomial"
       },

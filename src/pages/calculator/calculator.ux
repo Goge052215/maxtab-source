@@ -38,12 +38,11 @@
       <div class="section" if="selectedDistribution">
         <text class="section-title">参数设置</text>
         <div class="parameters-card">
-          <div class="param-row" for="{{ param in parameters }}">
+          <div class="param-row" for="{{ param in parameters }}" @click="selectInput('parameter', $idx)">
             <text class="param-name">{{ param.name }}:</text>
-            <input class="param-slider" type="number" 
-                   value="{{ param.value }}" 
-                   onchange="updateParameter($idx, $event.value)" />
-            <text class="param-value">{{ param.value.toFixed(2) }}</text>
+            <div class="param-display">
+              <text class="param-value">{{ param.value % 1 === 0 ? param.value.toString() : param.value.toFixed(2) }}</text>
+            </div>
           </div>
         </div>
       </div>
@@ -52,10 +51,12 @@
       <div class="section" if="parameters.length > 0">
         <text class="section-title">计算</text>
         <div class="calculation-panel">
-          <div class="input-group">
+          <div class="input-group" @click="selectInput('input')">
             <text class="input-label">输入值:</text>
             <div class="input-controls">
-              <input class="input-box" type="number" value="{{ inputValue }}" onchange="updateInputValue($event.value)" />
+              <div class="input-box">
+                <text class="param-value">{{ inputValue }}</text>
+              </div>
               <div class="input-buttons">
                 <div class="input-btn" onclick="decrementInput"><text class="input-btn-text">-</text></div>
                 <div class="input-btn" onclick="incrementInput"><text class="input-btn-text">+</text></div>
@@ -85,6 +86,7 @@
 
 <script>
 import router from "@system.router"
+import { globalState } from "../../common/global_state.js"
 
 export default {
   private: {
@@ -108,15 +110,36 @@ export default {
       { type: 'uniform', name: '均匀分布', formula: 'U(a, b)' },
       { type: 'gamma', name: '伽马分布', formula: 'Γ(α, β)' },
       { type: 'beta', name: '贝塔分布', formula: 'Beta(α, β)' }
-    ]
+    ],
+    errorMessage: ""
   },
 
   onInit() {
     this.$page.setTitleBar({ text: '快速计算' })
     this.selectCategory('discrete')
+    this.importFromGlobal()
+  },
+
+  onShow() {
+    console.log('Calculator onShow called')
+    this.handleKeyboardResult()
+    this.importFromGlobal()
+  },
+
+  onReady() {
+    console.log('Calculator onReady called')
+    this.handleKeyboardResult()
+    this.importFromGlobal()
+  },
+
+  onResume() {
+    console.log('Calculator onResume called')
+    this.handleKeyboardResult()
   },
 
   goBack() {
+    // Export current values back for the source page to pick up
+    this.exportToGlobal()
     router.back()
   },
 
@@ -175,20 +198,14 @@ export default {
     this.parameters = paramMap[type] || []
   },
 
-  updateParameter(index, value) {
-    this.parameters[index].value = parseFloat(value)
-  },
-
-  updateInputValue(value) {
-    this.inputValue = parseFloat(value) || 0
-  },
-
   incrementInput() {
-    this.inputValue += 0.1
+    this.inputValue = parseFloat((this.inputValue + 0.1).toFixed(2))
+    this.$forceUpdate()
   },
 
   decrementInput() {
-    this.inputValue = Math.max(0, this.inputValue - 0.1)
+    this.inputValue = parseFloat(Math.max(0, this.inputValue - 0.1).toFixed(2))
+    this.$forceUpdate()
   },
 
   calculate() {
@@ -205,6 +222,84 @@ export default {
       this.pmfResult = "-"
     }
     this.cdfResult = randomResult()
+  },
+
+  selectInput(inputType, index = -1) {
+    let parameterName = ''
+    let parameterType = ''
+    let currentValue = ''
+
+    if (inputType === 'parameter') {
+      parameterName = this.parameters[index].name
+      parameterType = `param_${index}`
+      currentValue = this.parameters[index].value.toString()
+    } else {
+      parameterName = '输入值'
+      parameterType = 'input'
+      currentValue = this.inputValue.toString()
+    }
+
+    router.push({
+      uri: 'pages/keyboard',
+      params: {
+        parameterName: parameterName,
+        parameterType: parameterType,
+        currentValue: currentValue
+      }
+    })
+  },
+
+  handleKeyboardResult() {
+    const result = globalState.getKeyboardResult()
+    if (result) {
+      const { value, parameterType } = result
+
+      if (parameterType.startsWith('param_')) {
+        const index = parseInt(parameterType.split('_')[1])
+        if (!isNaN(index) && index >= 0 && index < this.parameters.length) {
+          this.parameters[index].value = value
+        }
+      } else if (parameterType === 'input') {
+        this.inputValue = value
+      }
+      
+      this.$forceUpdate()
+    }
+  },
+
+  importFromGlobal() {
+    const payload = globalState.getCalculatorImport()
+    if (!payload) return
+
+    const { distributionType, paramValues, inputValue } = payload
+
+    // Set category by distribution type
+    const discreteTypes = ['binomial', 'poisson', 'geometric', 'negative_binomial', 'hypergeometric']
+    const isDiscrete = discreteTypes.indexOf(distributionType) !== -1
+    this.currentCategory = isDiscrete ? 'discrete' : 'continuous'
+    this.selectedDistribution = distributionType
+    this.setupParameters(distributionType)
+
+    if (Array.isArray(paramValues)) {
+      for (let i = 0; i < Math.min(paramValues.length, this.parameters.length); i++) {
+        this.parameters[i].value = paramValues[i]
+      }
+    }
+    if (typeof inputValue !== 'undefined') {
+      this.inputValue = inputValue
+    }
+    // Clear import so it is not re-applied
+    globalState.clearCalculatorImport()
+    this.$forceUpdate()
+  },
+
+  exportToGlobal() {
+    const payload = {
+      distributionType: this.selectedDistribution,
+      paramValues: this.parameters.map(p => p.value),
+      inputValue: this.inputValue
+    }
+    globalState.setCalculatorExport(payload)
   },
 
   computed: {
@@ -347,17 +442,20 @@ export default {
   width: 80px;
 }
 
-.param-slider {
-  flex: 1;
-  height: 20px;
-  margin: 0 10px;
-}
-
 .param-value {
   font-size: 14px;
   color: #00ff00;
-  width: 50px;
-  text-align: right;
+  text-align: center;
+}
+
+.param-display {
+  width: 120px;
+  height: 35px;
+  background-color: #333333;
+  border: 1px solid #555555;
+  border-radius: 6px;
+  justify-content: center;
+  align-items: center;
 }
 
 .calculation-panel {
@@ -387,14 +485,13 @@ export default {
 }
 
 .input-box {
-  width: 80px;
+  width: 100px;
   height: 35px;
   background-color: #333333;
   border: 1px solid #555555;
   border-radius: 5px;
-  color: #ffffff;
-  text-align: center;
-  font-size: 16px;
+  justify-content: center;
+  align-items: center;
 }
 
 .input-buttons {

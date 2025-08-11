@@ -6,19 +6,25 @@
 
     <div class="content">
       <div class="param-section">
-        <div class="param-item">
+        <div class="param-item" @click="selectInput('mu')">
           <text class="param-label">均值 μ</text>
-          <input class="param-input" type="number" @change="updateMu" value="{{ mu }}" />
+          <div class="param-display">
+            <text class="param-value">{{ mu }}</text>
+          </div>
         </div>
         
-        <div class="param-item">
+        <div class="param-item" @click="selectInput('sigma')">
           <text class="param-label">标准差 σ</text>
-          <input class="param-input" type="number" @change="updateSigma" value="{{ sigma }}" />
+          <div class="param-display">
+            <text class="param-value">{{ sigma }}</text>
+          </div>
         </div>
         
-        <div class="param-item">
+        <div class="param-item" @click="selectInput('x')">
           <text class="param-label">计算值 x</text>
-          <input class="param-input" type="number" @change="updateX" value="{{ x }}" />
+          <div class="param-display">
+            <text class="param-value">{{ x }}</text>
+          </div>
         </div>
       </div>
 
@@ -38,12 +44,15 @@
         <text class="back-text">返回</text>
       </div>
     </div>
+
+
   </div>
 </template>
 
 <script>
 import router from "@system.router"
 import { NativeBridge } from "../../../common/native_bridge"
+import { globalState } from "../../../common/global_state.js"
 
 export default {
   private: {
@@ -60,27 +69,89 @@ export default {
     this.$page.setTitleBar({ text: '正态分布' })
   },
 
+  onShow() {
+    // Handle return from keyboard page using VelaOS protocol
+    console.log('Normal onShow called')
+    this.handleKeyboardResult()
+  },
+
+  onReady() {
+    // Also handle on ready in case onShow doesn't fire
+    console.log('Normal onReady called')
+    this.handleKeyboardResult()
+  },
+
+  onResume() {
+    // Handle when page becomes active again
+    console.log('Normal onResume called')
+    this.handleKeyboardResult()
+  },
+
+  handleKeyboardResult() {
+    // Check for keyboard result multiple times to ensure we catch it
+    setTimeout(() => {
+      this.checkKeyboardResult()
+    }, 100)
+    
+    setTimeout(() => {
+      this.checkKeyboardResult()
+    }, 300)
+    
+    setTimeout(() => {
+      this.checkKeyboardResult()
+    }, 500)
+  },
+
+  checkKeyboardResult() {
+    const result = globalState.getKeyboardResult()
+    if (result) {
+      const { value, parameterType } = result
+      
+      console.log('Normal received result:', result) // Debug log
+      
+      // Update the parameter value
+      const numValue = parseFloat(value) || 0
+      this[parameterType] = numValue
+      
+      // Validate bounds
+      if (parameterType === 'sigma' && this.sigma <= 0) {
+        this.sigma = 1
+      }
+      
+      console.log('Updated values:', { mu: this.mu, sigma: this.sigma, x: this.x })
+      
+      this.hasResult = false
+      this.errorMessage = ""
+      
+      // Force UI update
+      this.$forceUpdate()
+      
+      return true // Found and processed result
+    }
+    return false // No result found
+  },
+
   goBack() {
     router.back()
   },
 
-  updateMu(e) {
-    this.mu = parseFloat(e.value) || 0
-    this.hasResult = false
-    this.errorMessage = ""
+  selectInput(inputType) {
+    let parameterName = ''
+    if (inputType === 'mu') parameterName = '均值'
+    else if (inputType === 'sigma') parameterName = '标准差'
+    else if (inputType === 'x') parameterName = '计算值'
+    
+    router.push({
+      uri: 'pages/keyboard',
+      params: {
+        parameterName: parameterName,
+        parameterType: inputType,
+        currentValue: this[inputType].toString()
+      }
+    })
   },
 
-  updateSigma(e) {
-    this.sigma = parseFloat(e.value) || 1
-    this.hasResult = false
-    this.errorMessage = ""
-  },
 
-  updateX(e) {
-    this.x = parseFloat(e.value) || 0
-    this.hasResult = false
-    this.errorMessage = ""
-  },
 
   calculate() {
     // Validate input parameters
@@ -188,16 +259,20 @@ export default {
   font-weight: 500;
 }
 
-.param-input {
+.param-display {
   width: 65px;
   height: 35px;
   background-color: #333333;
   border: 1px solid #555555;
   border-radius: 6px;
+  justify-content: center;
+  align-items: center;
+}
+
+.param-value {
   color: #ffffff;
   text-align: center;
   font-size: 18px;
-  padding: 0 5px;
 }
 
 .calc-section {
