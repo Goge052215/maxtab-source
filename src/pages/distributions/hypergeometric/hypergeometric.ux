@@ -1,0 +1,270 @@
+<template>
+  <div class="container">
+    <div class="top-bar">
+      <text class="title">超几何分布</text>
+    </div>
+
+    <div class="content">
+      <div class="param-section">
+        <div class="param-item">
+          <text class="param-label">总体大小 N</text>
+          <input class="param-input" type="number" @change="updateN" value="{{ N }}" />
+        </div>
+        
+        <div class="param-item">
+          <text class="param-label">成功项数 K</text>
+          <input class="param-input" type="number" @change="updateK_param" value="{{ K }}" />
+        </div>
+        
+        <div class="param-item">
+          <text class="param-label">抽取数量 n</text>
+          <input class="param-input" type="number" @change="updateN_sample" value="{{ n }}" />
+        </div>
+        
+        <div class="param-item">
+          <text class="param-label">成功次数 k</text>
+          <input class="param-input" type="number" @change="updateK" value="{{ k }}" />
+        </div>
+      </div>
+
+      <div class="calc-section">
+        <div class="calc-btn" onclick="calculate">
+          <text class="calc-text">计算</text>
+        </div>
+      </div>
+
+      <div class="error-message" if="{{ errorMessage }}">
+        <text class="error-text">{{ errorMessage }}</text>
+      </div>
+
+    </div>
+
+    <div class="bottom-section">
+      <div class="back-btn" onclick="goBack">
+        <text class="back-text">返回</text>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import router from "@system.router"
+import { NativeBridge } from "../../../common/native_bridge"
+
+export default {
+  private: {
+    N: 50,
+    K: 20,
+    n: 10,
+    k: 5,
+    pmf: "-",
+    cdf: "-",
+    hasResult: false,
+    errorMessage: ""
+  },
+
+  onInit() {
+    this.$page.setTitleBar({ text: '超几何分布' })
+  },
+
+  goBack() {
+    router.back()
+  },
+
+  updateN(e) {
+    this.N = parseInt(e.value) || 50
+    this.hasResult = false
+    this.errorMessage = ""
+  },
+
+  updateK_param(e) {
+    this.K = parseInt(e.value) || 20
+    this.hasResult = false
+    this.errorMessage = ""
+  },
+
+  updateN_sample(e) {
+    this.n = parseInt(e.value) || 10
+    this.hasResult = false
+    this.errorMessage = ""
+  },
+
+  updateK(e) {
+    this.k = parseInt(e.value) || 0
+    this.hasResult = false
+    this.errorMessage = ""
+  },
+
+  calculate() {
+    // Validate input parameters
+    if (this.N <= 0) {
+      this.errorMessage = "总体大小N必须大于0"
+      return
+    }
+    
+    if (this.K < 0 || this.K > this.N) {
+      this.errorMessage = "成功项数K必须在0到N之间"
+      return
+    }
+    
+    if (this.n < 0 || this.n > this.N) {
+      this.errorMessage = "抽取数量n必须在0到N之间"
+      return
+    }
+    
+    const kMin = Math.max(0, this.n - (this.N - this.K))
+    const kMax = Math.min(this.n, this.K)
+    
+    if (this.k < kMin || this.k > kMax) {
+      this.errorMessage = `成功次数k必须在${kMin}到${kMax}之间`
+      return
+    }
+
+    // Use optimized C calculation
+    const result = NativeBridge.calculateHypergeometric(this.N, this.K, this.n, this.k)
+    
+    if (result.success) {
+      router.push({
+        uri: 'pages/detail_discrete',
+        params: {
+          distributionName: '超几何分布',
+          pmfValue: result.pdfResult.toFixed(6),
+          cdfValue: result.cdfResult.toFixed(6),
+          inputParams: [
+            { key: '总体数量 N', value: this.N },
+            { key: '成功总数 K', value: this.K },
+            { key: '抽取数量 n', value: this.n },
+            { key: '计算值 k', value: this.k }
+          ]
+        }
+      })
+      this.hasResult = true
+      this.errorMessage = ""
+    } else {
+      this.errorMessage = result.errorMessage || "计算失败"
+      this.hasResult = false
+    }
+  }
+}
+</script>
+
+<style>
+.container {
+  flex-direction: column;
+  background-color: #000000;
+  height: 100%;
+}
+
+.top-bar {
+  height: 60px;
+  background-color: #111111;
+  flex-direction: row;
+  align-items: center;
+  padding: 0 20px;
+  border-bottom: 1px solid #333333;
+  justify-content: center;
+}
+
+.title {
+  font-size: 20px;
+  color: #ffffff;
+  font-weight: bold;
+}
+
+.bottom-section {
+  padding: 0px 20px 50px 20px;
+}
+
+.back-btn {
+  height: 45px;
+  width: 100%;
+  background-color: #333333;
+  border-radius: 10px;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid #555555;
+}
+
+.back-text {
+  font-size: 18px;
+  color: #ffffff;
+  font-weight: bold;
+}
+
+.content {
+  flex: 1;
+  flex-direction: column;
+  padding: 20px 15px;
+}
+
+.param-section {
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
+.param-item {
+  height: 65px;
+  background-color: #1a1a1a;
+  border-radius: 8px;
+  padding: 0 15px;
+  margin-bottom: 10px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid #333333;
+}
+
+.param-label {
+  font-size: 18px;
+  color: #ffffff;
+  font-weight: 500;
+}
+
+.param-input {
+  width: 65px;
+  height: 35px;
+  background-color: #333333;
+  border: 1px solid #555555;
+  border-radius: 6px;
+  color: #ffffff;
+  text-align: center;
+  font-size: 18px;
+  padding: 0 5px;
+}
+
+.calc-section {
+  margin-bottom: 0px;
+}
+
+.calc-btn {
+  height: 45px;
+  width: 100%;
+  background-color: #0066cc;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  justify-content: center;
+  align-items: center;
+}
+
+.calc-text {
+  font-size: 18px;
+  color: #ffffff;
+  font-weight: bold;
+}
+
+
+
+.error-message {
+  margin-bottom: 15px;
+  padding: 10px;
+  background-color: #2d1f1f;
+  border: 1px solid #cc4444;
+  border-radius: 8px;
+}
+
+.error-text {
+  font-size: 12px;
+  color: #ff6666;
+  text-align: center;
+}
+</style>

@@ -8,115 +8,14 @@
 
     <!-- 主内容区域 -->
     <div class="content">
-      <!-- 应用信息 -->
-      <div class="app-info-card">
-        <div class="app-logo">
-          <text class="logo-text">📊</text>
-        </div>
-        <text class="app-name">统计分布计算器</text>
-        <text class="app-version">版本 1.0.0</text>
-        <text class="app-description">专业的统计分布计算工具，支持多种离散和连续分布的概率计算</text>
-      </div>
-
-      <!-- 功能特点 -->
-      <div class="features-section">
-        <text class="section-title">功能特点</text>
-        <div class="features-list">
-          <div class="feature-item">
-            <text class="feature-icon">🔢</text>
-            <div class="feature-content">
-              <text class="feature-title">支持10种分布</text>
-              <text class="feature-desc">5种离散分布和5种连续分布</text>
-            </div>
-          </div>
-          <div class="feature-item">
-            <text class="feature-icon">📊</text>
-            <div class="feature-content">
-              <text class="feature-title">实时计算</text>
-              <text class="feature-desc">即时计算PDF/PMF和CDF值</text>
-            </div>
-          </div>
-          <div class="feature-item">
-            <text class="feature-icon">📝</text>
-            <div class="feature-content">
-              <text class="feature-title">计算历史</text>
-              <text class="feature-desc">保存和查看过往计算记录</text>
-            </div>
-          </div>
-          <div class="feature-item">
-            <text class="feature-icon">⚡</text>
-            <div class="feature-content">
-              <text class="feature-title">快速计算</text>
-              <text class="feature-desc">便捷的快速计算模式</text>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 支持的分布 -->
-      <div class="distributions-section">
-        <text class="section-title">支持的分布</text>
-        <div class="distribution-categories">
-          <div class="category-block">
-            <text class="category-title">离散分布</text>
-            <div class="distribution-items">
-              <text class="dist-item">• 二项分布 (Binomial)</text>
-              <text class="dist-item">• 泊松分布 (Poisson)</text>
-              <text class="dist-item">• 几何分布 (Geometric)</text>
-              <text class="dist-item">• 负二项分布 (Negative Binomial)</text>
-              <text class="dist-item">• 超几何分布 (Hypergeometric)</text>
-            </div>
-          </div>
-          <div class="category-block">
-            <text class="category-title">连续分布</text>
-            <div class="distribution-items">
-              <text class="dist-item">• 正态分布 (Normal)</text>
-              <text class="dist-item">• 指数分布 (Exponential)</text>
-              <text class="dist-item">• 均匀分布 (Uniform)</text>
-              <text class="dist-item">• 伽马分布 (Gamma)</text>
-              <text class="dist-item">• 贝塔分布 (Beta)</text>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 使用说明 -->
-      <div class="usage-section">
-        <text class="section-title">使用说明</text>
-        <div class="usage-steps">
-          <div class="step-item">
-            <text class="step-number">1</text>
-            <text class="step-text">选择分布类别（离散/连续）</text>
-          </div>
-          <div class="step-item">
-            <text class="step-number">2</text>
-            <text class="step-text">选择具体分布类型</text>
-          </div>
-          <div class="step-item">
-            <text class="step-number">3</text>
-            <text class="step-text">设置分布参数</text>
-          </div>
-          <div class="step-item-last">
-            <text class="step-number">4</text>
-            <text class="step-text">输入计算值并获取结果</text>
-          </div>
-        </div>
-      </div>
-
-      <!-- 联系信息 -->
-      <div class="contact-section">
-        <text class="section-title">联系我们</text>
-        <div class="contact-info">
-          <text class="contact-text">如有问题或建议，请发送邮件至:</text>
-          <text class="contact-email">stats.calculator@example.com</text>
-        </div>
-      </div>
-
-      <!-- 版权信息 -->
-      <div class="footer">
-        <text class="copyright">© 2024 统计分布计算器</text>
-        <text class="build-info">版本 1.0.0 | 构建时间 2024-08-10</text>
-      </div>
+      <text class="developer-label">Developer:</text>
+      <text class="developer-name">@goge</text>
+      
+      <text class="version-label">Version:</text>
+      <text class="version-number">1.0</text>
+      
+      <text class="date-label">Date:</text>
+      <text class="date-text">2025.08</text>
     </div>
   </div>
 </template>
@@ -151,7 +50,7 @@ export default {
   background-color: #111111;
   flex-direction: row;
   align-items: center;
-  padding: 0 20px;
+  padding: 0 15px;
   border-bottom: 1px solid #333333;
 }
 
@@ -165,211 +64,37 @@ export default {
   font-size: 20px;
   color: #ffffff;
   font-weight: bold;
-  margin-left: 20px;
+  margin-left: 10px;
 }
 
 .content {
   flex: 1;
   flex-direction: column;
-  padding: 20px;
-}
-
-.app-info-card {
-  background-color: #222222;
-  border: 1px solid #444444;
-  border-radius: 15px;
-  padding: 30px;
-  margin-bottom: 25px;
-  flex-direction: column;
-  align-items: center;
-}
-
-.app-logo {
-  width: 80px;
-  height: 80px;
-  background-color: #0066cc;
-  border-radius: 20px;
+  padding: 40px;
   justify-content: center;
   align-items: center;
-  margin-bottom: 15px;
 }
 
-.logo-text {
-  font-size: 40px;
+.developer-label,
+.version-label,
+.date-label {
+  font-size: 16px;
+  color: #cccccc;
+  margin-bottom: 8px;
+  margin-top: 20px;
 }
 
-.app-name {
-  font-size: 22px;
+.developer-label {
+  margin-top: 0;
+}
+
+.developer-name,
+.version-number,
+.date-text {
+  font-size: 20px;
   color: #ffffff;
   font-weight: bold;
-  margin-bottom: 5px;
-}
-
-.app-version {
-  font-size: 14px;
-  color: #cccccc;
   margin-bottom: 15px;
-}
-
-.app-description {
-  font-size: 14px;
-  color: #aaaaaa;
   text-align: center;
-  line-height: 20px;
-}
-
-.features-section,
-.distributions-section,
-.usage-section,
-.contact-section {
-  margin-bottom: 25px;
-}
-
-.section-title {
-  font-size: 18px;
-  color: #ffffff;
-  font-weight: bold;
-  margin-bottom: 15px;
-}
-
-.features-list {
-  flex-direction: column;
-}
-
-.feature-item {
-  height: 60px;
-  background-color: #222222;
-  border: 1px solid #444444;
-  border-radius: 10px;
-  padding: 10px 15px;
-  margin-bottom: 10px;
-  flex-direction: row;
-  align-items: center;
-}
-
-.feature-icon {
-  font-size: 24px;
-  margin-right: 15px;
-}
-
-.feature-content {
-  flex-direction: column;
-}
-
-.feature-title {
-  font-size: 16px;
-  color: #ffffff;
-  font-weight: bold;
-}
-
-.feature-desc {
-  font-size: 12px;
-  color: #cccccc;
-}
-
-.distribution-categories {
-  flex-direction: column;
-}
-
-.category-block {
-  background-color: #222222;
-  border: 1px solid #444444;
-  border-radius: 12px;
-  padding: 20px;
-  margin-bottom: 15px;
-}
-
-.category-title {
-  font-size: 16px;
-  color: #ffffff;
-  font-weight: bold;
-  margin-bottom: 10px;
-}
-
-.distribution-items {
-  flex-direction: column;
-}
-
-.dist-item {
-  font-size: 14px;
-  color: #cccccc;
-  margin-bottom: 5px;
-}
-
-.usage-steps {
-  background-color: #222222;
-  border: 1px solid #444444;
-  border-radius: 12px;
-  padding: 20px;
-}
-
-.step-item {
-  height: 40px;
-  flex-direction: row;
-  align-items: center;
-  margin-bottom: 10px;
-}
-
-.step-item-last {
-  height: 40px;
-  flex-direction: row;
-  align-items: center;
-}
-
-.step-number {
-  width: 25px;
-  height: 25px;
-  background-color: #0066cc;
-  border-radius: 50%;
-  justify-content: center;
-  align-items: center;
-  font-size: 14px;
-  color: #ffffff;
-  font-weight: bold;
-  margin-right: 15px;
-}
-
-.step-text {
-  font-size: 14px;
-  color: #cccccc;
-}
-
-.contact-info {
-  background-color: #222222;
-  border: 1px solid #444444;
-  border-radius: 12px;
-  padding: 20px;
-  flex-direction: column;
-  align-items: center;
-}
-
-.contact-text {
-  font-size: 14px;
-  color: #cccccc;
-  margin-bottom: 10px;
-}
-
-.contact-email {
-  font-size: 14px;
-  color: #0088ff;
-  font-weight: bold;
-}
-
-.footer {
-  flex-direction: column;
-  align-items: center;
-  padding: 20px 0;
-  border-top: 1px solid #333333;
-}
-
-.copyright {
-  font-size: 14px;
-  color: #666666;
-  margin-bottom: 5px;
-}
-
-.build-info {
-  font-size: 12px;
-  color: #888888;
 }
 </style>

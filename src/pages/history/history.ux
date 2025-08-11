@@ -154,7 +154,7 @@ export default {
     const item = this.history[index]
     // 将参数传递到计算器页面
     router.push({
-      uri: '/pages/calculator/calculator',
+      uri: 'pages/calculator',
       params: {
         category: item.category,
         distribution: item.distributionType,

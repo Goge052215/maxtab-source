@@ -11,6 +11,15 @@
   "features": [
     {
       "name": "system.router"
+    },
+    {
+      "name": "system.app"
+    },
+    {
+      "name": "system.vibrator"
+    },
+    {
+      "name": "system.device"
     }
   ],
   "config": {
@@ -23,8 +32,56 @@
       "pages/index": {
         "component": "index"
       },
-      "pages/detail": {
-        "component": "detail"
+      "pages/discrete": {
+        "component": "discrete"
+      },
+      "pages/continuous": {
+        "component": "continuous"
+      },
+      "pages/detail_discrete": {
+        "component": "detail_discrete"
+      },
+      "pages/detail_continuous": {
+        "component": "detail_continuous"
+      },
+      "pages/calculator": {
+        "component": "calculator"
+      },
+      "pages/history": {
+        "component": "history"
+      },
+      "pages/about": {
+        "component": "about"
+      },
+      "pages/distributions/binomial": {
+        "component": "binomial"
+      },
+      "pages/distributions/poisson": {
+        "component": "poisson"
+      },
+      "pages/distributions/geometric": {
+        "component": "geometric"
+      },
+      "pages/distributions/negative_binomial": {
+        "component": "negative_binomial"
+      },
+      "pages/distributions/hypergeometric": {
+        "component": "hypergeometric"
+      },
+      "pages/distributions/normal": {
+        "component": "normal"
+      },
+      "pages/distributions/exponential": {
+        "component": "exponential"
+      },
+      "pages/distributions/uniform": {
+        "component": "uniform"
+      },
+      "pages/distributions/gamma": {
+        "component": "gamma"
+      },
+      "pages/distributions/beta": {
+        "component": "beta"
       }
     }
   }

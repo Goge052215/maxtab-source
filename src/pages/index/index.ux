@@ -4,45 +4,40 @@
       <text class="app-title">统计分布计算器</text>
     </div>
 
-    <list class="main-menu">
-      <list-item type="menu-entry" class="menu-list-item" onclick="routeToDiscrete()">
+    <div class="main-menu">
+      <div class="menu-list-item menu-entry" onclick="routeToDiscrete()">
         <div class="menu-item">
           <text class="menu-title">离散分布</text>
-          <text class="menu-desc">二项分布、泊松分布、几何分布等</text>
         </div>
-      </list-item>
+      </div>
       
-      <list-item type="menu-entry" class="menu-list-item" onclick="routeToContinuous()">
+      <div class="menu-list-item menu-entry" onclick="routeToContinuous()">
         <div class="menu-item">
           <text class="menu-title">连续分布</text>
-          <text class="menu-desc">正态分布、指数分布、t分布等</text>
         </div>
-      </list-item>
-      
-      <list-item type="menu-entry" class="menu-list-item" onclick="routeToCalculator()">
+      </div>
+
+      <div class="menu-list-item menu-entry" onclick="routeToSimple()">
         <div class="menu-item">
-          <text class="menu-title">快速计算</text>
-          <text class="menu-desc">直接开始计算概率</text>
+          <text class="menu-title">简单计算</text>
         </div>
-      </list-item>
+      </div>
       
-      <list-item type="menu-entry" class="menu-list-item" onclick="routeToHistory()">
+      <div class="menu-list-item menu-entry" onclick="routeToHistory()">
         <div class="menu-item">
           <text class="menu-title">计算历史</text>
-          <text class="menu-desc">查看过往计算记录</text>
         </div>
-      </list-item>
+      </div>
       
-      <list-item type="menu-entry" class="menu-list-item" onclick="routeToAbout()">
+      <div class="menu-list-item menu-entry" onclick="routeToAbout()">
         <div class="menu-item">
           <text class="menu-title">关于</text>
-          <text class="menu-desc">应用信息和帮助</text>
         </div>
-      </list-item>
-    </list>
+      </div>
+    </div>
 
     <div class="footer">
-      <text class="footer-text">统计分布计算器 v1.0</text>
+      <text class="footer-text">v1.0</text>
     </div>
   </div>
 </template>
@@ -60,35 +55,37 @@ export default {
   },
 
   routeToDiscrete() {
-    router.push({ uri: '/pages/discrete/discrete' })
+    router.push({ uri: 'pages/discrete' })
   },
 
   routeToContinuous() {
-    router.push({ uri: '/pages/continuous/continuous' })
+    router.push({ uri: 'pages/continuous' })
   },
 
-  routeToCalculator() {
-    router.push({ uri: '/pages/calculator/calculator' })
+  routeToSimple() {
+    router.push({ uri: 'pages/calculator' })
   },
 
   routeToHistory() {
-    router.push({ uri: '/pages/history/history' })
+    router.push({ uri: 'pages/history' })
   },
 
   routeToAbout() {
-    router.push({ uri: '/pages/about/about' })
+    router.push({ uri: 'pages/about' })
   }
 }
 </script>
 
 <style>
 .container {
+  display: flex;
   flex-direction: column;
   background-color: #000000;
   height: 100%;
 }
 
 .top-bar {
+  display: flex;
   height: 80px;
   background-color: #111111;
   padding: 15px 20px;
@@ -98,12 +95,13 @@ export default {
 }
 
 .app-title {
-  font-size: 22px;
+  font-size: 20px;
   color: #ffffff;
   font-weight: bold;
 }
 
 .main-menu {
+  display: flex;
   flex: 1;
   padding: 20px;
   flex-direction: column;
@@ -111,34 +109,36 @@ export default {
 
 /* Added style for the new list-item wrapper */
 .menu-list-item {
-  margin-bottom: 18px; /* Increased spacing */
+  margin-bottom: 12px; /* Reduced spacing to fit better */
+}
+
+.menu-entry {
+  cursor: pointer;
 }
 
 /* Enhanced menu items */
 .menu-item {
-  height: 100px; /* Further increased height */
+  display: flex;
+  height: 60px; /* Reduced height since no description */
+  width: 100%; /* Ensure consistent width */
   background-color: #222222;
   border: 1px solid #444444;
-  border-radius: 15px; /* More rounded corners */
-  padding: 25px 30px; /* Increased padding */
+  border-radius: 12px; /* Slightly reduced border radius */
+  padding: 15px 20px; /* Adjusted padding for centered text */
   flex-direction: column;
   justify-content: center;
+  align-items: center; /* Center text horizontally */
 }
 
 .menu-title {
-  font-size: 20px; /* Larger title */
+  font-size: 18px; /* Adjusted title size for new button height */
   color: #ffffff;
   font-weight: bold;
-  margin-bottom: 8px;
-}
-
-.menu-desc {
-  font-size: 15px; /* Slightly larger description */
-  color: #cccccc;
-  opacity: 0.8;
+  text-align: center; /* Center the text */
 }
 
 .footer {
+  display: flex;
   height: 40px;
   background-color: #111111;
   border-top: 1px solid #333333;
@@ -147,7 +147,7 @@ export default {
 }
 
 .footer-text {
-  font-size: 12px;
+  font-size: 14px;
   color: #666666;
 }
 </style>

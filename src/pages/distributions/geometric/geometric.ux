@@ -1,0 +1,212 @@
+<template>
+  <div class="container">
+    <div class="top-bar">
+      <text class="title">几何分布</text>
+    </div>
+
+    <div class="content">
+      <div class="param-section">
+        <div class="param-item">
+          <text class="param-label">成功概率 p</text>
+          <input class="param-input" type="number" @change="updateP" value="{{ p }}" />
+        </div>
+        
+        <div class="param-item">
+          <text class="param-label">试验次数 k</text>
+          <input class="param-input" type="number" @change="updateK" value="{{ k }}" />
+        </div>
+      </div>
+
+      <div class="calc-section">
+        <div class="calc-btn" onclick="calculate">
+          <text class="calc-text">计算</text>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="bottom-section">
+      <div class="back-btn" onclick="goBack">
+        <text class="back-text">返回</text>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import router from "@system.router"
+import { NativeBridge } from "../../../common/native_bridge"
+
+export default {
+  private: {
+    p: 0.3,
+    k: 3,
+    pmf: "-",
+    cdf: "-",
+    hasResult: false,
+    errorMessage: ""
+  },
+
+  onInit() {
+    this.$page.setTitleBar({ text: '几何分布' })
+  },
+
+  goBack() {
+    router.back()
+  },
+
+  updateP(e) {
+    this.p = parseFloat(e.value) || 0.3
+    this.hasResult = false
+    this.errorMessage = ""
+  },
+
+  updateK(e) {
+    this.k = parseInt(e.value) || 1
+    this.hasResult = false
+    this.errorMessage = ""
+  },
+
+  calculate() {
+    // Validate input parameters
+    if (this.p < 0 || this.p > 1) {
+      this.errorMessage = "成功概率必须在0-1之间"
+      return
+    }
+    
+    if (this.k < 1) {
+      this.errorMessage = "试验次数k必须大于等于1"
+      return
+    }
+
+    // Use optimized C calculation
+    const result = NativeBridge.calculateGeometric(this.p, this.k)
+    
+    if (result.success) {
+      router.push({
+        uri: 'pages/detail_discrete',
+        params: {
+          distributionName: '几何分布',
+          pmfValue: result.pdfResult.toFixed(6),
+          cdfValue: result.cdfResult.toFixed(6),
+          inputParams: [
+            { key: '成功概率 p', value: this.p },
+            { key: '计算值 k', value: this.k }
+          ]
+        }
+      })
+      this.hasResult = true
+      this.errorMessage = ""
+    } else {
+      this.errorMessage = result.errorMessage || "计算失败"
+      this.hasResult = false
+    }
+  }
+}
+</script>
+
+<style>
+.container {
+  flex-direction: column;
+  background-color: #000000;
+  height: 100%;
+}
+
+.top-bar {
+  height: 60px;
+  background-color: #111111;
+  flex-direction: row;
+  align-items: center;
+  padding: 0 20px;
+  border-bottom: 1px solid #333333;
+  justify-content: center;
+}
+
+.title {
+  font-size: 20px;
+  color: #ffffff;
+  font-weight: bold;
+}
+
+.bottom-section {
+  padding: 0px 20px 50px 20px;
+}
+.back-btn {
+  height: 45px;
+  width: 100%;
+  background-color: #333333;
+  border-radius: 10px;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid #555555;
+}
+
+.back-text {
+  font-size: 18px;
+  color: #ffffff;
+  font-weight: bold;
+}
+
+.content {
+  flex: 1;
+  flex-direction: column;
+  padding: 20px 15px;
+}
+
+.param-section {
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
+.param-item {
+  height: 70px;
+  background-color: #1a1a1a;
+  border-radius: 8px;
+  padding: 0 15px;
+  margin-bottom: 15px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid #333333;
+}
+
+.param-label {
+  font-size: 18px;
+  color: #ffffff;
+  font-weight: 500;
+}
+
+.param-input {
+  width: 65px;
+  height: 35px;
+  background-color: #333333;
+  border: 1px solid #555555;
+  border-radius: 6px;
+  color: #ffffff;
+  text-align: center;
+  font-size: 18px;
+  padding: 0 5px;
+}
+
+.calc-section {
+  margin-bottom: 0px;
+}
+
+.calc-btn {
+  height: 50px;
+  width: 100%;
+  background-color: #0066cc;
+  border-radius: 10px;
+  margin-bottom: 10px;
+  justify-content: center;
+  align-items: center;
+}
+
+.calc-text {
+  font-size: 18px;
+  color: #ffffff;
+  font-weight: bold;
+}
+
+
+</style>

@@ -1,68 +1,42 @@
 <template>
   <div class="container">
     <div class="top-bar">
-      <text class="back-button" onclick="goBack">返回</text>
       <text class="page-title">离散分布</text>
     </div>
 
-    <div class="content">
-      <div class="section">
-        <text class="section-title">选择离散分布</text>
-        <div class="distribution-list">
-          <div class="distribution-item" onclick="selectDistribution('binomial')">
-            <text class="distribution-name">二项分布</text>
-            <text class="distribution-desc">Binomial(n, p)</text>
-          </div>
-          <div class="distribution-item" onclick="selectDistribution('poisson')">
-            <text class="distribution-name">泊松分布</text>
-            <text class="distribution-desc">Poisson(λ)</text>
-          </div>
-          <div class="distribution-item" onclick="selectDistribution('geometric')">
-            <text class="distribution-name">几何分布</text>
-            <text class="distribution-desc">Geometric(p)</text>
-          </div>
-          <div class="distribution-item" onclick="selectDistribution('negative_binomial')">
-            <text class="distribution-name">负二项分布</text>
-            <text class="distribution-desc">NegBinomial(r, p)</text>
-          </div>
-          <div class="distribution-item" onclick="selectDistribution('hypergeometric')">
-            <text class="distribution-name">超几何分布</text>
-            <text class="distribution-desc">HyperGeo(N, K, n)</text>
-          </div>
+    <div class="main-menu">
+      <div class="menu-list-item menu-entry" onclick="routeToBin()">
+        <div class="menu-item">
+          <text class="menu-title">二项分布</text>
+        </div>
+      </div>
+      
+      <div class="menu-list-item menu-entry" onclick="routeToPoisson()">
+        <div class="menu-item">
+          <text class="menu-title">泊松分布</text>
+        </div>
+      </div>
+      
+      <div class="menu-list-item menu-entry" onclick="routeToGeometric()">
+        <div class="menu-item">
+          <text class="menu-title">几何分布</text>
+        </div>
+      </div>
+      
+      <div class="menu-list-item menu-entry" onclick="routeToNegativeBinomial()">
+        <div class="menu-item">
+          <text class="menu-title">负二项分布</text>
+        </div>
+      </div>
+      
+      <div class="menu-list-item menu-entry" onclick="routeToHypergeometric()">
+        <div class="menu-item">
+          <text class="menu-title">超几何分布</text>
         </div>
       </div>
 
-      <div class="section" if="selectedDistribution">
-        <text class="section-title">参数设置</text>
-        <div class="parameter-inputs">
-          <div class="parameter-item" for="{{ param in parameters }}">
-            <text class="param-label">{{ param.label }}:</text>
-            <input class="param-input" type="number" onchange="updateParameter($idx, $event)" value="{{ param.value }}" />
-          </div>
-        </div>
-      </div>
-
-      <div class="section" if="parametersComplete">
-        <text class="section-title">计算结果</text>
-        <div class="calculation-results">
-          <div class="input-section">
-            <text class="input-label">输入值 (x):</text>
-            <input class="input-value" type="number" onchange="updateInputValue(this.value)" value="{{ inputValue }}" />
-          </div>
-          <div class="results">
-            <div class="result-item">
-              <text class="result-label">概率质量函数:</text>
-              <text class="result-value">{{ pmfResult }}</text>
-            </div>
-            <div class="result-item">
-              <text class="result-label">累积分布函数:</text>
-              <text class="result-value">{{ cdfResult }}</text>
-            </div>
-          </div>
-          <div class="calculate-button" onclick="calculate">
-            <text class="calculate-button-text">计算</text>
-          </div>
-        </div>
+      <div class="back-button-container">
+        <text class="back-button" @click="goBack">返回</text>
       </div>
     </div>
   </div>
@@ -73,12 +47,7 @@ import router from "@system.router"
 
 export default {
   private: {
-    selectedDistribution: null,
-    parameters: [],
-    inputValue: 0,
-    pmfResult: "-",
-    cdfResult: "-",
-    parametersComplete: false
+    
   },
 
   onInit() {
@@ -89,69 +58,24 @@ export default {
     router.back()
   },
 
-  selectDistribution(type) {
-    this.selectedDistribution = type
-    this.setupParameters(type)
+  routeToBin() {
+    router.push({ uri: 'pages/distributions/binomial' })
   },
 
-  setupParameters(type) {
-    switch(type) {
-      case 'binomial':
-        this.parameters = [
-          { label: '试验次数 n', value: 10, min: 1, max: 1000 },
-          { label: '成功概率 p', value: 0.5, min: 0, max: 1 }
-        ]
-        break
-      case 'poisson':
-        this.parameters = [
-          { label: '参数 λ', value: 3.0, min: 0.1, max: 100 }
-        ]
-        break
-      case 'geometric':
-        this.parameters = [
-          { label: '成功概率 p', value: 0.3, min: 0.01, max: 1 }
-        ]
-        break
-      case 'negative_binomial':
-        this.parameters = [
-          { label: '成功次数 r', value: 5, min: 1, max: 100 },
-          { label: '成功概率 p', value: 0.5, min: 0.01, max: 1 }
-        ]
-        break
-      case 'hypergeometric':
-        this.parameters = [
-          { label: '总体大小 N', value: 50, min: 1, max: 10000 },
-          { label: '成功项数 K', value: 20, min: 1, max: 50 },
-          { label: '抽取数量 n', value: 10, min: 1, max: 50 }
-        ]
-        break
-    }
-    this.parametersComplete = false
+  routeToPoisson() {
+    router.push({ uri: 'pages/distributions/poisson' })
   },
 
-  // FIX: Modified function to accept the event object and extract the value from it
-  updateParameter(index, event) {
-    this.parameters[index].value = parseFloat(event.value)
-    this.checkParametersComplete()
+  routeToGeometric() {
+    router.push({ uri: 'pages/distributions/geometric' })
   },
 
-  checkParametersComplete() {
-    this.parametersComplete = this.parameters.every(param => 
-      param.value >= param.min && param.value <= param.max
-    )
+  routeToNegativeBinomial() {
+    router.push({ uri: 'pages/distributions/negative_binomial' })
   },
 
-  updateInputValue(value) {
-    this.inputValue = parseInt(value) || 0
-  },
-
-  calculate() {
-    if (!this.parametersComplete) return
-    
-    // 这里应该调用实际的计算函数
-    // 暂时使用模拟结果
-    this.pmfResult = (Math.random() * 0.3).toFixed(4)
-    this.cdfResult = (Math.random() * 0.8).toFixed(4)
+  routeToHypergeometric() {
+    router.push({ uri: 'pages/distributions/hypergeometric' })
   }
 }
 </script>
@@ -164,176 +88,76 @@ export default {
 }
 
 .top-bar {
-  height: 70px;
+  height: 60px;
   background-color: #111111;
   flex-direction: row;
   align-items: center;
-  padding: 0 20px;
+  justify-content: center;
+  padding: 0 15px;
   border-bottom: 1px solid #333333;
-}
-
-.back-button {
-  font-size: 16px;
-  color: #ffffff;
-  padding: 10px 15px;
 }
 
 .page-title {
   font-size: 20px;
   color: #ffffff;
   font-weight: bold;
-  margin-left: 20px;
 }
 
-.content {
-  flex: 1;
-  flex-direction: column;
-  padding: 20px;
+.back-button-container {
+  margin-top: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-.section {
-  margin-bottom: 30px;
-}
-
-.section-title {
+.back-button {
+  width: 60%;
+  height: 45px;
   font-size: 18px;
   color: #ffffff;
-  font-weight: bold;
-  margin-bottom: 15px;
-}
-
-.distribution-list {
-  flex-direction: column;
-}
-
-.distribution-item {
-  height: 60px;
-  background-color: #222222;
-  border: 1px solid #444444;
-  border-radius: 10px;
-  padding: 10px 15px;
-  margin-bottom: 10px;
-  flex-direction: column;
-  justify-content: center;
-}
-
-.distribution-name {
-  font-size: 16px;
-  color: #ffffff;
-  font-weight: bold;
-}
-
-.distribution-desc {
-  font-size: 12px;
-  color: #cccccc;
-  margin-top: 2px;
-}
-
-.parameter-inputs {
-  flex-direction: column;
-}
-
-.parameter-item {
-  height: 50px;
-  background-color: #222222;
-  border: 1px solid #444444;
-  border-radius: 8px;
-  padding: 0 15px;
-  margin-bottom: 10px;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.param-label {
-  font-size: 14px;
-  color: #ffffff;
-}
-
-.param-input {
-  width: 100px;
-  height: 30px;
   background-color: #333333;
   border: 1px solid #555555;
-  border-radius: 4px;
-  color: #ffffff;
+  border-radius: 8px;
+  padding: 12px 24px;
   text-align: center;
-  font-size: 14px;
+  cursor: pointer;
 }
 
-.calculation-results {
+.main-menu {
+  display: flex;
+  flex: 1;
+  padding: 20px;
   flex-direction: column;
 }
 
-.input-section {
-  height: 50px;
+/* Added style for the new list-item wrapper */
+.menu-list-item {
+  margin-bottom: 10px; /* Reduced spacing to fit better */
+}
+
+.menu-entry {
+  cursor: pointer;
+}
+
+/* Enhanced menu items */
+.menu-item {
+  display: flex;
+  height: 60px; /* Reduced height since no description */
+  width: 100%; /* Ensure consistent width */
   background-color: #222222;
   border: 1px solid #444444;
-  border-radius: 8px;
-  padding: 0 15px;
-  margin-bottom: 15px;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.input-label {
-  font-size: 14px;
-  color: #ffffff;
-}
-
-.input-value {
-  width: 80px;
-  height: 30px;
-  background-color: #333333;
-  border: 1px solid #555555;
-  border-radius: 4px;
-  color: #ffffff;
-  text-align: center;
-  font-size: 14px;
-}
-
-.results {
+  border-radius: 12px; /* Slightly reduced border radius */
+  padding: 15px 20px; /* Adjusted padding for centered text */
   flex-direction: column;
-}
-
-.result-item {
-  height: 40px;
-  background-color: #222222;
-  border: 1px solid #444444;
-  border-radius: 8px;
-  padding: 0 15px;
-  margin-bottom: 10px;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.result-label {
-  font-size: 14px;
-  color: #ffffff;
-}
-
-.result-value {
-  font-size: 14px;
-  color: #00ff00;
-  font-weight: bold;
-}
-
-.calculate-button {
-  height: 50px;
-  background-color: #0066cc;
-  border: none;
-  border-radius: 10px;
-  margin-top: 20px;
   justify-content: center;
-  align-items: center;
+  align-items: center; /* Center text horizontally */
 }
 
-/* FIX: Replaced descendant selector with a class selector */
-.calculate-button-text {
-  font-size: 16px;
+.menu-title {
+  font-size: 18px; /* Adjusted title size for new button height */
   color: #ffffff;
   font-weight: bold;
+  text-align: center; /* Center the text */
 }
+
 </style>

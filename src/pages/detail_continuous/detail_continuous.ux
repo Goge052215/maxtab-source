@@ -1,0 +1,108 @@
+<template>
+  <div class="container">
+    <div class="top-bar">
+      <text class="title">{{ distributionName }}</text>
+    </div>
+
+    <div class="content">
+      <div class="result-display">
+        <text class="pdf-result">PDF: {{ pdfValue }}</text>
+        <text class="cdf-result">CDF: {{ cdfValue }}</text>
+      </div>
+    </div>
+
+    <div class="bottom-section">
+      <div class="back-btn" onclick="goBack">
+        <text class="back-text">返回</text>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import router from "@system.router"
+
+export default {
+  private: {
+    distribution_name: "计算结果",
+    pdf: "-",
+    cdf: "-",
+    params: []
+  },
+
+  onInit() {
+    this.$page.setTitleBar({ text: this.distributionName || "计算结果" })
+  },
+
+  goBack() {
+    router.back()
+  }
+}
+</script>
+
+<style>
+.container {
+  flex-direction: column;
+  background-color: #000000;
+  height: 100%;
+}
+
+.top-bar {
+  height: 60px;
+  background-color: #111111;
+  flex-direction: row;
+  align-items: center;
+  padding: 0 20px;
+  border-bottom: 1px solid #333333;
+  justify-content: center;
+}
+
+.title {
+  font-size: 20px;
+  color: #ffffff;
+  font-weight: bold;
+}
+
+.bottom-section {
+  padding: 0px 20px 50px 20px;
+}
+
+.back-btn {
+  height: 45px;
+  width: 100%;
+  background-color: #333333;
+  border-radius: 10px;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid #555555;
+}
+
+.back-text {
+  font-size: 18px;
+  color: #ffffff;
+  font-weight: bold;
+}
+
+.content {
+  flex: 1;
+  flex-direction: column;
+  padding: 30px 15px;
+  justify-content: center;
+  align-items: center;
+}
+
+.result-display {
+  flex-direction: column;
+  align-items: center;
+}
+
+.pdf-result,
+.cdf-result {
+  font-size: 25px;
+  color: #00ff88;
+  font-family: monospace;
+  font-weight: bold;
+  margin-bottom: 20px;
+  text-align: center;
+}
+</style>
