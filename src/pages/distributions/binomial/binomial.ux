@@ -9,28 +9,28 @@
     <div class="content">
       <div class="param-section">
         <div class="param-item" @click="selectInput('n')">
-          <text class="param-label">试验次数 n</text>
+          <text class="param-label">试验次数n</text>
           <div class="param-display">
             <text class="param-value">{{ n }}</text>
           </div>
         </div>
         
         <div class="param-item" @click="selectInput('p')">
-          <text class="param-label">成功概率 p</text>
+          <text class="param-label">成功概率p</text>
           <div class="param-display">
             <text class="param-value">{{ p }}</text>
           </div>
         </div>
         
         <div class="param-item" @click="selectInput('k')">
-          <text class="param-label">计算值 k</text>
+          <text class="param-label">计算值k</text>
           <div class="param-display">
             <text class="param-value">{{ k }}</text>
           </div>
         </div>
       </div>
 
-      <div class="calc-section">
+      <div class="calc-section" if="{{ !showKeyboard }}">
         <div class="calc-btn" onclick="calculate">
           <text class="calc-text">计算</text>
         </div>
@@ -40,38 +40,27 @@
         <text class="error-text">{{ errorMessage }}</text>
       </div>
 
-      <!-- Input Status Display -->
-      <div class="input-status" if="{{ showKeyboard }}">
-        <text class="status-text">正在输入: {{ currentParamName }}</text>
-        <text class="status-value">当前值: {{ inputBuffer }}</text>
-      </div>
-
-      <!-- Keyboard Backdrop -->
-      <div class="keyboard-backdrop" if="{{ showKeyboard }}" onclick="onVisibilityChange({detail: {visible: false}})"></div>
-
       <!-- VelaOS Input Method Container -->
-      <div class="keyboard-container" if="{{ showKeyboard }}">
-        <input-method 
-          hide="{{ !showKeyboard }}"
-          keyboardtype="numbers"
+      <div class="keyboard-page" style="flex-direction: column;" if="{{ showKeyboard }}">
+        <input-method
+          hide="{{!showKeyboard}}"
+          keyboardtype="NUMERIC"
           maxlength="10"
-          vibratemode="short"
-          screentype="circle"
+          vibratemode="{{vibratemode}}"
+          screentype="{{screentype}}"
           @visibility-change="onVisibilityChange"
           @key-down="onKeyDown"
           @delete="onDelete"
-          @complete="onComplete">
-        </input-method>
+          @complete="onComplete"
+        ></input-method>
       </div>
     </div>
 
-    <div class="bottom-section">
+    <div class="bottom-section" if="{{ !showKeyboard }}">
       <div class="back-btn" onclick="goBack">
         <text class="back-text">返回</text>
       </div>
     </div>
-
-
   </div>
 </template>
 
@@ -92,7 +81,11 @@ export default {
     showKeyboard: false,
     currentParam: '',
     currentParamName: '',
-    inputBuffer: ''
+    inputBuffer: '',
+    originalValue: undefined,
+    // Template variables
+    vibratemode: "short",
+    screentype: "pill-shaped"
   },
 
   onInit() {
@@ -138,7 +131,11 @@ export default {
     
     this.currentParam = inputType
     this.currentParamName = parameterName
-    this.inputBuffer = this[inputType].toString()
+    this.inputBuffer = ''  // Start with empty buffer for new input
+    
+    // Store original value for cancel functionality
+    this.originalValue = this[inputType]
+    
     this.showKeyboard = true
     this.$forceUpdate()
   },
@@ -160,23 +157,34 @@ export default {
   },
 
   onDelete() {
+    // InputMethod's onBackSpace() handles the visual deletion
+    // We just need to sync our inputBuffer and update our parameter
     if (this.inputBuffer.length > 0) {
       this.inputBuffer = this.inputBuffer.slice(0, -1)
-      if (this.inputBuffer === '') {
-        this.inputBuffer = '0'
-      }
+      this.updateParameterFromBuffer()
+    } else {
+      // If buffer is empty, reset to default values
+      if (this.currentParam === 'n') this.n = 10
+      else if (this.currentParam === 'p') this.p = 0.5
+      else if (this.currentParam === 'k') this.k = 5
     }
+    
     this.$forceUpdate()
-    console.log("删除字符, 当前值:", this.inputBuffer)
+    console.log("删除字符, 当前值:", this.inputBuffer, "参数值:", this[this.currentParam])
   },
 
   onComplete(evt) {
     const char = evt.detail.content
     console.log("输入字符:", JSON.stringify(evt))
     
-    // Handle decimal point validation
-    if (char === '.' && this.inputBuffer.indexOf('.') !== -1) {
-      return // Don't allow multiple decimal points
+    // Handle decimal point validation for probability parameter
+    if (char === '.' && this.currentParam === 'p' && this.inputBuffer.indexOf('.') !== -1) {
+      return // Don't allow multiple decimal points for probability
+    }
+    
+    // Don't allow decimal points for integer parameters (n, k)
+    if (char === '.' && (this.currentParam === 'n' || this.currentParam === 'k')) {
+      return
     }
     
     // Handle input
@@ -186,43 +194,61 @@ export default {
       this.inputBuffer += char
     }
     
+    // Update parameter directly as user types
+    this.updateParameterFromBuffer()
     this.$forceUpdate()
-    
-    // Auto-confirm when user finishes input (you can modify this logic)
-    if (this.inputBuffer.length > 0) {
-      setTimeout(() => {
-        this.confirmInput()
-      }, 1000) // Auto-confirm after 1 second of no input
-    }
   },
 
-  confirmInput() {
+
+
+  hideKeyboard() {
+    this.showKeyboard = false;
+    this.inputBuffer = '';
+    this.currentParam = '';
+    this.currentParamName = '';
+    this.$forceUpdate();
+  },
+
+  onFinish() {
+    console.log("完成输入");
+    // Check if this was a cancel action (no input buffer means cancel)
+    if (this.inputBuffer === '' && this.originalValue !== undefined) {
+      // Restore original value on cancel
+      this[this.currentParam] = this.originalValue;
+    }
+    this.hideKeyboard();
+  },
+
+  updateParameterFromBuffer() {
     if (!this.inputBuffer || this.inputBuffer === '') return
     
-    const value = parseFloat(this.inputBuffer) || 0
+    const value = parseFloat(this.inputBuffer)
+    if (isNaN(value)) return
     
-    // Update the parameter value
+    // Update the parameter value with proper type conversion
     if (this.currentParam === 'n' || this.currentParam === 'k') {
-      this[this.currentParam] = parseInt(this.inputBuffer) || 0
+      // For integer parameters, only accept whole numbers
+      const intValue = Math.floor(Math.abs(value))
+      this[this.currentParam] = intValue
     } else if (this.currentParam === 'p') {
-      this[this.currentParam] = value
+      // For probability, allow decimals but clamp to [0,1]
+      this[this.currentParam] = Math.max(0, Math.min(1, value))
     }
     
-    // Validate bounds
+    // Additional validation
     if (this.currentParam === 'n' && this.n <= 0) this.n = 1
-    if (this.currentParam === 'p') {
-      if (this.p < 0) this.p = 0
-      if (this.p > 1) this.p = 1
-    }
-    if (this.currentParam === 'k' && this.k < 0) this.k = 0
+    if (this.currentParam === 'k' && this.k > this.n) this.k = this.n
     
     this.hasResult = false
     this.errorMessage = ""
+  },
+
+  confirmInput() {
+    // Simply close the keyboard since parameters are updated in real-time
     this.showKeyboard = false
     this.inputBuffer = ''
     this.currentParam = ''
     this.currentParamName = ''
-    
     this.$forceUpdate()
   },
 
@@ -310,7 +336,7 @@ export default {
 }
 
 .back-text {
-  font-size: 18px;
+  font-size: 20px;
   color: #ffffff;
   font-weight: bold;
 }
@@ -327,11 +353,11 @@ export default {
 }
 
 .param-item {
-  height: 65px;
+  height: 70px;
   background-color: #1a1a1a;
   border-radius: 8px;
   padding: 0 15px;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
@@ -339,13 +365,13 @@ export default {
 }
 
 .param-label {
-  font-size: 18px;
+  font-size: 20px;
   color: #ffffff;
   font-weight: 500;
 }
 
 .param-display {
-  width: 65px;
+  width: 50px;
   height: 35px;
   background-color: #333333;
   border: 1px solid #555555;
@@ -357,7 +383,7 @@ export default {
 .param-value {
   color: #ffffff;
   text-align: center;
-  font-size: 18px;
+  font-size: 20px;
 }
 
 .calc-section {
@@ -374,11 +400,10 @@ export default {
 }
 
 .calc-text {
-  font-size: 18px;
+  font-size: 20px;
   color: #ffffff;
   font-weight: bold;
 }
-
 
 .error-message {
   margin-bottom: 15px;
@@ -394,51 +419,21 @@ export default {
   text-align: center;
 }
 
-.input-status {
-  background-color: #1a1a1a;
-  border: 1px solid #333333;
-  border-radius: 8px;
-  padding: 15px;
-  margin-top: 15px;
-  flex-direction: column;
-  align-items: center;
-}
-
-.status-text {
-  font-size: 14px;
-  color: #ffffff;
-  margin-bottom: 5px;
-}
-
-.status-value {
-  font-size: 18px;
-  color: #00ff00;
-  font-weight: bold;
-}
-
-.keyboard-backdrop {
+.keyboard-page {
+  width: 100%;
+  height: 480px;
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(0, 0, 0, 0.6);
-  z-index: 999;
+  z-index: 1000;
+  background-color: #000000;
 }
 
-.keyboard-container {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 30vh;
-  z-index: 1000;
-  background-color: rgba(26, 26, 26, 0.98);
-  border-top: 3px solid #444444;
-  border-top-left-radius: 20px;
-  border-top-right-radius: 20px;
-  overflow: visible;
-}
+
+
+
 
 
 </style>

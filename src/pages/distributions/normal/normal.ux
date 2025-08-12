@@ -1,3 +1,5 @@
+<import name="input-method" src="../../../components/InputMethod/InputMethod.ux"></import>
+
 <template>
   <div class="container">
     <div class="top-bar">
@@ -28,7 +30,7 @@
         </div>
       </div>
 
-      <div class="calc-section">
+      <div class="calc-section" if="{{ !showKeyboard }}">
         <div class="calc-btn" onclick="calculate">
           <text class="calc-text">计算</text>
         </div>
@@ -37,9 +39,24 @@
       <div class="error-message" if="{{ errorMessage }}">
         <text class="error-text">{{ errorMessage }}</text>
       </div>
+
+      <!-- VelaOS Input Method Container -->
+      <div class="keyboard-page" style="flex-direction: column;" if="{{ showKeyboard }}">
+        <input-method
+          hide="{{!showKeyboard}}"
+          keyboardtype="NUMERIC"
+          maxlength="10"
+          vibratemode="{{vibratemode}}"
+          screentype="{{screentype}}"
+          @visibility-change="onVisibilityChange"
+          @key-down="onKeyDown"
+          @delete="onDelete"
+          @complete="onComplete"
+        ></input-method>
+      </div>
     </div>
 
-    <div class="bottom-section">
+    <div class="bottom-section" if="{{ !showKeyboard }}">
       <div class="back-btn" onclick="goBack">
         <text class="back-text">返回</text>
       </div>
@@ -62,73 +79,46 @@ export default {
     pmf: "-",
     cdf: "-",
     hasResult: false,
-    errorMessage: ""
+    errorMessage: "",
+    showKeyboard: false,
+    currentParam: '',
+    currentParamName: '',
+    inputBuffer: '',
+    originalValue: undefined,
+    // Template variables
+    vibratemode: "short",
+    screentype: "pill-shaped"
   },
 
   onInit() {
     this.$page.setTitleBar({ text: '正态分布' })
+    this.importFromCalculator()
   },
 
   onShow() {
-    // Handle return from keyboard page using VelaOS protocol
     console.log('Normal onShow called')
-    this.handleKeyboardResult()
+    this.importFromCalculator()
   },
 
-  onReady() {
-    // Also handle on ready in case onShow doesn't fire
-    console.log('Normal onReady called')
-    this.handleKeyboardResult()
-  },
+  importFromCalculator() {
+    const payload = globalState.getCalculatorExport()
+    if (!payload) return
 
-  onResume() {
-    // Handle when page becomes active again
-    console.log('Normal onResume called')
-    this.handleKeyboardResult()
-  },
+    const { distributionType, paramValues, inputValue } = payload
 
-  handleKeyboardResult() {
-    // Check for keyboard result multiple times to ensure we catch it
-    setTimeout(() => {
-      this.checkKeyboardResult()
-    }, 100)
-    
-    setTimeout(() => {
-      this.checkKeyboardResult()
-    }, 300)
-    
-    setTimeout(() => {
-      this.checkKeyboardResult()
-    }, 500)
-  },
-
-  checkKeyboardResult() {
-    const result = globalState.getKeyboardResult()
-    if (result) {
-      const { value, parameterType } = result
-      
-      console.log('Normal received result:', result) // Debug log
-      
-      // Update the parameter value
-      const numValue = parseFloat(value) || 0
-      this[parameterType] = numValue
-      
-      // Validate bounds
-      if (parameterType === 'sigma' && this.sigma <= 0) {
-        this.sigma = 1
+    // Only import if this is normal distribution data
+    if (distributionType === 'normal' && Array.isArray(paramValues)) {
+      if (paramValues.length >= 2) {
+        this.mu = paramValues[0] || 0
+        this.sigma = paramValues[1] || 1
+      }
+      if (typeof inputValue !== 'undefined') {
+        this.x = inputValue || 0
       }
       
-      console.log('Updated values:', { mu: this.mu, sigma: this.sigma, x: this.x })
-      
-      this.hasResult = false
-      this.errorMessage = ""
-      
-      // Force UI update
+      console.log('Imported from calculator:', { mu: this.mu, sigma: this.sigma, x: this.x })
       this.$forceUpdate()
-      
-      return true // Found and processed result
     }
-    return false // No result found
   },
 
   goBack() {
@@ -141,14 +131,131 @@ export default {
     else if (inputType === 'sigma') parameterName = '标准差'
     else if (inputType === 'x') parameterName = '计算值'
     
-    router.push({
-      uri: 'pages/keyboard',
-      params: {
-        parameterName: parameterName,
-        parameterType: inputType,
-        currentValue: this[inputType].toString()
-      }
-    })
+    this.currentParam = inputType
+    this.currentParamName = parameterName
+    this.inputBuffer = ''  // Start with empty buffer for new input
+    
+    // Store original value for cancel functionality
+    this.originalValue = this[inputType]
+    
+    this.showKeyboard = true
+    this.$forceUpdate()
+  },
+
+  onVisibilityChange(evt) {
+    console.log("键盘显示状态变更:", JSON.stringify(evt))
+    if (!evt.detail.visible) {
+      this.showKeyboard = false
+      this.inputBuffer = ''
+      this.currentParam = ''
+      this.currentParamName = ''
+      this.$forceUpdate()
+    }
+  },
+
+  onKeyDown(evt) {
+    console.log("按下按键:", JSON.stringify(evt))
+    // Key down events are handled by the component
+  },
+
+  onDelete() {
+    // InputMethod's onBackSpace() handles the visual deletion
+    // We just need to sync our inputBuffer and update our parameter
+    if (this.inputBuffer.length > 0) {
+      this.inputBuffer = this.inputBuffer.slice(0, -1)
+      this.updateParameterFromBuffer()
+    } else {
+      // If buffer is empty, reset to default values
+      if (this.currentParam === 'mu') this.mu = 0
+      else if (this.currentParam === 'sigma') this.sigma = 1
+      else if (this.currentParam === 'x') this.x = 0
+    }
+    
+    this.$forceUpdate()
+    console.log("删除字符, 当前值:", this.inputBuffer, "参数值:", this[this.currentParam])
+  },
+
+  onComplete(evt) {
+    const char = evt.detail.content
+    console.log("输入字符:", JSON.stringify(evt))
+    
+    // Handle decimal point validation
+    if (char === '.' && this.inputBuffer.indexOf('.') !== -1) {
+      return // Don't allow multiple decimal points
+    }
+    
+    // Handle negative sign for mu and x (but not sigma)
+    if (char === '-' && this.inputBuffer.length === 0 && this.currentParam !== 'sigma') {
+      this.inputBuffer = char
+      this.updateParameterFromBuffer()
+      this.$forceUpdate()
+      return
+    }
+    
+    // Don't allow negative sign in middle of number or for sigma
+    if (char === '-' && (this.inputBuffer.length > 0 || this.currentParam === 'sigma')) {
+      return
+    }
+    
+    // Handle input
+    if (this.inputBuffer === '0' && char !== '.') {
+      this.inputBuffer = char
+    } else {
+      this.inputBuffer += char
+    }
+    
+    // Update parameter directly as user types
+    this.updateParameterFromBuffer()
+    this.$forceUpdate()
+  },
+
+  changeState() {
+    this.hide = !this.hide;
+  },
+
+  hideKeyboard() {
+    this.showKeyboard = false;
+    this.inputBuffer = '';
+    this.currentParam = '';
+    this.currentParamName = '';
+    this.$forceUpdate();
+  },
+
+  onFinish() {
+    console.log("完成输入");
+    // Check if this was a cancel action (no input buffer means cancel)
+    if (this.inputBuffer === '' && this.originalValue !== undefined) {
+      // Restore original value on cancel
+      this[this.currentParam] = this.originalValue;
+    }
+    this.hideKeyboard();
+  },
+
+  updateParameterFromBuffer() {
+    if (!this.inputBuffer || this.inputBuffer === '' || this.inputBuffer === '-') return
+    
+    const value = parseFloat(this.inputBuffer)
+    if (isNaN(value)) return
+    
+    // Update the parameter value
+    this[this.currentParam] = value
+    
+    // Validate bounds
+    if (this.currentParam === 'sigma' && this.sigma <= 0) {
+      this.sigma = Math.abs(value) || 1 // Ensure sigma is positive
+    }
+    
+    this.hasResult = false
+    this.errorMessage = ""
+  },
+
+  confirmInput() {
+    // Simply close the keyboard since parameters are updated in real-time
+    this.showKeyboard = false
+    this.inputBuffer = ''
+    this.currentParam = ''
+    this.currentParamName = ''
+    this.$forceUpdate()
   },
 
 
@@ -242,7 +349,7 @@ export default {
 }
 
 .param-item {
-  height: 65px;
+  height: 70px;
   background-color: #1a1a1a;
   border-radius: 8px;
   padding: 0 15px;
@@ -308,4 +415,30 @@ export default {
   color: #ff6666;
   text-align: center;
 }
+
+.keyboard-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 999;
+}
+
+.keyboard-page {
+  width: 100%;
+  height: 480px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  background-color: #000000;
+}
+
+
+
+
 </style>

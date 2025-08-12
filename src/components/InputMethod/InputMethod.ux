@@ -2,30 +2,38 @@
   <div class="page" style="flex-direction: column;" show="{{!hide}}">
     <div style="background-color:black" >
       <!-- 胶囊屏66 -->
-      <div style="width: 100%;height: 305px">
+      <div if="{{screentype==='pill-shaped'}}" style="width: 100%;height: 305px">
         <div static style="position:absolute;left:0px;top:34px;width:100%;height:276px;">
           <progress percent="{{30+percent66}}" type="arc" style="start-angle:204deg;total-angle:-48deg;width:188px;height:188px;top:82px;left:2px;position:absolute;color:#ffffff;stroke-width:6px;layer-color:#262626;margin-left: {{(screenWidth - 192)/2}}px;"></progress>
           <scroll id="keyboard66" scroll-x="{{true}}" onscroll="handelScroll" style="padding-left: {{(screenWidth - 192)/2}}px;padding-right: {{(screenWidth - 192)/2}}px;">
-            <div style="left: 3px; flex-direction: column;">
+            <div if="{{!numFlag}}" style="left: 3px; flex-direction: column;">
               <div static style="margin-left: 0px;margin-top: 0px;height: 60px;">
-                <text class="calbtn66" for="{{item in keys['numbers'][0]}}" @click="onSelect(item)">{{item}}</text>
+                <text class="calbtn66" for="{{item in keys['full'][0]}}" @click="onSelect(item)">{{item}}</text>
               </div>
               <div static style="margin-left: 32px;margin-top: -5px;height: 60px;">
-                <text class="calbtn66" for="{{item in keys['numbers'][1]}}" @click="onSelect(item)">{{item}}</text>
+                <text class="calbtn66" for="{{item in keys['full'][1]}}" @click="onSelect(item)">{{item}}</text>
               </div>
               <div static style="margin-left: 64px;margin-top: -5px;height: 60px;">
-                <text class="calbtn66" for="{{item in keys['numbers'][2]}}" @click="onSelect(item)">{{item}}</text>
+                <text class="calbtn66" for="{{item in keys['full'][2]}}" @click="onSelect(item)">{{item}}</text>
+                <img static src="./assets/arc/space.png" style="width: 60px;height: 60px;" @click="onBtnClick('space')" />
+              </div>
+            </div>
+            <div else style="left: 3px; flex-direction: column;">
+              <div static style="margin-left: 0px;margin-top: 0px;height: 60px;">
+                <text class="calbtn66" for="{{item in keys['sign'][0]}}" @click="onSelect(item)">{{item}}</text>
+              </div>
+              <div static style="margin-left: 32px;margin-top: -5px;height: 60px;">
+                <text class="calbtn66" for="{{item in keys['sign'][1]}}" @click="onSelect(item)">{{item}}</text>
+              </div>
+              <div static style="margin-left: 64px;margin-top: -5px;height: 60px;">
+                <text class="calbtn66" for="{{item in keys['sign'][2]}}" @click="onSelect(item)">{{item}}</text>
               </div>
             </div>
           </scroll>
         </div>
-        <div static style="position: absolute;left: {{(screenWidth - 192)/2}}px;top: 0px;width: 192px;height: 110px;"> 
-          <img static style="position: absolute;left: 3px;top: 47px;width: 186px;height: 60px;" src="./assets/arc/search.png" />
-          <div style="position: absolute;left: 15px;top: 56px;width: 144px;height: 42px;align-items: center;justify-content: center;">
-            <text class="calbtn02">{{inputValue}}</text>
-          </div>
-          <text class="complete-btn" style="position: absolute;left: 9px;top: 0px;width: 48px;height: 42px;" @click="onBtnClick('complete')">完成</text>
-          <img src="./assets/arc/del.png" style="position: absolute;left: 135px;top: 0px;width: 48px;height: 42px;" @click="onBtnClick('D')" />
+        <div static style="position: absolute;left: {{(screenWidth - 192)/2}}px;top: 60px;width: 192px;height: 50px;"> 
+          <!-- 带变量的相对路径在 aiot-tookit 2.0.4 中修复 -->
+          <img src="./assets/arc/del.png" style="position: absolute;left: 120px;top: 5px;width: 48px;height: 42px;" @click="onBtnClick('D')" />
         </div>
 
       </div>
@@ -36,65 +44,234 @@
 <script>
 import vibrator from "@system.vibrator";
 import device from '@system.device'
+import { SimpleInputMethod } from "./assets/dicUtil.js";
+function doSearchDic(word, cb) {
+  let hanzi = SimpleInputMethod.getHanzi(word);
+  if (hanzi && hanzi[0]) {
+    cb(hanzi[0]);
+  } else {
+    cb([]);
+  }
+}
+function deleteLast(t) {
+  if (t) {
+    return t.substr(0, t.length - 1);
+  }
+  return "";
+}
 export default {
   props: {
     hide: {
       default: true,
     },
+    keyboardtype: {
+      default: "QWERTY",
+    },
     maxlength: {
-      default: 10,
+      default: 5,
     },
     vibratemode: {
       default: "",
     },
+    screentype: {
+      default: "pill-shaped",
+    },
   },
   data: {
-    inputValue: "",
+    waitingList: [],
+    waitingIndex: -1,
+    lastWaitingStr: "",
+    lang: "cn",
+    numFlag: true,
+    upperFlag: false,
+    percent67: 52,
     percent66: 0,
+    // 针对screenShape为rect的设备，会自动获取screenWidth并绑定到根div
+    // 这样便能同时适配n67和o65甚至是后续设备，但实际效果可能受designWidth影响
     screenWidth: 336,
     keys: {
-      numbers: [
-        ["1", "2", "3"],
-        ["4", "5", "6"],
-        ["7", "8", "9"],
-        ["0", "."]
+      full: [
+        ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"],
+        ["A", "S", "D", "F", "G", "H", "J", "K", "L"],
+        ["Z", "X", "C", "V", "B", "N", "M"],
+      ],
+      sign: [
+        ["1", "2", "3", "4", "5"],
+        ["6", "7", "8", "9"],
+        ["0", ".", "√"],
+      ],
+      sign62: [
+        ["2", "3", "4", "5", "6", "7", "8", "9"],
+        ["!", "@", "#", "%", "“", "”", "*"],
+        [")", "-", "_", ":", ";"],
+      ],
+      full62: [
+        ["W", "E", "R", "T", "Y", "U", "I", "O"],
+        ["S", "D", "F", "G", "H", "J", "K"],
+        ["X", "C", "V", "B", "N"],
+      ],
+      t9: [
+        ["abc", "def"],
+        ["ghi", "jkl", "mno"],
+        ["pqrs", "tuv", "wxyz"],
       ],
     },
   },
   onInit() {
-    this.adjustScreenWidth();
-    this.$watch("hide", "watchHidePropsChange");
-  },
-  addChar(char) {
-    if (this.inputValue.length < this.maxlength) {
-      this.inputValue += char;
-      this.$emit("input", { content: this.inputValue });
+    if (this.screentype === "rect" || this.screentype === "pill-shaped") {
+      this.adjustScreenWidth();
     }
+    this.$watch("hide", "watchHidePropsChange");
+    this.$watch("maxlength", "watchMaxLengthPropsChange");
   },
+  addAllTxt(txt) {
+    this.$emit("complete", { content: txt });
+  },
+
   onBtnClick(sign) {
     this.onVibrate();
     switch (sign) {
+      case "AC":
+        this.clearWaiting();
+        break;
+      case "lang":
+        if (this.lang === "cn") {
+          this.lang = "en";
+        } else {
+          this.lang = "cn";
+        }
+        this.clearWaiting();
+        break;
       case "D":
-        if (this.inputValue.length > 0) {
-          this.inputValue = this.inputValue.slice(0, -1);
-          this.$emit("input", { content: this.inputValue });
+        if (this.waitingIndex >= 0) {
+          this.clearWaiting();
         } else {
           this.$emit("delete", {});
         }
         break;
-      case "complete":
-        this.$emit("complete", { content: this.inputValue });
+      case "E":
+        this.hide = true;
+        break;
+      case "space":
+        this.addAllTxt(" ");
+        break;
+
+      case "select":
+        if (this.lastWaitingStr != sign && this.lastWaitingStr) {
+          if (this.lang === "cn") {
+            this.addAllTxt(this.waitingList[this.waitingIndex]);
+          } else {
+            if (this.upperFlag) {
+              this.addAllTxt(this.waitingList[this.waitingIndex].toUpperCase());
+            } else {
+              this.addAllTxt(this.waitingList[this.waitingIndex].toLowerCase());
+            }
+          }
+          this.clearWaiting();
+        }
+        break;
+      case "switchNum":
+        this.numFlag = true;
+        this.clearWaiting();
+        break;
+      case "switchCn":
+        this.numFlag = false;
+        break;
+      case "switchUpper":
+        this.upperFlag = true;
+        break;
+      case "switchLow":
+        this.upperFlag = false;
+        break;
+              default:
+        if (sign.length === 1) {
+          this.addAllTxt(sign);
+        } else {
+          if (this.waitingIndex >= 0) {
+            if (this.lastWaitingStr === sign) {
+              this.waitingIndex++;
+              if (this.waitingIndex >= this.lastWaitingStr.length) {
+                this.waitingIndex = 0;
+              }
+            } else {
+              if (this.lang === "cn") {
+                this.addAllTxt(this.waitingList[this.waitingIndex]);
+              } else {
+                if (this.upperFlag) {
+                  this.addAllTxt(
+                    this.waitingList[this.waitingIndex].toUpperCase(),
+                  );
+                } else {
+                  this.addAllTxt(
+                    this.waitingList[this.waitingIndex].toLowerCase(),
+                  );
+                }
+              }
+              this.lastWaitingStr = sign;
+              this.waitingIndex = 0;
+              this.waitingList = sign.split("");
+            }
+          } else {
+            this.lastWaitingStr = sign;
+            this.waitingIndex = 0;
+            this.waitingList = sign.split("");
+          }
+        }
         break;
     }
+  },
+  clearWaiting() {
+    this.waitingList = [];
+    this.waitingIndex = -1;
+    this.lastWaitingStr = "";
   },
 
   onSelect(num) {
     this.$emit("keyDown", { content: num });
+    if (this.keyboardtype === "T9" && this.screentype !== "pill-shaped") {
+      this.onBtnClick(num);
+      return;
+    }
     this.onVibrate();
-    this.addChar(num);
+    
+    // Handle "√" as complete button
+    if (num === "√") {
+      this.$emit("visibilityChange", { visible: false });  // Tell parent to hide keyboard
+      this.$emit("complete", { isCompleteButton: true });
+      return;
+    }
+    
+    if (this.lang === "cn" && !this.numFlag) {
+      // For Chinese input, use waiting functionality for character selection
+      this.addAllTxt(num.toLowerCase());
+    } else if (this.lang === "en" && !this.numFlag) {
+      if (this.upperFlag) {
+        this.addAllTxt(num.toUpperCase());
+      } else {
+        this.addAllTxt(num.toLowerCase());
+      }
+    } else {
+      this.addAllTxt(num);
+    }
+  },
+  onSelectWaiting(num) {
+    this.onVibrate();
+    if (this.lang === "cn") {
+      this.addAllTxt(this.waitingList[num].toString());
+    } else {
+      if (this.upperFlag) {
+        this.addAllTxt(this.waitingList[num].toUpperCase());
+      } else {
+        this.addAllTxt(this.waitingList[num].toLowerCase());
+      }
+    }
+    this.clearWaiting();
   },
   watchHidePropsChange(newV, oldV) {
     this.$emit("visibilityChange", { visible: newV });
+  },
+  watchMaxLengthPropsChange(newV, oldV) {
+    // maxlength property change handler - kept for compatibility
   },
   onVibrate() {
     if (this.vibratemode != "") {
@@ -102,6 +279,8 @@ export default {
     }
   },
   handelScroll(event) {
+    let percentTemp67 = (event.scrollX / 636) * 100 + 52.8;
+    this.percent67 = parseInt(percentTemp67 <= 100 ? percentTemp67 : 100);
     let percentTemp66 = (event.scrollX / 633) * 100;
     this.percent66 = parseInt(percentTemp66 <= 100 ? percentTemp66 : 100);
   },
@@ -144,6 +323,30 @@ export default {
 	text-align:center;
 	height:42px;
 }
+.calbtnfull {
+	color:#fff;
+	font-size:24px;
+	font-weight:bold;
+	background-color:#262626;
+	border-radius:12px;
+	margin-right:4px;
+	height:52px;
+	width:40px;
+	text-align:center;
+	border:3px solid rgba(255,255,255,0.06)
+}
+.calbtnt9 {
+	color:#fff;
+	font-size:25px;
+	font-weight:bold;
+	background-color:#262626;
+	border-radius:999px;
+	margin-right:4px;
+	width:94px;
+	height:60px;
+	text-align:center;
+	border:3px solid rgba(255,255,255,0.06)
+}
 .caltext {
 	text-align:left;
 	line-height:38px;
@@ -155,6 +358,58 @@ export default {
 	text-align:left;
 	font-weight:bold;
 	padding-left:8px
+}
+.list3 {
+	position:absolute;
+	top:38px;
+	left:78px;
+	width:324px;
+	height:160px;
+	flex-direction:column;
+	background-color:#262626;
+	border-radius:12px
+}
+.item3 {
+	width:324px;
+	height:52px
+}
+.calbtn67 {
+	color:rgb(255,255,255);
+	font-size:32px;
+	font-weight:bold;
+	background-color:rgb(38,38,38);
+	margin-right:4px;
+	width:60px;
+	height:60px;
+	border-radius:30px;
+	text-align:center;
+	border:3px solid rgba(255,255,255,0.06);
+}
+#keyboard67 {
+	position:absolute;
+	left:0px;
+	top:82px;
+	width:100%;
+	height:170px;
+}
+#keyboard66 {
+	position:absolute;
+	left:0px;
+	top:82px;
+	width:100%;
+	height:170px;
+}
+.list67 {
+	top:0px;
+	width:96.4%;
+	height:170px;
+	border-radius:30px;
+	background-color:#262626;
+	border:3px solid rgba(255,255,255,0.06);
+	padding:0px 10px;
+}
+.item67 {
+	height:50px;
 }
 .calbtn66 {
 	color:rgb(255,255,255);
@@ -182,15 +437,25 @@ export default {
 .item66 {
 	height:42px;
 }
-.complete-btn {
-	color:rgb(13,132,255);
-	font-size:24px;
-	font-weight:bold;
-	background-color:rgba(38,38,38,0.8);
-	border-radius:21px;
-	text-align:center;
-	border:2px solid rgba(13,132,255,0.3);
-	align-items:center;
-	justify-content:center;
+.waiting-keys {
+	width:36px;
+	height:40px;
+	text-align: center;
+}
+
+.keyboard-rows-rect-t9 { 
+  align-items: center;
+  justify-content: space-between;
+  flex-direction: row;
+  flex-shrink: 0;
+  height: 55px;
+  width: 100%;
+}
+
+.calbtnt9-rect { 
+  flex:1;
+  height: 55px;
+  margin: 0 3px;
+  width: unset;
 }
 </style>
