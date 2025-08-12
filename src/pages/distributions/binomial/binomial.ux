@@ -1,3 +1,5 @@
+<import name="input-method" src="../../../components/InputMethod/InputMethod.ux"></import>
+
 <template>
   <div class="container">
     <div class="top-bar">
@@ -37,6 +39,30 @@
       <div class="error-message" if="{{ errorMessage }}">
         <text class="error-text">{{ errorMessage }}</text>
       </div>
+
+      <!-- Input Status Display -->
+      <div class="input-status" if="{{ showKeyboard }}">
+        <text class="status-text">正在输入: {{ currentParamName }}</text>
+        <text class="status-value">当前值: {{ inputBuffer }}</text>
+      </div>
+
+      <!-- Keyboard Backdrop -->
+      <div class="keyboard-backdrop" if="{{ showKeyboard }}" onclick="onVisibilityChange({detail: {visible: false}})"></div>
+
+      <!-- VelaOS Input Method Container -->
+      <div class="keyboard-container" if="{{ showKeyboard }}">
+        <input-method 
+          hide="{{ !showKeyboard }}"
+          keyboardtype="numbers"
+          maxlength="10"
+          vibratemode="short"
+          screentype="circle"
+          @visibility-change="onVisibilityChange"
+          @key-down="onKeyDown"
+          @delete="onDelete"
+          @complete="onComplete">
+        </input-method>
+      </div>
     </div>
 
     <div class="bottom-section">
@@ -62,87 +88,46 @@ export default {
     pmf: "-",
     cdf: "-",
     hasResult: false,
-    errorMessage: ""
+    errorMessage: "",
+    showKeyboard: false,
+    currentParam: '',
+    currentParamName: '',
+    inputBuffer: ''
   },
 
   onInit() {
     this.$page.setTitleBar({ text: '二项分布' })
+    this.importFromCalculator()
   },
 
   onShow() {
-    // Handle return from keyboard page using VelaOS protocol
     console.log('Binomial onShow called')
-    this.handleKeyboardResult()
-  },
-
-  onReady() {
-    // Also handle on ready in case onShow doesn't fire
-    console.log('Binomial onReady called')
-    this.handleKeyboardResult()
-  },
-
-  onResume() {
-    // Handle when page becomes active again
-    console.log('Binomial onResume called')
-    this.handleKeyboardResult()
-  },
-
-  handleKeyboardResult() {
-    // Check for keyboard result multiple times to ensure we catch it
-    setTimeout(() => {
-      this.checkKeyboardResult()
-    }, 100)
-    
-    setTimeout(() => {
-      this.checkKeyboardResult()
-    }, 300)
-    
-    setTimeout(() => {
-      this.checkKeyboardResult()
-    }, 500)
-  },
-
-  checkKeyboardResult() {
-    const result = globalState.getKeyboardResult()
-    if (result) {
-      const { value, parameterType, forceBack } = result
-      
-      console.log('Binomial received result:', result) // Debug log
-      
-      // Update the parameter value
-      if (parameterType === 'n' || parameterType === 'k') {
-        this[parameterType] = parseInt(value) || 0
-      } else if (parameterType === 'p') {
-        this[parameterType] = parseFloat(value) || 0
-      }
-      
-      // Validate bounds
-      if (parameterType === 'n' && this.n <= 0) this.n = 1
-      if (parameterType === 'p') {
-        if (this.p < 0) this.p = 0
-        if (this.p > 1) this.p = 1
-      }
-      if (parameterType === 'k' && this.k < 0) this.k = 0
-      
-      console.log('Updated values:', { n: this.n, p: this.p, k: this.k })
-      
-      this.hasResult = false
-      this.errorMessage = ""
-      
-      // Force UI update
-      this.$forceUpdate()
-
-      if (forceBack) {
-        router.back()
-      }
-      
-      return true // Found and processed result
-    }
-    return false // No result found
+    this.importFromCalculator()
   },
 
   goBack() {
     router.back()
+  },
+
+  importFromCalculator() {
+    const payload = globalState.getCalculatorExport()
+    if (!payload) return
+
+    const { distributionType, paramValues, inputValue } = payload
+
+    // Only import if this is binomial distribution data
+    if (distributionType === 'binomial' && Array.isArray(paramValues)) {
+      if (paramValues.length >= 2) {
+        this.n = paramValues[0] || 10
+        this.p = paramValues[1] || 0.5
+      }
+      if (typeof inputValue !== 'undefined') {
+        this.k = inputValue || 0
+      }
+      
+      console.log('Imported from calculator:', { n: this.n, p: this.p, k: this.k })
+      this.$forceUpdate()
+    }
   },
 
   selectInput(inputType) {
@@ -151,15 +136,94 @@ export default {
     else if (inputType === 'p') parameterName = '成功概率'
     else if (inputType === 'k') parameterName = '计算值'
     
-    router.push({
-      uri: 'pages/keyboard',
-      params: {
-        parameterName: parameterName,
-        parameterType: inputType,
-        currentValue: this[inputType].toString(),
-        forceBack: true
+    this.currentParam = inputType
+    this.currentParamName = parameterName
+    this.inputBuffer = this[inputType].toString()
+    this.showKeyboard = true
+    this.$forceUpdate()
+  },
+
+  onVisibilityChange(evt) {
+    console.log("键盘显示状态变更:", JSON.stringify(evt))
+    if (!evt.detail.visible) {
+      this.showKeyboard = false
+      this.inputBuffer = ''
+      this.currentParam = ''
+      this.currentParamName = ''
+      this.$forceUpdate()
+    }
+  },
+
+  onKeyDown(evt) {
+    console.log("按下按键:", JSON.stringify(evt))
+    // Key down events are handled by the component
+  },
+
+  onDelete() {
+    if (this.inputBuffer.length > 0) {
+      this.inputBuffer = this.inputBuffer.slice(0, -1)
+      if (this.inputBuffer === '') {
+        this.inputBuffer = '0'
       }
-    })
+    }
+    this.$forceUpdate()
+    console.log("删除字符, 当前值:", this.inputBuffer)
+  },
+
+  onComplete(evt) {
+    const char = evt.detail.content
+    console.log("输入字符:", JSON.stringify(evt))
+    
+    // Handle decimal point validation
+    if (char === '.' && this.inputBuffer.indexOf('.') !== -1) {
+      return // Don't allow multiple decimal points
+    }
+    
+    // Handle input
+    if (this.inputBuffer === '0' && char !== '.') {
+      this.inputBuffer = char
+    } else {
+      this.inputBuffer += char
+    }
+    
+    this.$forceUpdate()
+    
+    // Auto-confirm when user finishes input (you can modify this logic)
+    if (this.inputBuffer.length > 0) {
+      setTimeout(() => {
+        this.confirmInput()
+      }, 1000) // Auto-confirm after 1 second of no input
+    }
+  },
+
+  confirmInput() {
+    if (!this.inputBuffer || this.inputBuffer === '') return
+    
+    const value = parseFloat(this.inputBuffer) || 0
+    
+    // Update the parameter value
+    if (this.currentParam === 'n' || this.currentParam === 'k') {
+      this[this.currentParam] = parseInt(this.inputBuffer) || 0
+    } else if (this.currentParam === 'p') {
+      this[this.currentParam] = value
+    }
+    
+    // Validate bounds
+    if (this.currentParam === 'n' && this.n <= 0) this.n = 1
+    if (this.currentParam === 'p') {
+      if (this.p < 0) this.p = 0
+      if (this.p > 1) this.p = 1
+    }
+    if (this.currentParam === 'k' && this.k < 0) this.k = 0
+    
+    this.hasResult = false
+    this.errorMessage = ""
+    this.showKeyboard = false
+    this.inputBuffer = ''
+    this.currentParam = ''
+    this.currentParamName = ''
+    
+    this.$forceUpdate()
   },
 
 
@@ -329,4 +393,52 @@ export default {
   color: #ff6666;
   text-align: center;
 }
+
+.input-status {
+  background-color: #1a1a1a;
+  border: 1px solid #333333;
+  border-radius: 8px;
+  padding: 15px;
+  margin-top: 15px;
+  flex-direction: column;
+  align-items: center;
+}
+
+.status-text {
+  font-size: 14px;
+  color: #ffffff;
+  margin-bottom: 5px;
+}
+
+.status-value {
+  font-size: 18px;
+  color: #00ff00;
+  font-weight: bold;
+}
+
+.keyboard-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  z-index: 999;
+}
+
+.keyboard-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 30vh;
+  z-index: 1000;
+  background-color: rgba(26, 26, 26, 0.98);
+  border-top: 3px solid #444444;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  overflow: visible;
+}
+
+
 </style>
