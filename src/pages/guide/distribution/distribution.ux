@@ -1,0 +1,226 @@
+<template>
+  <div class="container">
+    <div class="top-bar">
+      <text class="page-title">分布介绍</text>
+    </div>
+
+    <div class="content">
+      <div class="guide-section">
+        <text class="section-title">离散分布</text>
+        
+        <text class="text-content">
+          二项分布
+          描述n次独立试验中成功次数的概率分布
+        </text>
+        
+        <text class="text-content">
+          应用场景：抛硬币、质量检测、投票结果
+          参数：n(试验次数), p(单次成功概率)
+          特点：每次试验只有成功/失败两种结果
+        </text>
+        
+        <text class="text-content">
+          泊松分布
+          描述单位时间或空间内随机事件发生次数的概率分布
+        </text>
+        
+        <text class="text-content">
+          应用场景：客服电话呼入、交通事故、放射性衰变
+          参数：λ(平均发生率)
+          特点：事件独立发生，平均发生率恒定
+        </text>
+        
+        <text class="text-content">
+          几何分布
+          描述首次成功所需试验次数的概率分布
+        </text>
+        
+        <text class="text-content">
+          应用场景：首次中奖、首次故障、首次成功
+          参数：p(单次成功概率)
+          特点：无记忆性，之前失败不影响未来概率
+        </text>
+        
+        <text class="text-content">
+          负二项分布
+          描述达到指定成功次数所需试验次数的概率分布
+        </text>
+        
+        <text class="text-content">
+          应用场景：收集全套卡片、达到销售目标
+          参数：r(成功次数), p(单次成功概率)
+          特点：几何分布的推广形式
+        </text>
+        
+        <text class="text-content">
+          超几何分布
+          描述不放回抽样中成功次数的概率分布
+        </text>
+        
+        <text class="text-content">
+          应用场景：质量抽检、扑克牌游戏
+          参数：N(总数), K(成功总数), n(抽样数)
+          特点：不放回抽样，概率随抽样变化
+        </text>
+      </div>
+
+      <div class="guide-section">
+        <text class="section-title">连续分布</text>
+        
+        <text class="text-content">
+          正态分布
+          最重要的连续概率分布，呈钟形曲线
+        </text>
+        
+        <text class="text-content">
+          应用场景：身高体重、考试成绩、测量误差
+          参数：μ(均值), σ²(方差)
+          特点：68-95-99.7法则，中心极限定理
+        </text>
+        
+        <text class="text-content">
+          指数分布
+          描述泊松过程中事件间隔时间的概率分布
+        </text>
+        
+        <text class="text-content">
+          应用场景：设备寿命、客服等待时间、地震间隔
+          参数：λ(率参数)
+          特点：无记忆性，常用于可靠性分析
+        </text>
+        
+        <text class="text-content">
+          均匀分布
+          在区间内所有取值等可能的连续分布
+        </text>
+        
+        <text class="text-content">
+          应用场景：随机数生成、轮盘赌、舍入误差
+          参数：a(最小值), b(最大值)
+          特点：简单直观，每个区间概率相等
+        </text>
+        
+        <text class="text-content">
+          伽马分布
+          描述多个独立指数变量之和的概率分布
+        </text>
+        
+        <text class="text-content">
+          应用场景：总等待时间、总降雨量、系统寿命
+          参数：k(形状参数), θ(尺度参数)
+          特点：指数分布和卡方分布的特例
+        </text>
+        
+        <text class="text-content">
+          贝塔分布
+          定义在(0,1)区间的连续概率分布
+        </text>
+        
+        <text class="text-content">
+          应用场景：比例估计、成功率分析、贝叶斯统计
+          参数：α, β(形状参数)
+          特点：灵活性高，可呈现多种形状
+        </text>
+      </div>
+    </div>
+
+    <div class="bottom-section">
+      <div class="back-btn" onclick="goBack">
+        <text class="back-text">返回</text>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import router from "@system.router"
+
+export default {
+  private: {
+    
+  },
+
+  onInit() {
+    this.$page.setTitleBar({ text: '分布介绍' })
+  },
+
+  goBack() {
+    router.back()
+  }
+}
+</script>
+
+<style>
+.container {
+  display: flex;
+  flex-direction: column;
+  background-color: #000000;
+  height: 100%;
+}
+
+.top-bar {
+  display: flex;
+  height: 60px;
+  background-color: #111111;
+  padding: 0 20px;
+  justify-content: center;
+  align-items: center;
+  border-bottom: 1px solid #333333;
+}
+
+.page-title {
+  font-size: 22px;
+  color: #ffffff;
+  font-weight: bold;
+}
+
+.content {
+  flex: 1;
+  flex-direction: column;
+  padding: 20px 15px;
+  overflow-y: auto;
+}
+
+.guide-section {
+  margin-bottom: 25px;
+}
+
+.section-title {
+  font-size: 20px;
+  color: #ffffff;
+  font-weight: bold;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.text-content {
+  font-size: 14px;
+  color: #cccccc;
+  line-height: 1.6;
+  white-space: pre-line;
+  margin-bottom: 15px;
+}
+
+.bottom-section {
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  border-top: 1px solid #333333;
+}
+
+.back-btn {
+  height: 45px;
+  width: 120px;
+  background-color: #333333;
+  border: 1px solid #555555;
+  border-radius: 10px;
+  justify-content: center;
+  align-items: center;
+}
+
+.back-text {
+  font-size: 18px;
+  color: #ffffff;
+  font-weight: bold;
+}
+</style>

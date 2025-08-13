@@ -18,7 +18,7 @@
         <div class="param-item" @click="selectInput('p')">
           <text class="param-label">成功概率p</text>
           <div class="param-display">
-            <text class="param-value">{{ p }}</text>
+            <text class="param-value">{{ currentParam === 'p' && inputBuffer ? inputBuffer : p }}</text>
           </div>
         </div>
         
@@ -187,9 +187,11 @@ export default {
       return
     }
 
-    // Handle input
+    // Handle input - allow decimal point after 0
     if (this.inputBuffer === '0' && char !== '.') {
       this.inputBuffer = char
+    } else if (this.inputBuffer === '0' && char === '.') {
+      this.inputBuffer = '0.'  // Ensure 0. is properly formed
     } else {
       this.inputBuffer += char
     }
@@ -232,6 +234,7 @@ export default {
       this[this.currentParam] = intValue
     } else if (this.currentParam === 'p') {
       // For probability, allow decimals but clamp to [0,1]
+      // Always store as number, but handle display formatting in the template
       this[this.currentParam] = Math.max(0, Math.min(1, value))
     }
     

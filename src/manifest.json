@@ -1,7 +1,7 @@
 {
-  "package": "com.application.watch.demo",
+  "package": "statsmodels.10s",
   "name": "statsmodels",
-  "versionName": "1.0.0",
+  "versionName": "beta",
   "versionCode": 1,
   "minPlatformVersion": 1000,
   "icon": "/common/logo.png",
@@ -89,6 +89,18 @@
       },
       "pages/distributions/beta": {
         "component": "beta"
+      },
+      "pages/guide": {
+        "component": "guide"
+      },
+      "pages/guide/distribution": {
+        "component": "distribution"
+      },
+      "pages/guide/function": {
+        "component": "function"
+      },
+      "pages/guide/tips": {
+        "component": "tips"
       }
     }
   }

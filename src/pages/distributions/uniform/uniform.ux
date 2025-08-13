@@ -11,21 +11,21 @@
         <div class="param-item" @click="selectInput('a')">
           <text class="param-label">下限a</text>
           <div class="param-display">
-            <text class="param-value">{{ a }}</text>
+            <text class="param-value">{{ currentParam === 'a' && inputBuffer ? inputBuffer : a }}</text>
           </div>
         </div>
         
         <div class="param-item" @click="selectInput('b')">
           <text class="param-label">上限b</text>
           <div class="param-display">
-            <text class="param-value">{{ b }}</text>
+            <text class="param-value">{{ currentParam === 'b' && inputBuffer ? inputBuffer : b }}</text>
           </div>
         </div>
         
         <div class="param-item" @click="selectInput('x')">
           <text class="param-label">计算值x</text>
           <div class="param-display">
-            <text class="param-value">{{ x }}</text>
+            <text class="param-value">{{ currentParam === 'x' && inputBuffer ? inputBuffer : x }}</text>
           </div>
         </div>
       </div>
@@ -198,6 +198,8 @@ export default {
     // Handle input
     if (this.inputBuffer === '0' && char !== '.') {
       this.inputBuffer = char
+    } else if (this.inputBuffer === '0' && char === '.') {
+      this.inputBuffer = '0.'
     } else {
       this.inputBuffer += char
     }

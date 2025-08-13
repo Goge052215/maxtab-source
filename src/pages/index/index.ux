@@ -17,6 +17,12 @@
         </div>
       </div>
 
+      <div class="menu-list-item menu-entry" onclick="routeToGuide()">
+        <div class="menu-item">
+          <text class="menu-title">使用指南</text>
+        </div>
+      </div>
+
       <div class="menu-list-item menu-entry" onclick="routeToSimple()">
         <div class="menu-item">
           <text class="menu-title">计算器</text>
@@ -72,6 +78,10 @@ export default {
 
   routeToAbout() {
     router.push({ uri: 'pages/about' })
+  },
+
+  routeToGuide() {
+    router.push({ uri: 'pages/guide' })
   }
 }
 </script>
@@ -109,7 +119,7 @@ export default {
 
 /* Added style for the new list-item wrapper */
 .menu-list-item {
-  margin-bottom: 12px; /* Reduced spacing to fit better */
+  margin-bottom: 10px; /* Reduced spacing to fit better */
 
 }
 
@@ -120,7 +130,7 @@ export default {
 /* Enhanced menu items */
 .menu-item {
   display: flex;
-  height: 65px; /* Reduced height since no description */
+  height: 60px; /* Reduced height since no description */
   width: 100%; /* Ensure consistent width */
   background-color: #222222;
   border: 1px solid #444444;

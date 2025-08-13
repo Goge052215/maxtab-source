@@ -1,0 +1,218 @@
+<template>
+  <div class="container">
+    <div class="top-bar">
+      <text class="page-title">概率函数</text>
+    </div>
+
+    <div class="content">
+      <div class="guide-section">
+        <text class="section-title">概率密度函数(PDF)</text>
+        
+        <text class="text-content">
+          连续分布的PDF
+          概率密度函数描述连续随机变量在某点的相对可能性
+        </text>
+        
+        <text class="text-content">
+          • 数学定义：f(x) ≥ 0，且∫(-∞,∞) f(x)dx = 1
+          • 物理意义：某点的"密度"而非概率
+          • 计算应用：P(a ≤ X ≤ b) = ∫[a,b] f(x)dx
+          • 重要性质：密度值可以大于1，但区间概率必须在0-1之间
+        </text>
+        
+        <text class="text-content">
+          示例：正态分布N(0,1)在x=0处密度为1/√(2π) ≈ 0.4
+          但这不表示P(X=0)=0.4，而是该点附近相对可能性
+        </text>
+      </div>
+
+      <div class="guide-section">
+        <text class="section-title">概率质量函数(PMF)</text>
+        
+        <text class="text-content">
+          离散分布的PMF
+          概率质量函数给出离散随机变量取某个特定值的精确概率
+        </text>
+        
+        <text class="text-content">
+          • 数学定义：p(k) = P(X = k)，其中0 ≤ p(k) ≤ 1
+          • 归一化：Σ p(k) = 1（对所有可能取值求和）
+          • 物理意义：直接给出某点的概率值
+          • 计算应用：P(a ≤ X ≤ b) = Σ[k=a→b] p(k)
+        </text>
+        
+        <text class="text-content">
+          示例：二项分布B(n=10,p=0.3)中
+          P(X=3) = C(10,3) × 0.3³ × 0.7⁷ ≈ 0.267
+          这表示"10次试验中恰好成功3次"的精确概率
+        </text>
+      </div>
+
+      <div class="guide-section">
+        <text class="section-title">累积分布函数(CDF)</text>
+        
+        <text class="text-content">
+          通用CDF定义
+          累积分布函数给出随机变量不超过某值的概率
+          
+          • 数学定义：F(x) = P(X ≤ x)
+          • 连续分布：F(x) = ∫(-∞,x] f(t)dt
+          • 离散分布：F(x) = Σ[k≤x] p(k)
+          • 重要性质：单调不减，右连续，F(-∞)=0，F(∞)=1
+          
+          应用价值：
+          • 计算区间概率：P(a < X ≤ b) = F(b) - F(a)
+          • 计算分位数：给定概率p，求x使得F(x)=p
+          • 统计检验：计算p值和置信区间
+          
+          
+          CDF与PDF/PMF的关系
+          三者之间的数学关系
+          
+          • 连续分布：
+            - F'(x) = f(x)（CDF的导数是PDF）
+            - F(x) = ∫(-∞,x] f(t)dt（CDF是PDF的积分）
+          
+          • 离散分布：
+            - F(x) - F(x⁻) = p(x)（CDF的跳跃高度是PMF）
+            - F(x) = Σ[k≤x] p(k)（CDF是PMF的累加和）
+          
+          • 计算优势：
+            - CDF通常有解析表达式，便于计算
+            - 避免复杂的积分或求和运算
+            - 现代统计软件都内置CDF计算函数
+        </text>
+      </div>
+
+      <div class="guide-section">
+        <text class="section-title">函数使用实例</text>
+        
+        <text class="text-content">
+          正态分布示例
+          标准正态分布N(0,1)的计算演示
+          
+          • PDF计算：φ(1.96) = 1/√(2π) × e^(-1.96²/2) ≈ 0.058
+          • CDF计算：Φ(1.96) ≈ 0.975
+          • 区间概率：P(-1.96 ≤ Z ≤ 1.96) = Φ(1.96) - Φ(-1.96) ≈ 0.95
+          
+          实际应用：
+          • 假设检验：计算Z统计量的p值
+          • 置信区间：构建95%置信区间
+          • 质量控制：设定控制限
+          
+          
+          二项分布示例
+          二项分布B(n=20,p=0.4)的计算演示
+          
+          • PMF计算：P(X=8) = C(20,8) × 0.4⁸ × 0.6¹² ≈ 0.179
+          • CDF计算：P(X≤8) ≈ 0.596
+          • 区间概率：P(6≤X≤10) = F(10) - F(5) ≈ 0.746 - 0.125 = 0.621
+          
+          实际应用：
+          • 产品质检：计算批次合格率
+          • 医学试验：评估治疗效果
+          • 投资决策：分析成功概率
+        </text>
+      </div>
+    </div>
+
+    <div class="bottom-section">
+      <div class="back-btn" onclick="goBack">
+        <text class="back-text">返回</text>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import router from "@system.router"
+
+export default {
+  private: {
+    
+  },
+
+  onInit() {
+    this.$page.setTitleBar({ text: '概率函数' })
+  },
+
+  goBack() {
+    router.back()
+  }
+}
+</script>
+
+<style>
+.container {
+  display: flex;
+  flex-direction: column;
+  background-color: #000000;
+  height: 100%;
+}
+
+.top-bar {
+  display: flex;
+  height: 60px;
+  background-color: #111111;
+  padding: 0 20px;
+  justify-content: center;
+  align-items: center;
+  border-bottom: 1px solid #333333;
+}
+
+.page-title {
+  font-size: 22px;
+  color: #ffffff;
+  font-weight: bold;
+}
+
+.content {
+  flex: 1;
+  flex-direction: column;
+  padding: 20px 15px;
+  overflow-y: auto;
+}
+
+.guide-section {
+  margin-bottom: 25px;
+}
+
+.section-title {
+  font-size: 20px;
+  color: #ffffff;
+  font-weight: bold;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.text-content {
+  font-size: 14px;
+  color: #cccccc;
+  line-height: 1.6;
+  white-space: pre-line;
+  margin-bottom: 15px;
+}
+
+.bottom-section {
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  border-top: 1px solid #333333;
+}
+
+.back-btn {
+  height: 45px;
+  width: 120px;
+  background-color: #333333;
+  border: 1px solid #555555;
+  border-radius: 10px;
+  justify-content: center;
+  align-items: center;
+}
+
+.back-text {
+  font-size: 18px;
+  color: #ffffff;
+  font-weight: bold;
+}
+</style>

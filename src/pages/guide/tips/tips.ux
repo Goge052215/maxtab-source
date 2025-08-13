@@ -1,0 +1,294 @@
+<template>
+  <div class="container">
+    <div class="top-bar">
+      <text class="page-title">使用技巧</text>
+    </div>
+
+    <div class="content">
+      <div class="guide-section">
+        <text class="section-title">输入技巧</text>
+        
+        <text class="text-content">
+          数值输入规范
+          支持多种数值格式输入，灵活适应不同需求
+          
+          • 小数输入：支持任意精度，如0.25, 1.5, 2.75, 3.14159
+          • 负数输入：支持负值参数，如-1.5, -0.8, -2.3
+          • 科学计数法：支持1e-3, 2.5e4等科学计数法
+          • 分数形式：支持1/2, 3/4等分数（自动转换为小数）
+          
+          输入示例：
+          - 正态分布均值：输入"0"或"1.5"或"-2.3"
+          - 指数分布率参数：输入"1.5"或"0.01"
+          - 二项分布概率：输入"0.3"或"3/10"
+          
+          
+          实时计算特性
+          应用支持实时计算，输入即时显示结果
+          
+          • 即时反馈：输入过程中立即显示计算结果
+          • 动态更新：修改参数时结果实时更新
+          • 错误提示：输入无效时立即显示错误信息
+          • 边界检查：自动检测参数范围是否合法
+          
+          使用建议：
+          • 逐步调整参数观察结果变化
+          • 快速测试不同参数组合
+          • 即时验证计算结果合理性
+          
+          
+          快速操作技巧
+          提高使用效率的快捷操作
+          
+          • 快速清空：删除键或退格键一键清空输入
+          • 默认值恢复：长按输入框恢复推荐默认值
+          • 批量修改：连续输入多个值进行比较
+          • 历史记录：查看最近使用的参数组合
+          
+          效率技巧：
+          • 使用复制粘贴快速输入常用值
+          • 记住常用参数的快捷键位
+          • 建立个人参数库，便于重复使用
+        </text>
+      </div>
+
+      <div class="guide-section">
+        <text class="section-title">结果解读技巧</text>
+        
+        <text class="text-content">
+          概率值理解
+          正确理解不同类型的概率值含义
+          
+          • PDF/PMF值：
+            - 连续分布PDF：密度值，可能大于1
+            - 离散分布PMF：概率值，0-1之间
+            - 单位差异：注意数值的单位影响
+          
+          • CDF值：累积概率，总是在0-1之间
+            - 接近0：事件发生概率极低
+            - 接近0.5：事件发生概率中等
+            - 接近1：事件发生概率极高
+          
+          • 区间概率：两个CDF值的差，表示区间概率
+          
+          解读示例：
+          - 正态分布N(0,1)的PDF在0处为0.4，表示峰值密度
+          - CDF在1.96处为0.975，表示P(Z≤1.96)=97.5%
+          
+          
+          异常值识别
+          识别和处理异常或不合理的结果
+          
+          • 概率超限：结果>1或<0时立即检查参数
+          • 极端值：CDF接近0或1时考虑数值精度
+          • 密度超限：PDF值很大时确认单位正确性
+          • 负值检查：概率值不应为负数
+          
+          常见错误：
+          • 混淆PDF和概率，认为密度就是概率
+          • 忽略参数范围限制导致无效结果
+          • 误解极值概率的实际含义
+          
+          验证方法：
+          • 用多个工具交叉验证结果
+          • 检查参数是否在合理范围内
+          • 对比理论期望值和实际结果
+          
+          
+          实用解读策略
+          将数学结果转化为实际意义的策略
+          
+          • 标准化思维：将结果与常见基准比较
+            - 95%置信区间对应±1.96标准差
+            - 99%置信区间对应±2.58标准差
+          
+          • 实际背景联系：
+            - 质量检测：99%合格率意味着1%缺陷率
+            - 风险评估：1%概率事件在100次试验中可能发生
+          
+          • 决策支持：
+            - 高概率事件：可以相对放心地预期
+            - 低概率事件：需要准备应对措施
+            - 中等概率：需要进一步分析其他因素
+          
+          应用示例：
+          • 正态分布N(100,15²)的95%区间：[70.6, 129.4]
+          • 二项分布B(100,0.05)的期望值：5次成功
+          • 指数分布λ=0.1的平均等待时间：10个时间单位
+        </text>
+      </div>
+
+      <div class="guide-section">
+        <text class="section-title">高级应用技巧</text>
+        
+        <text class="text-content">
+          参数优化技巧
+          优化参数选择以获得最佳分析效果
+          
+          • 灵敏度分析：
+            - 逐步微调参数观察结果变化
+            - 识别对结果影响最大的关键参数
+            - 确定参数的稳定区间
+          
+          • 边界值测试：
+            - 测试参数在允许范围内的极值
+            - 验证模型在极端情况下的表现
+            - 确定实际应用的合理边界
+          
+          • 对比分析：
+            - 设置多个参数组合进行比较
+            - 评估不同策略的预期效果
+            - 选择最优参数配置
+          
+          优化流程：
+          1. 设定评估标准和目标函数
+          2. 系统性地测试参数空间
+          3. 记录和分析结果模式
+          4. 验证最优参数的稳健性
+          
+          
+          数据验证方法
+          确保计算结果可靠性的验证技术
+          
+          • 理论验证：
+            - 与已知理论结果对比
+            - 检查特殊情况的极限行为
+            - 验证对称性和单调性等性质
+          
+          • 数值验证：
+            - 使用不同精度设置重复计算
+            - 与标准统计软件结果对比
+            - 检查数值稳定性和收敛性
+          
+          • 实际验证：
+            - 用历史数据回测预测效果
+            - 通过小规模实验验证模型
+            - 收集实际反馈调整参数
+          
+          验证清单：
+          □ 参数在合理范围内
+          □ 结果符合理论预期
+          □ 数值精度满足要求
+          □ 实际应用效果良好
+          
+          
+          常见误区提醒
+          避免常见错误和误解的注意事项
+          
+          • 概念误区：
+            - 混淆概率密度和概率
+            - 误解置信区间的含义
+            - 忽视独立同分布假设
+          
+          • 计算误区：
+            - 忽略参数范围限制
+            - 使用不适当的近似方法
+            - 忽视数值精度问题
+          
+          • 应用误区：
+            - 过度解读统计显著性
+            - 忽视实际意义的重要性
+            - 错误推广到不同场景
+          
+          预防措施：
+          • 定期回顾基础统计概念
+          • 建立标准化验证流程
+          • 与专业人士讨论复杂案例
+          • 保持批判性思维态度
+        </text>
+      </div>
+    </div>
+
+    <div class="bottom-section">
+      <div class="back-btn" onclick="goBack">
+        <text class="back-text">返回</text>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import router from "@system.router"
+
+export default {
+  private: {
+    
+  },
+
+  onInit() {
+    this.$page.setTitleBar({ text: '使用技巧' })
+  },
+
+  goBack() {
+    router.back()
+  }
+}
+</script>
+
+<style>
+.container {
+  display: flex;
+  flex-direction: column;
+  background-color: #000000;
+  height: 100%;
+}
+
+.top-bar {
+  display: flex;
+  height: 60px;
+  background-color: #111111;
+  padding: 0 20px;
+  justify-content: center;
+  align-items: center;
+  border-bottom: 1px solid #333333;
+}
+
+.page-title {
+  font-size: 22px;
+  color: #ffffff;
+  font-weight: bold;
+}
+
+.content {
+  flex: 1;
+  flex-direction: column;
+  padding: 20px 15px;
+  overflow-y: auto;
+}
+
+.guide-section {
+  margin-bottom: 25px;
+}
+
+.section-title {
+  font-size: 20px;
+  color: #ffffff;
+  font-weight: bold;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+
+.bottom-section {
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  border-top: 1px solid #333333;
+}
+
+.back-btn {
+  height: 45px;
+  width: 120px;
+  background-color: #333333;
+  border: 1px solid #555555;
+  border-radius: 10px;
+  justify-content: center;
+  align-items: center;
+}
+
+.back-text {
+  font-size: 18px;
+  color: #ffffff;
+  font-weight: bold;
+}
+</style>

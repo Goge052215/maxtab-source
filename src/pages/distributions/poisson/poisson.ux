@@ -11,14 +11,14 @@
         <div class="param-item" @click="selectInput('lambda')">
           <text class="param-label">发生率λ</text>
           <div class="param-display">
-            <text class="param-value">{{ lambda }}</text>
+            <text class="param-value">{{ currentParam === 'lambda' && inputBuffer ? inputBuffer : lambda }}</text>
           </div>
         </div>
         
         <div class="param-item" @click="selectInput('k')">
           <text class="param-label">计算值k</text>
           <div class="param-display">
-            <text class="param-value">{{ k }}</text>
+            <text class="param-value">{{ currentParam === 'k' && inputBuffer ? inputBuffer : k }}</text>
           </div>
         </div>
       </div>
@@ -179,6 +179,8 @@ export default {
     // Handle input
     if (this.inputBuffer === '0' && char !== '.') {
       this.inputBuffer = char
+    } else if (this.inputBuffer === '0' && char === '.') {
+      this.inputBuffer = '0.'
     } else {
       this.inputBuffer += char
     }

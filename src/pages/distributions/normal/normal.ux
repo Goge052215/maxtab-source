@@ -11,21 +11,21 @@
         <div class="param-item" @click="selectInput('mu')">
           <text class="param-label">均值μ</text>
           <div class="param-display">
-            <text class="param-value">{{ mu }}</text>
+            <text class="param-value">{{ currentParam === 'mu' && inputBuffer ? inputBuffer : mu }}</text>
           </div>
         </div>
         
         <div class="param-item" @click="selectInput('sigma')">
           <text class="param-label">标准差σ</text>
           <div class="param-display">
-            <text class="param-value">{{ sigma }}</text>
+            <text class="param-value">{{ currentParam === 'sigma' && inputBuffer ? inputBuffer : sigma }}</text>
           </div>
         </div>
         
         <div class="param-item" @click="selectInput('x')">
           <text class="param-label">计算值x</text>
           <div class="param-display">
-            <text class="param-value">{{ x }}</text>
+            <text class="param-value">{{ currentParam === 'x' && inputBuffer ? inputBuffer : x }}</text>
           </div>
         </div>
       </div>
@@ -197,9 +197,11 @@ export default {
       return
     }
     
-    // Handle input
+    // Handle input - allow decimal point after 0
     if (this.inputBuffer === '0' && char !== '.') {
       this.inputBuffer = char
+    } else if (this.inputBuffer === '0' && char === '.') {
+      this.inputBuffer = '0.'  // Ensure 0. is properly formed
     } else {
       this.inputBuffer += char
     }

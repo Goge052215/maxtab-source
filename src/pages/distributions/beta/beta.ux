@@ -11,21 +11,21 @@
         <div class="param-item" @click="selectInput('alpha')">
           <text class="param-label">形状参数α</text>
           <div class="param-display">
-            <text class="param-value">{{ alpha }}</text>
+            <text class="param-value">{{ currentParam === 'alpha' && inputBuffer ? inputBuffer : alpha }}</text>
           </div>
         </div>
         
         <div class="param-item" @click="selectInput('beta')">
           <text class="param-label">形状参数β</text>
           <div class="param-display">
-            <text class="param-value">{{ beta }}</text>
+            <text class="param-value">{{ currentParam === 'beta' && inputBuffer ? inputBuffer : beta }}</text>
           </div>
         </div>
         
         <div class="param-item" @click="selectInput('x')">
           <text class="param-label">计算值x</text>
           <div class="param-display">
-            <text class="param-value">{{ x }}</text>
+            <text class="param-value">{{ currentParam === 'x' && inputBuffer ? inputBuffer : x }}</text>
           </div>
         </div>
       </div>
@@ -185,6 +185,8 @@ export default {
     // Handle input
     if (this.inputBuffer === '0' && char !== '.') {
       this.inputBuffer = char
+    } else if (this.inputBuffer === '0' && char === '.') {
+      this.inputBuffer = '0.'
     } else {
       this.inputBuffer += char
     }
