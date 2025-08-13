@@ -278,9 +278,9 @@ export default {
           pdfValue: result.pdfResult.toFixed(6),
           cdfValue: result.cdfResult.toFixed(6),
           inputParams: [
-            { key: '均值 μ', value: this.mu },
-            { key: '标准差 σ', value: this.sigma },
-            { key: '计算值 x', value: this.x }
+            { key: '均值μ', value: this.mu },
+            { key: '标准差σ', value: this.sigma },
+            { key: '计算值x', value: this.x }
           ]
         }
       })
@@ -319,11 +319,13 @@ export default {
 
 .bottom-section {
   padding: 0px 20px 50px 20px;
+  display: flex;
+  justify-content: center;
 }
 
 .back-btn {
-  height: 45px;
-  width: 100%;
+  height: 50px;
+  width: 100px;
   background-color: #333333;
   border-radius: 10px;
   justify-content: center;
@@ -332,7 +334,7 @@ export default {
 }
 
 .back-text {
-  font-size: 18px;
+  font-size: 20px;
   color: #ffffff;
   font-weight: bold;
 }
@@ -361,13 +363,13 @@ export default {
 }
 
 .param-label {
-  font-size: 18px;
+  font-size: 20px;
   color: #ffffff;
   font-weight: 500;
 }
 
 .param-display {
-  width: 65px;
+  width: 50px;
   height: 35px;
   background-color: #333333;
   border: 1px solid #555555;
@@ -379,7 +381,7 @@ export default {
 .param-value {
   color: #ffffff;
   text-align: center;
-  font-size: 18px;
+  font-size: 20px;
 }
 
 .calc-section {
@@ -396,7 +398,7 @@ export default {
 }
 
 .calc-text {
-  font-size: 18px;
+  font-size: 20px;
   color: #ffffff;
   font-weight: bold;
 }

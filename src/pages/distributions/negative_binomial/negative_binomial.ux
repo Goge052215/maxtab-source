@@ -278,9 +278,9 @@ export default {
           pmfValue: result.pdfResult.toFixed(6),
           cdfValue: result.cdfResult.toFixed(6),
           inputParams: [
-            { key: '成功次数 r', value: this.r },
-            { key: '成功概率 p', value: this.p },
-            { key: '计算值 k', value: this.k }
+            { key: '成功次数r', value: this.r },
+            { key: '成功概率p', value: this.p },
+            { key: '计算值k', value: this.k }
           ]
         }
       })
@@ -319,11 +319,13 @@ export default {
 
 .bottom-section {
   padding: 0px 20px 50px 20px;
+  display: flex;
+  justify-content: center;
 }
 
 .back-btn {
   height: 50px;
-  width: 100%;
+  width: 100px;
   background-color: #333333;
   border-radius: 10px;
   justify-content: center;
@@ -367,7 +369,7 @@ export default {
 }
 
 .param-display {
-  width: 65px;
+  width: 50px;
   height: 35px;
   background-color: #333333;
   border: 1px solid #555555;

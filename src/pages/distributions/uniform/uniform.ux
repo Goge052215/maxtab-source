@@ -273,9 +273,9 @@ export default {
           pdfValue: result.pdfResult.toFixed(6),
           cdfValue: result.cdfResult.toFixed(6),
           inputParams: [
-            { key: '下限 a', value: this.a },
-            { key: '上限 b', value: this.b },
-            { key: '计算值 x', value: this.x }
+            { key: '下限a', value: this.a },
+            { key: '上限b', value: this.b },
+            { key: '计算值x', value: this.x }
           ]
         }
       })
@@ -314,11 +314,13 @@ export default {
 
 .bottom-section {
   padding: 0px 20px 50px 20px;
+  display: flex;
+  justify-content: center;
 }
 
 .back-btn {
-  height: 45px;
-  width: 100%;
+  height: 50px;
+  width: 100px;
   background-color: #333333;
   border-radius: 10px;
   justify-content: center;
@@ -362,7 +364,7 @@ export default {
 }
 
 .param-display {
-  width: 65px;
+  width: 50px;
   height: 35px;
   background-color: #333333;
   border: 1px solid #555555;

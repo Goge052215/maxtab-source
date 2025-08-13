@@ -186,7 +186,7 @@ export default {
     if (char === '.' && (this.currentParam === 'n' || this.currentParam === 'k')) {
       return
     }
-    
+
     // Handle input
     if (this.inputBuffer === '0' && char !== '.') {
       this.inputBuffer = char
@@ -282,9 +282,9 @@ export default {
           pmfValue: result.pdfResult.toFixed(6),
           cdfValue: result.cdfResult.toFixed(6),
           inputParams: [
-            { key: '试验次数 n', value: this.n },
-            { key: '成功概率 p', value: this.p },
-            { key: '计算值 k', value: this.k }
+            { key: '试验次数n', value: this.n },
+            { key: '成功概率p', value: this.p },
+            { key: '计算值k', value: this.k }
           ]
         }
       })
@@ -323,11 +323,13 @@ export default {
 
 .bottom-section {
   padding: 0px 20px 50px 20px;
+  display: flex;
+  justify-content: center;
 }
 
 .back-btn {
-  height: 45px;
-  width: 100%;
+  height: 50px;
+  width: 100px;
   background-color: #333333;
   border-radius: 10px;
   justify-content: center;
@@ -353,11 +355,11 @@ export default {
 }
 
 .param-item {
-  height: 70px;
+  height: 65px;
   background-color: #1a1a1a;
   border-radius: 8px;
   padding: 0 15px;
-  margin-bottom: 5px;
+  margin-bottom: 10px;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;

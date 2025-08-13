@@ -19,15 +19,15 @@
 
       <div class="menu-list-item menu-entry" onclick="routeToSimple()">
         <div class="menu-item">
-          <text class="menu-title">简单计算</text>
+          <text class="menu-title">计算器</text>
         </div>
       </div>
       
-      <div class="menu-list-item menu-entry" onclick="routeToHistory()">
+      <!-- <div class="menu-list-item menu-entry" onclick="routeToHistory()">
         <div class="menu-item">
-          <text class="menu-title">计算历史</text>
+          <text class="menu-title">计算历史</text> 后续更新会加
         </div>
-      </div>
+      </div> -->
       
       <div class="menu-list-item menu-entry" onclick="routeToAbout()">
         <div class="menu-item">
@@ -95,7 +95,7 @@ export default {
 }
 
 .app-title {
-  font-size: 20px;
+  font-size: 22px;
   color: #ffffff;
   font-weight: bold;
 }
@@ -110,6 +110,7 @@ export default {
 /* Added style for the new list-item wrapper */
 .menu-list-item {
   margin-bottom: 12px; /* Reduced spacing to fit better */
+
 }
 
 .menu-entry {
@@ -119,7 +120,7 @@ export default {
 /* Enhanced menu items */
 .menu-item {
   display: flex;
-  height: 60px; /* Reduced height since no description */
+  height: 65px; /* Reduced height since no description */
   width: 100%; /* Ensure consistent width */
   background-color: #222222;
   border: 1px solid #444444;

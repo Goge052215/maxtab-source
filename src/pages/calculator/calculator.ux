@@ -1,95 +1,64 @@
 <template>
-  <div class="container">
-    <!-- 顶部导航栏 -->
-    <div class="top-bar">
-      <text class="back-button" onclick="goBack">返回</text>
-      <text class="page-title">快速计算</text>
+  <div class="container" onswipe="touchMove">
+    <div class="resultBox">
+      <text class="resultShow result-text">{{resultShow}}</text>
     </div>
-
-    <!-- 主内容区域 -->
-    <div class="content">
-      <!-- 分布类别选择 -->
-      <div class="section">
-        <text class="section-title">选择分布类别</text>
-        <div class="category-tabs">
-          <div class="category-tab {{ currentCategory === 'discrete' ? 'active' : '' }}" onclick="selectCategory('discrete')">
-            <text class="tab-text">离散分布</text>
-          </div>
-          <div class="category-tab {{ currentCategory === 'continuous' ? 'active' : '' }}" onclick="selectCategory('continuous')">
-            <text class="tab-text">连续分布</text>
-          </div>
-        </div>
-      </div>
-
-      <!-- 具体分布选择 -->
-      <div class="section">
-        <text class="section-title">选择具体分布</text>
-        <div class="distribution-grid">
-          <div class="distribution-cell {{ selectedDistribution === dist.type ? 'selected' : '' }}" 
-               for="{{ dist in distributions }}" 
-               onclick="selectDistribution(dist.type)">
-            <text class="dist-name">{{ dist.name }}</text>
-            <text class="dist-formula">{{ dist.formula }}</text>
-          </div>
-        </div>
-      </div>
-
-      <!-- 参数输入 -->
-      <div class="section" if="selectedDistribution">
-        <text class="section-title">参数设置</text>
-        <div class="parameters-card">
-          <div class="param-row" for="{{ param in parameters }}" @click="selectInput('parameter', $idx)">
-            <text class="param-name">{{ param.name }}:</text>
-            <div class="param-display">
-              <text class="param-value">{{ param.value % 1 === 0 ? param.value.toString() : param.value.toFixed(2) }}</text>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- 计算区域 -->
-      <div class="section" if="parameters.length > 0">
-        <text class="section-title">计算</text>
-        <div class="calculation-panel">
-          <div class="input-group" @click="selectInput('input')">
-            <text class="input-label">输入值:</text>
-            <div class="input-controls">
-              <div class="input-box">
-                <text class="param-value">{{ inputValue }}</text>
-              </div>
-              <div class="input-buttons">
-                <div class="input-btn" onclick="decrementInput"><text class="input-btn-text">-</text></div>
-                <div class="input-btn" onclick="incrementInput"><text class="input-btn-text">+</text></div>
-              </div>
-            </div>
-          </div>
-
-          <div class="results-display">
-            <div class="result-box">
-              <text class="result-label">概率密度:</text>
-              <text class="result-value {{ currentCategory === 'discrete' ? 'pmf' : 'pdf' }}">{{ currentCategory === 'discrete' ? pmfResult : pdfResult }}</text>
-            </div>
-            <div class="result-box">
-              <text class="result-label">累积概率:</text>
-              <text class="result-value cdf">{{ cdfResult }}</text>
-            </div>
-          </div>
-
-          <div class="calculate-btn" onclick="calculate">
-            <text class="btn-text">立即计算</text>
-          </div>
-        </div>
-      </div>
+    <div class="keyBoardBox">
+      <text class="inputCommon input1" onclick="clearAll">AC</text>
+      <text class="inputCommon input1" onclick="deleteLast">D</text>
+      <text class="inputCommon input1" onclick="operatorClick('%')">{{keyBoardNum[19]}}</text>
+      <text class="inputCommon input1" onclick="operatorClick('/')">{{keyBoardNum[15]}}</text>
+    </div>
+    <div class="keyBoardBox">
+      <text class="inputCommon" onclick="numberClick(7)">{{keyBoardNum[1]}}</text>
+      <text class="inputCommon" onclick="numberClick(8)">{{keyBoardNum[2]}}</text>
+      <text class="inputCommon" onclick="numberClick(9)">{{keyBoardNum[3]}}</text>
+      <text class="inputCommon input1" onclick="operatorClick('*')">{{keyBoardNum[10]}}</text>
+    </div>
+    <div class="keyBoardBox">
+      <text class="inputCommon" onclick="numberClick(4)">{{keyBoardNum[6]}}</text>
+      <text class="inputCommon" onclick="numberClick(5)">{{keyBoardNum[7]}}</text>
+      <text class="inputCommon" onclick="numberClick(6)">{{keyBoardNum[8]}}</text>
+      <text class="inputCommon input1" onclick="operatorClick('-')">{{keyBoardNum[14]}}</text>
+    </div>
+    <div class="keyBoardBox">
+      <text class="inputCommon" onclick="numberClick(1)">{{keyBoardNum[11]}}</text>
+      <text class="inputCommon" onclick="numberClick(2)">{{keyBoardNum[12]}}</text>
+      <text class="inputCommon" onclick="numberClick(3)">{{keyBoardNum[13]}}</text>
+      <text  class="inputCommon input1" onclick="operatorClick('+')">{{keyBoardNum[9]}}</text>
+    </div>
+    <div class="keyBoardBox">
+      <text class="inputCommon" onclick="numberClick(0)">{{keyBoardNum[16]}}</text>
+      <text class="inputCommon" onclick="decimalClick">{{keyBoardNum[17]}}</text>
+      <text class="inputCommon input1 expand-button" onclick="calculate">{{keyBoardNum[18]}}</text>
+    </div>
+    <div class="back-row">
+      <input onclick="goBack" class="back-button-full" value="返回" />
     </div>
   </div>
 </template>
 
 <script>
 import router from "@system.router"
+import app from '@system.app'
+import device from '@system.device'
 import { globalState } from "../../common/global_state.js"
+
+const MinusIcon = '+/-';
+const DelIcon = ' ';
 
 export default {
   private: {
+    resultShow: '0',
+    currentInput: '',
+    operator: '',
+    previousInput: '',
+    waitingForOperand: false,
+    keyBoardNum: ['C', '7', '8', '9', MinusIcon, DelIcon, '4', '5', '6', '+', 'x', '1', '2', '3', '-', '/', '0', '.', '=', '%'],
+    commonColorList: ['#F53333', '#505050', '#505050', '#505050', '#505050', '#FFA626', '#505050', '#505050', '#505050', '#FFA626', '#FFA626', '#505050', '#505050', '#505050', '#FFA626', '#FFA626', '#505050', '#505050', '#FFA626'],
+    clickColorList: [],
+    signColorList: ['#FFFFFF', '#FFFFFF', '#FFFFFF', '#FFFFFF'],
+    errorMessage: "",
     currentCategory: 'discrete',
     selectedDistribution: null,
     parameters: [],
@@ -110,31 +79,115 @@ export default {
       { type: 'uniform', name: '均匀分布', formula: 'U(a, b)' },
       { type: 'gamma', name: '伽马分布', formula: 'Γ(α, β)' },
       { type: 'beta', name: '贝塔分布', formula: 'Beta(α, β)' }
-    ],
-    errorMessage: ""
+    ]
   },
 
   onInit() {
     this.$page.setTitleBar({ text: '快速计算' })
+    this.clickColorList = this.commonColorList.slice()
     this.selectCategory('discrete')
     this.importFromGlobal()
   },
 
   onShow() {
     console.log('Calculator onShow called')
-    this.handleKeyboardResult()
     this.importFromGlobal()
   },
 
   onReady() {
     console.log('Calculator onReady called')
-    this.handleKeyboardResult()
     this.importFromGlobal()
   },
 
   onResume() {
     console.log('Calculator onResume called')
-    this.handleKeyboardResult()
+  },
+
+  // Calculator functions
+  numberClick(num) {
+    console.log('Number clicked:', num)
+    if (this.waitingForOperand) {
+      this.resultShow = String(num)
+      this.waitingForOperand = false
+    } else {
+      this.resultShow = this.resultShow === '0' ? String(num) : this.resultShow + num
+    }
+    this.currentInput = this.resultShow
+    this.$forceUpdate()
+  },
+
+  operatorClick(nextOperator) {
+    console.log('Operator clicked:', nextOperator)
+    const inputValue = parseFloat(this.currentInput || this.resultShow)
+
+    if (this.previousInput === '') {
+      this.previousInput = inputValue
+    } else if (this.operator) {
+      const newValue = this.performCalculation()
+      this.resultShow = String(newValue)
+      this.previousInput = newValue
+    }
+
+    this.waitingForOperand = true
+    this.operator = nextOperator
+    this.$forceUpdate()
+  },
+
+  performCalculation() {
+    const prev = parseFloat(this.previousInput)
+    const current = parseFloat(this.currentInput || this.resultShow)
+
+    if (this.operator === '+') {
+      return prev + current
+    } else if (this.operator === '-') {
+      return prev - current
+    } else if (this.operator === '*' || this.operator === 'x') {
+      return prev * current
+    } else if (this.operator === '/') {
+      return current !== 0 ? prev / current : 0
+    } else if (this.operator === '%') {
+      return prev % current
+    }
+
+    return current
+  },
+
+  decimalClick() {
+    if (this.waitingForOperand) {
+      this.resultShow = '0.'
+      this.waitingForOperand = false
+    } else if (this.resultShow.indexOf('.') === -1) {
+      this.resultShow += '.'
+    }
+    this.currentInput = this.resultShow
+    this.$forceUpdate()
+  },
+
+  clearAll() {
+    this.resultShow = '0'
+    this.currentInput = ''
+    this.previousInput = ''
+    this.operator = ''
+    this.waitingForOperand = false
+    this.$forceUpdate()
+  },
+
+  deleteLast() {
+    if (this.resultShow.length > 1) {
+      this.resultShow = this.resultShow.slice(0, -1)
+    } else {
+      this.resultShow = '0'
+    }
+    this.currentInput = this.resultShow
+    this.$forceUpdate()
+  },
+
+  exit() {
+    app.terminate()
+  },
+
+  touchMove() {
+    // Handle touch/swipe events if needed
   },
 
   goBack() {
@@ -209,63 +262,32 @@ export default {
   },
 
   calculate() {
-    if (this.parameters.length === 0) return
-    
-    // 模拟计算结果
-    const randomResult = () => (Math.random() * 0.8 + 0.1).toFixed(4)
-    
-    if (this.currentCategory === 'discrete') {
-      this.pmfResult = randomResult()
-      this.pdfResult = "-"
-    } else {
-      this.pdfResult = randomResult()
-      this.pmfResult = "-"
+    if (this.operator && this.previousInput !== '' && !this.waitingForOperand) {
+      const newValue = this.performCalculation()
+      this.resultShow = String(newValue)
+      this.currentInput = ''
+      this.previousInput = ''
+      this.operator = ''
+      this.waitingForOperand = true
     }
-    this.cdfResult = randomResult()
-  },
-
-  selectInput(inputType, index = -1) {
-    let parameterName = ''
-    let parameterType = ''
-    let currentValue = ''
-
-    if (inputType === 'parameter') {
-      parameterName = this.parameters[index].name
-      parameterType = `param_${index}`
-      currentValue = this.parameters[index].value.toString()
-    } else {
-      parameterName = '输入值'
-      parameterType = 'input'
-      currentValue = this.inputValue.toString()
-    }
-
-    router.push({
-      uri: 'pages/keyboard',
-      params: {
-        parameterName: parameterName,
-        parameterType: parameterType,
-        currentValue: currentValue
-      }
-    })
-  },
-
-  handleKeyboardResult() {
-    const result = globalState.getKeyboardResult()
-    if (result) {
-      const { value, parameterType } = result
-
-      if (parameterType.startsWith('param_')) {
-        const index = parseInt(parameterType.split('_')[1])
-        if (!isNaN(index) && index >= 0 && index < this.parameters.length) {
-          this.parameters[index].value = value
-        }
-      } else if (parameterType === 'input') {
-        this.inputValue = value
-      }
+    
+    // Also handle statistical calculations if parameters are set
+    if (this.parameters.length > 0) {
+      // 模拟计算结果
+      const randomResult = () => (Math.random() * 0.8 + 0.1).toFixed(4)
       
-      this.$forceUpdate()
+      if (this.currentCategory === 'discrete') {
+        this.pmfResult = randomResult()
+        this.pdfResult = "-"
+      } else {
+        this.pdfResult = randomResult()
+        this.pmfResult = "-"
+      }
+      this.cdfResult = randomResult()
     }
   },
+
+
 
   importFromGlobal() {
     const payload = globalState.getCalculatorImport()
@@ -313,40 +335,59 @@ export default {
 </script>
 
 <style>
+@import "./pillShaped.css";
+
 .container {
-  flex-direction: column;
-  background-color: #000000;
+  width: 100%;
   height: 100%;
-}
-
-.top-bar {
-  height: 70px;
-  background-color: #111111;
-  flex-direction: row;
-  align-items: center;
-  padding: 0 20px;
-  border-bottom: 1px solid #333333;
-}
-
-.back-button {
-  font-size: 16px;
-  color: #ffffff;
-  padding: 10px 15px;
-}
-
-.page-title {
-  font-size: 20px;
-  color: #ffffff;
-  font-weight: bold;
-  margin-left: 20px;
-}
-
-.content {
-  flex: 1;
   flex-direction: column;
-  padding: 20px;
+  align-items: center;
 }
 
+.clearAll {
+  width: 50px;
+  height: 60px;
+  background-color: #3d3d3d;
+  color: #ffffff;
+  text-align: center;
+  font-size: 24px;
+  font-weight: bold;
+  border-radius: 8px;
+  border: none;
+  margin: 2px;
+}
+
+.expand-button {
+  width: 100px !important;
+  background-color: #ca8600;
+}
+
+.back-row {
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.back-button-full {
+  width: 100px;
+  height: 60px;
+  background-color: #3d3d3d;
+  color: #ffffff;
+  text-align: center;
+  font-size: 24px;
+  font-weight: bold;
+  border-radius: 12px;
+  border: none;
+  margin: 2px;
+}
+
+.delIcon {
+  width: 30px;
+  height: 22px;
+}
+
+/* Legacy styles for statistical calculator features */
 .section {
   margin-bottom: 25px;
 }

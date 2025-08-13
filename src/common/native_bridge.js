@@ -1,27 +1,10 @@
-/**
- * Native Bridge for JavaScript-to-C function calls
- * Provides optimized statistical distribution calculations using C libraries
- * 
- * ALL CALCULATIONS NOW USE C BRIDGE EXCLUSIVELY
- * JavaScript fallback implementations have been commented out
- * Native C module is required for all distribution calculations
- */
-
-// Import native C module (QuickApp framework specific)
 import app from '@system.app'
-import { MockNativeModule } from './mock_native_module.js'
 
-// Initialize native module reference
 let NativeModule = null
-let usingMockModule = false
 
-// Initialize native module with proper QuickApp API
 try {
-  // QuickApp native module access patterns
   if (app) {
-    // Try different QuickApp native module access methods
     if (app.invokeNativePlugin) {
-      // Method 1: invokeNativePlugin (QuickApp 1.0+)
       NativeModule = {
         call: (functionName, params) => {
           return app.invokeNativePlugin({
@@ -32,7 +15,6 @@ try {
         }
       }
     } else if (app.callNative) {
-      // Method 2: callNative (older QuickApp versions)
       NativeModule = {
         call: (functionName, params) => {
           return app.callNative({
@@ -43,7 +25,6 @@ try {
         }
       }
     } else if (typeof global !== 'undefined' && global.requireNativePlugin) {
-      // Method 3: global requireNativePlugin (alternative approach)
       const nativeModule = global.requireNativePlugin('StatisticalCalculator')
       if (nativeModule && nativeModule.orchestrator_calculate_with_request) {
         NativeModule = {
@@ -55,31 +36,23 @@ try {
     }
   }
 
-  // If no native module found, check for development/testing mode
+  // If no native module found, will use JavaScript fallback
   if (!NativeModule) {
-    // Enable mock module for testing C integration
-    const enableMock = true // Set to true for testing, false for production
-
-    if (enableMock) {
-      NativeModule = MockNativeModule
-      usingMockModule = true
-      console.log('Native module initialization: MOCK MODE (simulating C engine)')
-    } else {
-      console.log('Native module initialization: FALLBACK MODE (JavaScript only)')
-    }
+    console.log('Native module initialization: FALLBACK MODE (JavaScript only)')
   } else {
     console.log('Native module initialization: SUCCESS (real C engine)')
   }
 } catch (error) {
   console.warn('Native module initialization failed:', error)
   NativeModule = null
-  usingMockModule = false
 }
 
 /**
  * Distribution type constants matching C enum
+ * Note: Uniform, Gamma, and Beta distributions are only available in JavaScript fallback
  */
 const DISTRIBUTION_TYPES = {
+  // C enum values (0-9)
   DIST_NORMAL: 0,
   DIST_EXPONENTIAL: 1,
   DIST_CHI_SQUARE: 2,
@@ -90,6 +63,8 @@ const DISTRIBUTION_TYPES = {
   DIST_BINOMIAL: 7,
   DIST_NEGATIVE_BINOMIAL: 8,
   DIST_POISSON: 9,
+  
+  // JavaScript-only values (10+)
   DIST_UNIFORM: 10,
   DIST_GAMMA: 11,
   DIST_BETA: 12
@@ -121,14 +96,26 @@ class NativeBridge {
   }
 
   /**
+   * Force use of JavaScript fallback for testing purposes
+   * @param {boolean} forceFallback - Whether to force fallback mode
+   */
+  static setForceFallback(forceFallback) {
+    if (forceFallback) {
+      this._originalNativeModule = NativeModule
+      NativeModule = null
+    } else if (this._originalNativeModule) {
+      NativeModule = this._originalNativeModule
+      this._originalNativeModule = null
+    }
+  }
+
+  /**
    * Get current calculation mode
-   * @returns {string} 'native', 'mock', or 'fallback'
+   * @returns {string} 'native' or 'fallback'
    */
   static getCalculationMode() {
-    if (NativeModule && !usingMockModule) {
+    if (NativeModule && typeof NativeModule.call === 'function') {
       return 'native'
-    } else if (NativeModule && usingMockModule) {
-      return 'mock'
     } else {
       return 'fallback'
     }
@@ -143,32 +130,31 @@ class NativeBridge {
    */
   static calculateBinomial(n, p, k) {
     try {
-      // Check if NativeModule is available
-      if (!NativeModule || typeof NativeModule.call !== 'function') {
-        console.error('NativeModule not available - C bridge required for calculations')
-        return new CalculationResult(false, 0, 0, 'Native C module not available')
+      // Try native calculation first
+      if (NativeModule && typeof NativeModule.call === 'function') {
+        const params = [n, p]
+        const request = {
+          distribution: DISTRIBUTION_TYPES.DIST_BINOMIAL,
+          parameters: params,
+          param_count: 2,
+          input_value: k
+        }
+
+        const result = NativeModule.call('orchestrator_calculate_with_request', request)
+        return new CalculationResult(
+          result.success === 1,
+          result.pdf_result,
+          result.cdf_result,
+          result.error_message
+        )
+      } else {
+        // Fall back to JavaScript implementation
+        console.log('Using JavaScript fallback for binomial calculation')
+        return this.fallbackBinomial(n, p, k)
       }
-
-      const params = [n, p]
-      const request = {
-        distribution: DISTRIBUTION_TYPES.DIST_BINOMIAL,
-        parameters: params,
-        param_count: 2,
-        input_value: k
-      }
-
-      // Call native C function through QuickApp bridge
-      const result = NativeModule.call('orchestrator_calculate_with_request', request)
-
-      return new CalculationResult(
-        result.success === 1,
-        result.pdf_result,
-        result.cdf_result,
-        result.error_message
-      )
     } catch (error) {
-      console.error('Native binomial calculation failed:', error)
-      return new CalculationResult(false, 0, 0, 'Native calculation failed: ' + error.message)
+      console.error('Native binomial calculation failed, using fallback:', error)
+      return this.fallbackBinomial(n, p, k)
     }
   }
 
@@ -180,31 +166,31 @@ class NativeBridge {
    */
   static calculatePoisson(lambda, k) {
     try {
-      // Check if NativeModule is available
-      if (!NativeModule || typeof NativeModule.call !== 'function') {
-        console.error('NativeModule not available - C bridge required for calculations')
-        return new CalculationResult(false, 0, 0, 'Native C module not available')
+      // Try native calculation first
+      if (NativeModule && typeof NativeModule.call === 'function') {
+        const params = [lambda]
+        const request = {
+          distribution: DISTRIBUTION_TYPES.DIST_POISSON,
+          parameters: params,
+          param_count: 1,
+          input_value: k
+        }
+
+        const result = NativeModule.call('orchestrator_calculate_with_request', request)
+        return new CalculationResult(
+          result.success === 1,
+          result.pdf_result,
+          result.cdf_result,
+          result.error_message
+        )
+      } else {
+        // Fall back to JavaScript implementation
+        console.log('Using JavaScript fallback for Poisson calculation')
+        return this.fallbackPoisson(lambda, k)
       }
-
-      const params = [lambda]
-      const request = {
-        distribution: DISTRIBUTION_TYPES.DIST_POISSON,
-        parameters: params,
-        param_count: 1,
-        input_value: k
-      }
-
-      const result = NativeModule.call('orchestrator_calculate_with_request', request)
-
-      return new CalculationResult(
-        result.success === 1,
-        result.pdf_result,
-        result.cdf_result,
-        result.error_message
-      )
     } catch (error) {
-      console.error('Native Poisson calculation failed:', error)
-      return new CalculationResult(false, 0, 0, 'Native calculation failed: ' + error.message)
+      console.error('Native Poisson calculation failed, using fallback:', error)
+      return this.fallbackPoisson(lambda, k)
     }
   }
 
@@ -216,31 +202,31 @@ class NativeBridge {
    */
   static calculateGeometric(p, k) {
     try {
-      // Check if NativeModule is available
-      if (!NativeModule || typeof NativeModule.call !== 'function') {
-        console.error('NativeModule not available - C bridge required for calculations')
-        return new CalculationResult(false, 0, 0, 'Native C module not available')
+      // Try native calculation first
+      if (NativeModule && typeof NativeModule.call === 'function') {
+        const params = [p]
+        const request = {
+          distribution: DISTRIBUTION_TYPES.DIST_GEOMETRIC,
+          parameters: params,
+          param_count: 1,
+          input_value: k
+        }
+
+        const result = NativeModule.call('orchestrator_calculate_with_request', request)
+        return new CalculationResult(
+          result.success === 1,
+          result.pdf_result,
+          result.cdf_result,
+          result.error_message
+        )
+      } else {
+        // Fall back to JavaScript implementation
+        console.log('Using JavaScript fallback for geometric calculation')
+        return this.fallbackGeometric(p, k)
       }
-
-      const params = [p]
-      const request = {
-        distribution: DISTRIBUTION_TYPES.DIST_GEOMETRIC,
-        parameters: params,
-        param_count: 1,
-        input_value: k
-      }
-
-      const result = NativeModule.call('orchestrator_calculate_with_request', request)
-
-      return new CalculationResult(
-        result.success === 1,
-        result.pdf_result,
-        result.cdf_result,
-        result.error_message
-      )
     } catch (error) {
-      console.error('Native geometric calculation failed:', error)
-      return new CalculationResult(false, 0, 0, 'Native calculation failed: ' + error.message)
+      console.error('Native geometric calculation failed, using fallback:', error)
+      return this.fallbackGeometric(p, k)
     }
   }
 
@@ -253,31 +239,31 @@ class NativeBridge {
    */
   static calculateNegativeBinomial(r, p, k) {
     try {
-      // Check if NativeModule is available
-      if (!NativeModule || typeof NativeModule.call !== 'function') {
-        console.error('NativeModule not available - C bridge required for calculations')
-        return new CalculationResult(false, 0, 0, 'Native C module not available')
+      // Try native calculation first
+      if (NativeModule && typeof NativeModule.call === 'function') {
+        const params = [r, p]
+        const request = {
+          distribution: DISTRIBUTION_TYPES.DIST_NEGATIVE_BINOMIAL,
+          parameters: params,
+          param_count: 2,
+          input_value: k
+        }
+
+        const result = NativeModule.call('orchestrator_calculate_with_request', request)
+        return new CalculationResult(
+          result.success === 1,
+          result.pdf_result,
+          result.cdf_result,
+          result.error_message
+        )
+      } else {
+        // Fall back to JavaScript implementation
+        console.log('Using JavaScript fallback for negative binomial calculation')
+        return this.fallbackNegativeBinomial(r, p, k)
       }
-
-      const params = [r, p]
-      const request = {
-        distribution: DISTRIBUTION_TYPES.DIST_NEGATIVE_BINOMIAL,
-        parameters: params,
-        param_count: 2,
-        input_value: k
-      }
-
-      const result = NativeModule.call('orchestrator_calculate_with_request', request)
-
-      return new CalculationResult(
-        result.success === 1,
-        result.pdf_result,
-        result.cdf_result,
-        result.error_message
-      )
     } catch (error) {
-      console.error('Native negative binomial calculation failed:', error)
-      return new CalculationResult(false, 0, 0, 'Native calculation failed: ' + error.message)
+      console.error('Native negative binomial calculation failed, using fallback:', error)
+      return this.fallbackNegativeBinomial(r, p, k)
     }
   }
 
@@ -290,31 +276,31 @@ class NativeBridge {
    */
   static calculateNormalDistribution(mu, sigma, x) {
     try {
-      // Check if NativeModule is available
-      if (!NativeModule || typeof NativeModule.call !== 'function') {
-        console.error('NativeModule not available - C bridge required for calculations')
-        return new CalculationResult(false, 0, 0, 'Native C module not available')
+      // Try native calculation first
+      if (NativeModule && typeof NativeModule.call === 'function') {
+        const params = [mu, sigma]
+        const request = {
+          distribution: DISTRIBUTION_TYPES.DIST_NORMAL,
+          parameters: params,
+          param_count: 2,
+          input_value: x
+        }
+
+        const result = NativeModule.call('orchestrator_calculate_with_request', request)
+        return new CalculationResult(
+          result.success === 1,
+          result.pdf_result,
+          result.cdf_result,
+          result.error_message
+        )
+      } else {
+        // Fall back to JavaScript implementation
+        console.log('Using JavaScript fallback for normal distribution calculation')
+        return this.fallbackNormalDistribution(mu, sigma, x)
       }
-
-      const params = [mu, sigma]
-      const request = {
-        distribution: DISTRIBUTION_TYPES.DIST_NORMAL,
-        parameters: params,
-        param_count: 2,
-        input_value: x
-      }
-
-      const result = NativeModule.call('orchestrator_calculate_with_request', request)
-
-      return new CalculationResult(
-        result.success === 1,
-        result.pdf_result,
-        result.cdf_result,
-        result.error_message
-      )
     } catch (error) {
-      console.error('Native normal distribution calculation failed:', error)
-      return new CalculationResult(false, 0, 0, 'Native calculation failed: ' + error.message)
+      console.error('Native normal distribution calculation failed, using fallback:', error)
+      return this.fallbackNormalDistribution(mu, sigma, x)
     }
   }
 
@@ -328,31 +314,31 @@ class NativeBridge {
    */
   static calculateHypergeometric(N, K, n, k) {
     try {
-      // Check if NativeModule is available
-      if (!NativeModule || typeof NativeModule.call !== 'function') {
-        console.error('NativeModule not available - C bridge required for calculations')
-        return new CalculationResult(false, 0, 0, 'Native C module not available')
+      // Try native calculation first
+      if (NativeModule && typeof NativeModule.call === 'function') {
+        const params = [N, K, n]
+        const request = {
+          distribution: DISTRIBUTION_TYPES.DIST_HYPERGEOMETRIC,
+          parameters: params,
+          param_count: 3,
+          input_value: k
+        }
+
+        const result = NativeModule.call('orchestrator_calculate_with_request', request)
+        return new CalculationResult(
+          result.success === 1,
+          result.pdf_result,
+          result.cdf_result,
+          result.error_message
+        )
+      } else {
+        // Fall back to JavaScript implementation
+        console.log('Using JavaScript fallback for hypergeometric calculation')
+        return this.fallbackHypergeometric(N, K, n, k)
       }
-
-      const params = [N, K, n]
-      const request = {
-        distribution: DISTRIBUTION_TYPES.DIST_HYPERGEOMETRIC,
-        parameters: params,
-        param_count: 3,
-        input_value: k
-      }
-
-      const result = NativeModule.call('orchestrator_calculate_with_request', request)
-
-      return new CalculationResult(
-        result.success === 1,
-        result.pdf_result,
-        result.cdf_result,
-        result.error_message
-      )
     } catch (error) {
-      console.error('Native hypergeometric calculation failed:', error)
-      return new CalculationResult(false, 0, 0, 'Native calculation failed: ' + error.message)
+      console.error('Native hypergeometric calculation failed, using fallback:', error)
+      return this.fallbackHypergeometric(N, K, n, k)
     }
   }
 
@@ -364,31 +350,31 @@ class NativeBridge {
    */
   static calculateExponentialDistribution(lambda, x) {
     try {
-      // Check if NativeModule is available
-      if (!NativeModule || typeof NativeModule.call !== 'function') {
-        console.error('NativeModule not available - C bridge required for calculations')
-        return new CalculationResult(false, 0, 0, 'Native C module not available')
+      // Try native calculation first
+      if (NativeModule && typeof NativeModule.call === 'function') {
+        const params = [lambda]
+        const request = {
+          distribution: DISTRIBUTION_TYPES.DIST_EXPONENTIAL,
+          parameters: params,
+          param_count: 1,
+          input_value: x
+        }
+
+        const result = NativeModule.call('orchestrator_calculate_with_request', request)
+        return new CalculationResult(
+          result.success === 1,
+          result.pdf_result,
+          result.cdf_result,
+          result.error_message
+        )
+      } else {
+        // Fall back to JavaScript implementation
+        console.log('Using JavaScript fallback for exponential distribution calculation')
+        return this.fallbackExponentialDistribution(lambda, x)
       }
-
-      const params = [lambda]
-      const request = {
-        distribution: DISTRIBUTION_TYPES.DIST_EXPONENTIAL,
-        parameters: params,
-        param_count: 1,
-        input_value: x
-      }
-
-      const result = NativeModule.call('orchestrator_calculate_with_request', request)
-
-      return new CalculationResult(
-        result.success === 1,
-        result.pdf_result,
-        result.cdf_result,
-        result.error_message
-      )
     } catch (error) {
-      console.error('Native exponential distribution calculation failed:', error)
-      return new CalculationResult(false, 0, 0, 'Native calculation failed: ' + error.message)
+      console.error('Native exponential distribution calculation failed, using fallback:', error)
+      return this.fallbackExponentialDistribution(lambda, x)
     }
   }
 
@@ -400,31 +386,31 @@ class NativeBridge {
    */
   static calculateChiSquareDistribution(k, x) {
     try {
-      // Check if NativeModule is available
-      if (!NativeModule || typeof NativeModule.call !== 'function') {
-        console.error('NativeModule not available - C bridge required for calculations')
-        return new CalculationResult(false, 0, 0, 'Native C module not available')
+      // Try native calculation first
+      if (NativeModule && typeof NativeModule.call === 'function') {
+        const params = [k]
+        const request = {
+          distribution: DISTRIBUTION_TYPES.DIST_CHI_SQUARE,
+          parameters: params,
+          param_count: 1,
+          input_value: x
+        }
+
+        const result = NativeModule.call('orchestrator_calculate_with_request', request)
+        return new CalculationResult(
+          result.success === 1,
+          result.pdf_result,
+          result.cdf_result,
+          result.error_message
+        )
+      } else {
+        // Fall back to JavaScript implementation
+        console.log('Using JavaScript fallback for chi-square distribution calculation')
+        return this.fallbackChiSquareDistribution(k, x)
       }
-
-      const params = [k]
-      const request = {
-        distribution: DISTRIBUTION_TYPES.DIST_CHI_SQUARE,
-        parameters: params,
-        param_count: 1,
-        input_value: x
-      }
-
-      const result = NativeModule.call('orchestrator_calculate_with_request', request)
-
-      return new CalculationResult(
-        result.success === 1,
-        result.pdf_result,
-        result.cdf_result,
-        result.error_message
-      )
     } catch (error) {
-      console.error('Native chi-square distribution calculation failed:', error)
-      return new CalculationResult(false, 0, 0, 'Native calculation failed: ' + error.message)
+      console.error('Native chi-square distribution calculation failed, using fallback:', error)
+      return this.fallbackChiSquareDistribution(k, x)
     }
   }
 
@@ -436,31 +422,31 @@ class NativeBridge {
    */
   static calculateTDistribution(nu, t) {
     try {
-      // Check if NativeModule is available
-      if (!NativeModule || typeof NativeModule.call !== 'function') {
-        console.error('NativeModule not available - C bridge required for calculations')
-        return new CalculationResult(false, 0, 0, 'Native C module not available')
+      // Try native calculation first
+      if (NativeModule && typeof NativeModule.call === 'function') {
+        const params = [nu]
+        const request = {
+          distribution: DISTRIBUTION_TYPES.DIST_T_DISTRIBUTION,
+          parameters: params,
+          param_count: 1,
+          input_value: t
+        }
+
+        const result = NativeModule.call('orchestrator_calculate_with_request', request)
+        return new CalculationResult(
+          result.success === 1,
+          result.pdf_result,
+          result.cdf_result,
+          result.error_message
+        )
+      } else {
+        // Fall back to JavaScript implementation
+        console.log('Using JavaScript fallback for t-distribution calculation')
+        return this.fallbackTDistribution(nu, t)
       }
-
-      const params = [nu]
-      const request = {
-        distribution: DISTRIBUTION_TYPES.DIST_T_DISTRIBUTION,
-        parameters: params,
-        param_count: 1,
-        input_value: t
-      }
-
-      const result = NativeModule.call('orchestrator_calculate_with_request', request)
-
-      return new CalculationResult(
-        result.success === 1,
-        result.pdf_result,
-        result.cdf_result,
-        result.error_message
-      )
     } catch (error) {
-      console.error('Native t-distribution calculation failed:', error)
-      return new CalculationResult(false, 0, 0, 'Native calculation failed: ' + error.message)
+      console.error('Native t-distribution calculation failed, using fallback:', error)
+      return this.fallbackTDistribution(nu, t)
     }
   }
 
@@ -473,31 +459,31 @@ class NativeBridge {
    */
   static calculateFDistribution(d1, d2, x) {
     try {
-      // Check if NativeModule is available
-      if (!NativeModule || typeof NativeModule.call !== 'function') {
-        console.error('NativeModule not available - C bridge required for calculations')
-        return new CalculationResult(false, 0, 0, 'Native C module not available')
+      // Try native calculation first
+      if (NativeModule && typeof NativeModule.call === 'function') {
+        const params = [d1, d2]
+        const request = {
+          distribution: DISTRIBUTION_TYPES.DIST_F_DISTRIBUTION,
+          parameters: params,
+          param_count: 2,
+          input_value: x
+        }
+
+        const result = NativeModule.call('orchestrator_calculate_with_request', request)
+        return new CalculationResult(
+          result.success === 1,
+          result.pdf_result,
+          result.cdf_result,
+          result.error_message
+        )
+      } else {
+        // Fall back to JavaScript implementation
+        console.log('Using JavaScript fallback for F-distribution calculation')
+        return this.fallbackFDistribution(d1, d2, x)
       }
-
-      const params = [d1, d2]
-      const request = {
-        distribution: DISTRIBUTION_TYPES.DIST_F_DISTRIBUTION,
-        parameters: params,
-        param_count: 2,
-        input_value: x
-      }
-
-      const result = NativeModule.call('orchestrator_calculate_with_request', request)
-
-      return new CalculationResult(
-        result.success === 1,
-        result.pdf_result,
-        result.cdf_result,
-        result.error_message
-      )
     } catch (error) {
-      console.error('Native F-distribution calculation failed:', error)
-      return new CalculationResult(false, 0, 0, 'Native calculation failed: ' + error.message)
+      console.error('Native F-distribution calculation failed, using fallback:', error)
+      return this.fallbackFDistribution(d1, d2, x)
     }
   }
 
@@ -509,33 +495,9 @@ class NativeBridge {
    * @returns {CalculationResult}
    */
   static calculateUniformDistribution(a, b, x) {
-    try {
-      // Check if NativeModule is available
-      if (!NativeModule || typeof NativeModule.call !== 'function') {
-        console.error('NativeModule not available - C bridge required for calculations')
-        return new CalculationResult(false, 0, 0, 'Native C module not available')
-      }
-
-      const params = [a, b]
-      const request = {
-        distribution: DISTRIBUTION_TYPES.DIST_UNIFORM,
-        parameters: params,
-        param_count: 2,
-        input_value: x
-      }
-
-      const result = NativeModule.call('orchestrator_calculate_with_request', request)
-
-      return new CalculationResult(
-        result.success === 1,
-        result.pdf_result,
-        result.cdf_result,
-        result.error_message
-      )
-    } catch (error) {
-      console.error('Native uniform distribution calculation failed:', error)
-      return new CalculationResult(false, 0, 0, 'Native calculation failed: ' + error.message)
-    }
+    // Uniform distribution only available in JavaScript (not in C module)
+    console.log('Using JavaScript implementation for uniform distribution calculation')
+    return this.fallbackUniformDistribution(a, b, x)
   }
 
   /**
@@ -546,33 +508,9 @@ class NativeBridge {
    * @returns {CalculationResult}
    */
   static calculateGammaDistribution(k, theta, x) {
-    try {
-      // Check if NativeModule is available
-      if (!NativeModule || typeof NativeModule.call !== 'function') {
-        console.error('NativeModule not available - C bridge required for calculations')
-        return new CalculationResult(false, 0, 0, 'Native C module not available')
-      }
-
-      const params = [k, theta]
-      const request = {
-        distribution: DISTRIBUTION_TYPES.DIST_GAMMA,
-        parameters: params,
-        param_count: 2,
-        input_value: x
-      }
-
-      const result = NativeModule.call('orchestrator_calculate_with_request', request)
-
-      return new CalculationResult(
-        result.success === 1,
-        result.pdf_result,
-        result.cdf_result,
-        result.error_message
-      )
-    } catch (error) {
-      console.error('Native gamma distribution calculation failed:', error)
-      return new CalculationResult(false, 0, 0, 'Native calculation failed: ' + error.message)
-    }
+    // Gamma distribution only available in JavaScript (not in C module)
+    console.log('Using JavaScript implementation for gamma distribution calculation')
+    return this.fallbackGammaDistribution(k, theta, x)
   }
 
   /**
@@ -583,40 +521,14 @@ class NativeBridge {
    * @returns {CalculationResult}
    */
   static calculateBetaDistribution(alpha, beta, x) {
-    try {
-      // Check if NativeModule is available
-      if (!NativeModule || typeof NativeModule.call !== 'function') {
-        console.error('NativeModule not available - C bridge required for calculations')
-        return new CalculationResult(false, 0, 0, 'Native C module not available')
-      }
-
-      const params = [alpha, beta]
-      const request = {
-        distribution: DISTRIBUTION_TYPES.DIST_BETA,
-        parameters: params,
-        param_count: 2,
-        input_value: x
-      }
-
-      const result = NativeModule.call('orchestrator_calculate_with_request', request)
-
-      return new CalculationResult(
-        result.success === 1,
-        result.pdf_result,
-        result.cdf_result,
-        result.error_message
-      )
-    } catch (error) {
-      console.error('Native beta distribution calculation failed:', error)
-      return new CalculationResult(false, 0, 0, 'Native calculation failed: ' + error.message)
-    }
+    // Beta distribution only available in JavaScript (not in C module)
+    console.log('Using JavaScript implementation for beta distribution calculation')
+    return this.fallbackBetaDistribution(alpha, beta, x)
   }
 
-  // Fallback JavaScript implementations (simplified versions of previous code)
-  // These are used when native C module is not available
-  // COMMENTED OUT - Using C bridge for all calculations
+  // JavaScript fallback implementations
+  // Used when native C module is not available
 
-  /*
   static fallbackBinomial(n, p, k) {
     try {
       const logCombo = this.logCombination(n, k)
@@ -635,9 +547,7 @@ class NativeBridge {
       return new CalculationResult(false, 0, 0, 'Fallback calculation failed')
     }
   }
-  */
 
-  /*
   static fallbackPoisson(lambda, k) {
     try {
       const logProb = k * Math.log(lambda) - lambda - this.logFactorial(k)
@@ -654,9 +564,7 @@ class NativeBridge {
       return new CalculationResult(false, 0, 0, 'Fallback calculation failed')
     }
   }
-  */
 
-  /*
   static fallbackGeometric(p, k) {
     try {
       const logProb = (k - 1) * Math.log(1 - p) + Math.log(p)
@@ -668,9 +576,7 @@ class NativeBridge {
       return new CalculationResult(false, 0, 0, 'Fallback calculation failed')
     }
   }
-  */
 
-  /*
   static fallbackNegativeBinomial(r, p, k) {
     try {
       const logCombo = this.logCombination(k + r - 1, k)
@@ -689,9 +595,7 @@ class NativeBridge {
       return new CalculationResult(false, 0, 0, 'Fallback calculation failed')
     }
   }
-  */
 
-  /*
   static fallbackNormalDistribution(mu, sigma, x) {
     try {
       // Standard normal PDF calculation
@@ -706,9 +610,7 @@ class NativeBridge {
       return new CalculationResult(false, 0, 0, 'Fallback calculation failed')
     }
   }
-  */
 
-  /*
   static fallbackHypergeometric(N, K, n, k) {
     try {
       const logProb = this.logCombination(K, k) + 
@@ -730,9 +632,7 @@ class NativeBridge {
       return new CalculationResult(false, 0, 0, 'Fallback calculation failed')
     }
   }
-  */
 
-  /*
   static fallbackExponentialDistribution(lambda, x) {
     try {
       if (lambda <= 0 || x < 0) {
@@ -747,9 +647,7 @@ class NativeBridge {
       return new CalculationResult(false, 0, 0, 'Fallback calculation failed')
     }
   }
-  */
 
-  /*
   static fallbackChiSquareDistribution(k, x) {
     try {
       if (k <= 0 || x < 0) {
@@ -769,9 +667,7 @@ class NativeBridge {
       return new CalculationResult(false, 0, 0, 'Fallback calculation failed')
     }
   }
-  */
 
-  /*
   static fallbackTDistribution(nu, t) {
     try {
       if (nu <= 0) {
@@ -786,9 +682,7 @@ class NativeBridge {
       return new CalculationResult(false, 0, 0, 'Fallback calculation failed')
     }
   }
-  */
 
-  /*
   static fallbackFDistribution(d1, d2, x) {
     try {
       if (d1 <= 0 || d2 <= 0 || x < 0) {
@@ -803,26 +697,33 @@ class NativeBridge {
       return new CalculationResult(false, 0, 0, 'Fallback calculation failed')
     }
   }
-  */
 
-  /*
   static fallbackUniformDistribution(a, b, x) {
     try {
-      if (a >= b || x < a || x > b) {
-        return new CalculationResult(false, 0, 0, 'Invalid parameters')
+      if (a >= b) {
+        return new CalculationResult(false, 0, 0, 'Invalid parameters: a must be less than b')
       }
       
-      const pdf = 1 / (b - a)
-      const cdf = (x - a) / (b - a)
+      let pdf = 0
+      let cdf = 0
+      
+      if (x >= a && x <= b) {
+        pdf = 1 / (b - a)
+        cdf = (x - a) / (b - a)
+      } else if (x < a) {
+        pdf = 0
+        cdf = 0
+      } else { // x > b
+        pdf = 0
+        cdf = 1
+      }
       
       return new CalculationResult(true, pdf, cdf)
     } catch (error) {
       return new CalculationResult(false, 0, 0, 'Fallback calculation failed')
     }
   }
-  */
 
-  /*
   static fallbackGammaDistribution(k, theta, x) {
     try {
       if (k <= 0 || theta <= 0 || x < 0) {
@@ -840,9 +741,7 @@ class NativeBridge {
       return new CalculationResult(false, 0, 0, 'Fallback calculation failed')
     }
   }
-  */
 
-  /*
   static fallbackBetaDistribution(alpha, beta, x) {
     try {
       if (alpha <= 0 || beta <= 0 || x < 0 || x > 1) {
@@ -860,11 +759,8 @@ class NativeBridge {
       return new CalculationResult(false, 0, 0, 'Fallback calculation failed')
     }
   }
-  */
 
-  // Helper mathematical functions - COMMENTED OUT
-  // All calculations now use C bridge exclusively
-  /*
+  // Helper mathematical functions for JavaScript fallback calculations
   static logCombination(n, k) {
     if (k > n || k < 0) return -Infinity
     if (k === 0 || k === n) return 0
@@ -970,7 +866,6 @@ class NativeBridge {
     const pdf = (1 / Math.sqrt(2 * Math.PI)) * Math.exp(-0.5 * z * z)
     return 1 - pdf * polynomial
   }
-  */
 }
 
 export { NativeBridge, CalculationResult, DISTRIBUTION_TYPES }
