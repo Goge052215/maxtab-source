@@ -1,5 +1,5 @@
-#include "binomial_distribution.h"
-#include "../math/math_utils.h"
+#include "../lib/binomial_distribution.h"
+#include "../../math/math_utils.h"
 #include <math.h>
 #include <stddef.h>
 

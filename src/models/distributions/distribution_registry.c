@@ -24,7 +24,7 @@ static const char* negative_binomial_param_names[] = {"successes", "probability"
 static const char* poisson_param_names[] = {"lambda"};
 
 // Distribution registry entries
-static const distribution_registry_entry_t registry_entries[] = {
+static distribution_registry_entry_t registry_entries[] = {
     // Continuous distributions
     {
         .type = DIST_NORMAL,
@@ -151,8 +151,45 @@ static void initialize_registry(void) {
         return;
     }
     
-    // Initialize distribution implementations (will be done when available)
-    // For now, we'll set them to NULL and they can be populated later
+    // Initialize distribution implementations
+    // Connect C distribution implementations to registry entries
+    for (uint8_t i = 0; i < registry.total_count; i++) {
+        switch (registry_entries[i].type) {
+            case DIST_NORMAL:
+                registry_entries[i].distribution_impl = get_normal_distribution();
+                break;
+            case DIST_EXPONENTIAL:
+                registry_entries[i].distribution_impl = get_exponential_distribution();
+                break;
+            case DIST_CHI_SQUARE:
+                registry_entries[i].distribution_impl = get_chi_square_distribution();
+                break;
+            case DIST_T_DISTRIBUTION:
+                registry_entries[i].distribution_impl = get_t_distribution();
+                break;
+            case DIST_F_DISTRIBUTION:
+                registry_entries[i].distribution_impl = get_f_distribution();
+                break;
+            case DIST_GEOMETRIC:
+                registry_entries[i].distribution_impl = get_geometric_distribution();
+                break;
+            case DIST_HYPERGEOMETRIC:
+                registry_entries[i].distribution_impl = get_hypergeometric_distribution();
+                break;
+            case DIST_BINOMIAL:
+                registry_entries[i].distribution_impl = get_binomial_distribution();
+                break;
+            case DIST_NEGATIVE_BINOMIAL:
+                registry_entries[i].distribution_impl = get_negative_binomial_distribution();
+                break;
+            case DIST_POISSON:
+                registry_entries[i].distribution_impl = get_poisson_distribution();
+                break;
+            default:
+                registry_entries[i].distribution_impl = NULL;
+                break;
+        }
+    }
     
     // Populate category arrays
     uint8_t continuous_idx = 0;
