@@ -19,7 +19,10 @@ const DISTRIBUTION_TYPES = {
   DIST_HYPERGEOMETRIC: 6,
   DIST_BINOMIAL: 7,
   DIST_NEGATIVE_BINOMIAL: 8,
-  DIST_POISSON: 9
+  DIST_POISSON: 9,
+  DIST_UNIFORM: 10,
+  DIST_GAMMA: 11,
+  DIST_BETA: 12
 }
 
 /**
@@ -225,6 +228,220 @@ class NativeBridge {
     }
   }
 
+  /**
+   * Calculate exponential distribution
+   * @param {number} lambda - rate parameter
+   * @param {number} x - input value
+   * @returns {CalculationResult}
+   */
+  static calculateExponentialDistribution(lambda, x) {
+    try {
+      const params = [lambda]
+      const request = {
+        distribution: DISTRIBUTION_TYPES.DIST_EXPONENTIAL,
+        parameters: params,
+        param_count: 1,
+        input_value: x
+      }
+      
+      const result = NativeModule.call('orchestrator_calculate_with_request', request)
+      
+      return new CalculationResult(
+        result.success === 1,
+        result.pdf_result,
+        result.cdf_result,
+        result.error_message
+      )
+    } catch (error) {
+      console.error('Native exponential distribution calculation failed:', error)
+      return this.fallbackExponentialDistribution(lambda, x)
+    }
+  }
+
+  /**
+   * Calculate chi-square distribution
+   * @param {number} k - degrees of freedom
+   * @param {number} x - input value
+   * @returns {CalculationResult}
+   */
+  static calculateChiSquareDistribution(k, x) {
+    try {
+      const params = [k]
+      const request = {
+        distribution: DISTRIBUTION_TYPES.DIST_CHI_SQUARE,
+        parameters: params,
+        param_count: 1,
+        input_value: x
+      }
+      
+      const result = NativeModule.call('orchestrator_calculate_with_request', request)
+      
+      return new CalculationResult(
+        result.success === 1,
+        result.pdf_result,
+        result.cdf_result,
+        result.error_message
+      )
+    } catch (error) {
+      console.error('Native chi-square distribution calculation failed:', error)
+      return this.fallbackChiSquareDistribution(k, x)
+    }
+  }
+
+  /**
+   * Calculate t-distribution
+   * @param {number} nu - degrees of freedom
+   * @param {number} t - input value
+   * @returns {CalculationResult}
+   */
+  static calculateTDistribution(nu, t) {
+    try {
+      const params = [nu]
+      const request = {
+        distribution: DISTRIBUTION_TYPES.DIST_T_DISTRIBUTION,
+        parameters: params,
+        param_count: 1,
+        input_value: t
+      }
+      
+      const result = NativeModule.call('orchestrator_calculate_with_request', request)
+      
+      return new CalculationResult(
+        result.success === 1,
+        result.pdf_result,
+        result.cdf_result,
+        result.error_message
+      )
+    } catch (error) {
+      console.error('Native t-distribution calculation failed:', error)
+      return this.fallbackTDistribution(nu, t)
+    }
+  }
+
+  /**
+   * Calculate F-distribution
+   * @param {number} d1 - numerator degrees of freedom
+   * @param {number} d2 - denominator degrees of freedom
+   * @param {number} x - input value
+   * @returns {CalculationResult}
+   */
+  static calculateFDistribution(d1, d2, x) {
+    try {
+      const params = [d1, d2]
+      const request = {
+        distribution: DISTRIBUTION_TYPES.DIST_F_DISTRIBUTION,
+        parameters: params,
+        param_count: 2,
+        input_value: x
+      }
+      
+      const result = NativeModule.call('orchestrator_calculate_with_request', request)
+      
+      return new CalculationResult(
+        result.success === 1,
+        result.pdf_result,
+        result.cdf_result,
+        result.error_message
+      )
+    } catch (error) {
+      console.error('Native F-distribution calculation failed:', error)
+      return this.fallbackFDistribution(d1, d2, x)
+    }
+  }
+
+  /**
+   * Calculate uniform distribution
+   * @param {number} a - lower bound
+   * @param {number} b - upper bound
+   * @param {number} x - input value
+   * @returns {CalculationResult}
+   */
+  static calculateUniformDistribution(a, b, x) {
+    try {
+      const params = [a, b]
+      const request = {
+        distribution: DISTRIBUTION_TYPES.DIST_UNIFORM,
+        parameters: params,
+        param_count: 2,
+        input_value: x
+      }
+      
+      const result = NativeModule.call('orchestrator_calculate_with_request', request)
+      
+      return new CalculationResult(
+        result.success === 1,
+        result.pdf_result,
+        result.cdf_result,
+        result.error_message
+      )
+    } catch (error) {
+      console.error('Native uniform distribution calculation failed:', error)
+      return this.fallbackUniformDistribution(a, b, x)
+    }
+  }
+
+  /**
+   * Calculate gamma distribution
+   * @param {number} k - shape parameter
+   * @param {number} theta - scale parameter
+   * @param {number} x - input value
+   * @returns {CalculationResult}
+   */
+  static calculateGammaDistribution(k, theta, x) {
+    try {
+      const params = [k, theta]
+      const request = {
+        distribution: DISTRIBUTION_TYPES.DIST_GAMMA,
+        parameters: params,
+        param_count: 2,
+        input_value: x
+      }
+      
+      const result = NativeModule.call('orchestrator_calculate_with_request', request)
+      
+      return new CalculationResult(
+        result.success === 1,
+        result.pdf_result,
+        result.cdf_result,
+        result.error_message
+      )
+    } catch (error) {
+      console.error('Native gamma distribution calculation failed:', error)
+      return this.fallbackGammaDistribution(k, theta, x)
+    }
+  }
+
+  /**
+   * Calculate beta distribution
+   * @param {number} alpha - first shape parameter
+   * @param {number} beta - second shape parameter
+   * @param {number} x - input value
+   * @returns {CalculationResult}
+   */
+  static calculateBetaDistribution(alpha, beta, x) {
+    try {
+      const params = [alpha, beta]
+      const request = {
+        distribution: DISTRIBUTION_TYPES.DIST_BETA,
+        parameters: params,
+        param_count: 2,
+        input_value: x
+      }
+      
+      const result = NativeModule.call('orchestrator_calculate_with_request', request)
+      
+      return new CalculationResult(
+        result.success === 1,
+        result.pdf_result,
+        result.cdf_result,
+        result.error_message
+      )
+    } catch (error) {
+      console.error('Native beta distribution calculation failed:', error)
+      return this.fallbackBetaDistribution(alpha, beta, x)
+    }
+  }
+
   // Fallback JavaScript implementations (simplified versions of previous code)
   
   static fallbackBinomial(n, p, k) {
@@ -331,6 +548,122 @@ class NativeBridge {
     }
   }
 
+  static fallbackExponentialDistribution(lambda, x) {
+    try {
+      if (lambda <= 0 || x < 0) {
+        return new CalculationResult(false, 0, 0, 'Invalid parameters')
+      }
+      
+      const pdf = lambda * Math.exp(-lambda * x)
+      const cdf = 1 - Math.exp(-lambda * x)
+      
+      return new CalculationResult(true, pdf, cdf)
+    } catch (error) {
+      return new CalculationResult(false, 0, 0, 'Fallback calculation failed')
+    }
+  }
+
+  static fallbackChiSquareDistribution(k, x) {
+    try {
+      if (k <= 0 || x < 0) {
+        return new CalculationResult(false, 0, 0, 'Invalid parameters')
+      }
+      
+      // Using chi-square approximation
+      const gamma = this.logGamma(k / 2)
+      const pdf = Math.pow(x, (k / 2) - 1) * Math.exp(-x / 2) / (Math.pow(2, k / 2) * Math.exp(gamma))
+      
+      // Approximate CDF using incomplete gamma function approximation
+      // This is a simplified version - in practice, you'd use a more sophisticated method
+      const cdf = this.incompleteGamma(k / 2, x / 2)
+      
+      return new CalculationResult(true, pdf, cdf)
+    } catch (error) {
+      return new CalculationResult(false, 0, 0, 'Fallback calculation failed')
+    }
+  }
+
+  static fallbackTDistribution(nu, t) {
+    try {
+      if (nu <= 0) {
+        return new CalculationResult(false, 0, 0, 'Invalid degrees of freedom')
+      }
+      
+      const pdf = this.tDistributionPDF(t, nu)
+      const cdf = this.tDistributionCDF(t, nu)
+      
+      return new CalculationResult(true, pdf, cdf)
+    } catch (error) {
+      return new CalculationResult(false, 0, 0, 'Fallback calculation failed')
+    }
+  }
+
+  static fallbackFDistribution(d1, d2, x) {
+    try {
+      if (d1 <= 0 || d2 <= 0 || x < 0) {
+        return new CalculationResult(false, 0, 0, 'Invalid parameters')
+      }
+      
+      const pdf = this.fDistributionPDF(x, d1, d2)
+      const cdf = this.fDistributionCDF(x, d1, d2)
+      
+      return new CalculationResult(true, pdf, cdf)
+    } catch (error) {
+      return new CalculationResult(false, 0, 0, 'Fallback calculation failed')
+    }
+  }
+
+  static fallbackUniformDistribution(a, b, x) {
+    try {
+      if (a >= b || x < a || x > b) {
+        return new CalculationResult(false, 0, 0, 'Invalid parameters')
+      }
+      
+      const pdf = 1 / (b - a)
+      const cdf = (x - a) / (b - a)
+      
+      return new CalculationResult(true, pdf, cdf)
+    } catch (error) {
+      return new CalculationResult(false, 0, 0, 'Fallback calculation failed')
+    }
+  }
+
+  static fallbackGammaDistribution(k, theta, x) {
+    try {
+      if (k <= 0 || theta <= 0 || x < 0) {
+        return new CalculationResult(false, 0, 0, 'Invalid parameters')
+      }
+      
+      const gamma = this.logGamma(k)
+      const pdf = Math.pow(x, k - 1) * Math.exp(-x / theta) / (Math.pow(theta, k) * Math.exp(gamma))
+      
+      // Approximate CDF using incomplete gamma function
+      const cdf = this.incompleteGamma(k, x / theta)
+      
+      return new CalculationResult(true, pdf, cdf)
+    } catch (error) {
+      return new CalculationResult(false, 0, 0, 'Fallback calculation failed')
+    }
+  }
+
+  static fallbackBetaDistribution(alpha, beta, x) {
+    try {
+      if (alpha <= 0 || beta <= 0 || x < 0 || x > 1) {
+        return new CalculationResult(false, 0, 0, 'Invalid parameters')
+      }
+      
+      const logBeta = this.logBeta(alpha, beta)
+      const pdf = Math.pow(x, alpha - 1) * Math.pow(1 - x, beta - 1) / Math.exp(logBeta)
+      
+      // Approximate CDF using incomplete beta function
+      const cdf = this.incompleteBeta(x, alpha, beta)
+      
+      return new CalculationResult(true, pdf, cdf)
+    } catch (error) {
+      return new CalculationResult(false, 0, 0, 'Fallback calculation failed')
+    }
+  }
+
   // Helper mathematical functions
   static logCombination(n, k) {
     if (k > n || k < 0) return -Infinity
@@ -345,6 +678,81 @@ class NativeBridge {
       result += Math.log(i)
     }
     return result
+  }
+
+  static logGamma(z) {
+    // Stirling's approximation for log gamma
+    if (z < 1) z += 1
+    return (z - 0.5) * Math.log(z) - z + 0.5 * Math.log(2 * Math.PI) + 1/(12 * z) - 1/(360 * z * z * z)
+  }
+
+  static logBeta(a, b) {
+    return this.logGamma(a) + this.logGamma(b) - this.logGamma(a + b)
+  }
+
+  static incompleteGamma(s, x) {
+    // Simplified incomplete gamma function approximation
+    if (x <= 0) return 0
+    if (s <= 0) return 1
+    
+    let sum = 0
+    let term = Math.exp(-x + s * Math.log(x) - this.logGamma(s))
+    for (let k = 0; k < 100; k++) {
+      sum += term
+      term *= x / (s + k + 1)
+      if (Math.abs(term) < 1e-15) break
+    }
+    return sum
+  }
+
+  static incompleteBeta(x, a, b) {
+    // Simplified incomplete beta function approximation
+    if (x <= 0) return 0
+    if (x >= 1) return 1
+    
+    let sum = 0
+    
+    for (let k = 0; k < 100; k++) {
+      const logTerm = this.logGamma(a + k) - this.logGamma(a) + this.logGamma(b) - this.logGamma(b + k) + 
+                     this.logGamma(a + b) - this.logGamma(a + b + k) + Math.log(x) * k - Math.log(k + 1)
+      sum += Math.exp(logTerm)
+      if (Math.abs(Math.exp(logTerm)) < 1e-15) break
+    }
+    
+    return Math.exp(this.logGamma(a + b) - this.logGamma(a) - this.logGamma(b) + a * Math.log(x)) * sum
+  }
+
+  static tDistributionPDF(t, nu) {
+    const pdf = Math.exp(this.logGamma((nu + 1) / 2) - 0.5 * Math.log(Math.PI * nu) - this.logGamma(nu / 2) - 
+                        (nu + 1) / 2 * Math.log(1 + t * t / nu))
+    return pdf
+  }
+
+  static tDistributionCDF(t, nu) {
+    if (t === 0) return 0.5
+    
+    const x = nu / (t * t + nu)
+    const sign = t > 0 ? 1 : -1
+    
+    // Use incomplete beta function approximation
+    const cdf = 0.5 + 0.5 * sign * this.incompleteBeta(x, nu / 2, 0.5)
+    return Math.max(0, Math.min(1, cdf))
+  }
+
+  static fDistributionPDF(x, d1, d2) {
+    if (x <= 0) return 0
+    
+    const logBeta = this.logBeta(d1 / 2, d2 / 2)
+    const pdf = Math.exp((d1 / 2) * Math.log(d1 / d2) + (d1 / 2 - 1) * Math.log(x) - 
+                        ((d1 + d2) / 2) * Math.log(1 + (d1 / d2) * x) - logBeta)
+    return pdf
+  }
+
+  static fDistributionCDF(x, d1, d2) {
+    if (x <= 0) return 0
+    
+    const z = (d1 * x) / (d1 * x + d2)
+    return this.incompleteBeta(z, d1 / 2, d2 / 2)
   }
 
   // Standard normal CDF approximation using Abramowitz and Stegun

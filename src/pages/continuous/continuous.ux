@@ -154,7 +154,7 @@ export default {
 }
 
 .menu-title {
-  font-size: 18px; /* Adjusted title size for new button height */
+  font-size: 20px; /* Adjusted title size for new button height */
   color: #ffffff;
   font-weight: bold;
   text-align: center; /* Center the text */

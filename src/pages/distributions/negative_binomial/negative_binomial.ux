@@ -1,3 +1,5 @@
+ <import name="input-method" src="../../../components/InputMethod/InputMethod.ux"></import>
+
 <template>
   <div class="container">
     <div class="top-bar">
@@ -6,23 +8,29 @@
 
     <div class="content">
       <div class="param-section">
-        <div class="param-item">
-          <text class="param-label">成功次数 r</text>
-          <input class="param-input" type="number" @change="updateR" value="{{ r }}" />
+        <div class="param-item" @click="selectInput('r')">
+          <text class="param-label">成功次数r</text>
+          <div class="param-display">
+            <text class="param-value">{{ r }}</text>
+          </div>
         </div>
         
-        <div class="param-item">
-          <text class="param-label">成功概率 p</text>
-          <input class="param-input" type="number" @change="updateP" value="{{ p }}" />
+        <div class="param-item" @click="selectInput('p')">
+          <text class="param-label">成功概率p</text>
+          <div class="param-display">
+            <text class="param-value">{{ p }}</text>
+          </div>
         </div>
         
-        <div class="param-item">
-          <text class="param-label">失败次数 k</text>
-          <input class="param-input" type="number" @change="updateK" value="{{ k }}" />
+        <div class="param-item" @click="selectInput('k')">
+          <text class="param-label">失败次数k</text>
+          <div class="param-display">
+            <text class="param-value">{{ k }}</text>
+          </div>
         </div>
       </div>
 
-      <div class="calc-section">
+      <div class="calc-section" if="{{ !showKeyboard }}">
         <div class="calc-btn" onclick="calculate">
           <text class="calc-text">计算</text>
         </div>
@@ -32,9 +40,23 @@
         <text class="error-text">{{ errorMessage }}</text>
       </div>
 
+      <!-- VelaOS Input Method Container -->
+      <div class="keyboard-page" style="flex-direction: column;" if="{{ showKeyboard }}">
+        <input-method
+          hide="{{!showKeyboard}}"
+          keyboardtype="NUMERIC"
+          maxlength="10"
+          vibratemode="{{vibratemode}}"
+          screentype="{{screentype}}"
+          @visibility-change="onVisibilityChange"
+          @key-down="onKeyDown"
+          @delete="onDelete"
+          @complete="onComplete"
+        ></input-method>
+      </div>
     </div>
 
-    <div class="bottom-section">
+    <div class="bottom-section" if="{{ !showKeyboard }}">
       <div class="back-btn" onclick="goBack">
         <text class="back-text">返回</text>
       </div>
@@ -45,6 +67,7 @@
 <script>
 import router from "@system.router"
 import { NativeBridge } from "../../../common/native_bridge"
+import { globalState } from "../../../common/global_state.js"
 
 export default {
   private: {
@@ -54,33 +77,177 @@ export default {
     pmf: "-",
     cdf: "-",
     hasResult: false,
-    errorMessage: ""
+    errorMessage: "",
+    showKeyboard: false,
+    currentParam: '',
+    currentParamName: '',
+    inputBuffer: '',
+    originalValue: undefined,
+    // Template variables
+    vibratemode: "short",
+    screentype: "pill-shaped"
   },
 
   onInit() {
     this.$page.setTitleBar({ text: '负二项分布' })
+    this.importFromCalculator()
+  },
+
+  onShow() {
+    console.log('NegativeBinomial onShow called')
+    this.importFromCalculator()
+  },
+
+  importFromCalculator() {
+    const payload = globalState.getCalculatorExport()
+    if (!payload) return
+
+    const { distributionType, paramValues, inputValue } = payload
+
+    // Only import if this is negative binomial distribution data
+    if (distributionType === 'negative_binomial' && Array.isArray(paramValues)) {
+      if (paramValues.length >= 2) {
+        this.r = paramValues[0] || 5
+        this.p = paramValues[1] || 0.5
+      }
+      if (typeof inputValue !== 'undefined') {
+        this.k = inputValue || 3
+      }
+      
+      console.log('Imported from calculator:', { r: this.r, p: this.p, k: this.k })
+      this.$forceUpdate()
+    }
   },
 
   goBack() {
     router.back()
   },
 
-  updateR(e) {
-    this.r = parseInt(e.value) || 1
+  selectInput(inputType) {
+    let parameterName = ''
+    if (inputType === 'r') parameterName = '成功次数'
+    else if (inputType === 'p') parameterName = '成功概率'
+    else if (inputType === 'k') parameterName = '失败次数'
+    
+    this.currentParam = inputType
+    this.currentParamName = parameterName
+    this.inputBuffer = ''  // Start with empty buffer for new input
+    
+    // Store original value for cancel functionality
+    this.originalValue = this[inputType]
+    
+    this.showKeyboard = true
+    this.$forceUpdate()
+  },
+
+  onVisibilityChange(evt) {
+    console.log("键盘显示状态变更:", JSON.stringify(evt))
+    if (!evt.detail.visible) {
+      this.showKeyboard = false
+      this.inputBuffer = ''
+      this.currentParam = ''
+      this.currentParamName = ''
+      this.$forceUpdate()
+    }
+  },
+
+  onKeyDown(evt) {
+    console.log("按下按键:", JSON.stringify(evt))
+    // Key down events are handled by the component
+  },
+
+  onDelete() {
+    // InputMethod's onBackSpace() handles the visual deletion
+    // We just need to sync our inputBuffer and update our parameter
+    if (this.inputBuffer.length > 0) {
+      this.inputBuffer = this.inputBuffer.slice(0, -1)
+      this.updateParameterFromBuffer()
+    } else {
+      // If buffer is empty, reset to default values
+      if (this.currentParam === 'r') this.r = 5
+      else if (this.currentParam === 'p') this.p = 0.5
+      else if (this.currentParam === 'k') this.k = 3
+    }
+    
+    this.$forceUpdate()
+    console.log("删除字符, 当前值:", this.inputBuffer, "参数值:", this[this.currentParam])
+  },
+
+  onComplete(evt) {
+    const char = evt.detail.content
+    console.log("输入字符:", JSON.stringify(evt))
+    
+    // Handle decimal point validation for probability parameter
+    if (char === '.' && this.currentParam === 'p' && this.inputBuffer.indexOf('.') !== -1) {
+      return // Don't allow multiple decimal points for probability
+    }
+    
+    // Don't allow decimal points for integer parameters (r, k)
+    if (char === '.' && (this.currentParam === 'r' || this.currentParam === 'k')) {
+      return
+    }
+    
+    // Handle input
+    if (this.inputBuffer === '0' && char !== '.') {
+      this.inputBuffer = char
+    } else {
+      this.inputBuffer += char
+    }
+    
+    // Update parameter directly as user types
+    this.updateParameterFromBuffer()
+    this.$forceUpdate()
+  },
+
+  hideKeyboard() {
+    this.showKeyboard = false;
+    this.inputBuffer = '';
+    this.currentParam = '';
+    this.currentParamName = '';
+    this.$forceUpdate();
+  },
+
+  onFinish() {
+    console.log("完成输入");
+    // Check if this was a cancel action (no input buffer means cancel)
+    if (this.inputBuffer === '' && this.originalValue !== undefined) {
+      // Restore original value on cancel
+      this[this.currentParam] = this.originalValue;
+    }
+    this.hideKeyboard();
+  },
+
+  updateParameterFromBuffer() {
+    if (!this.inputBuffer || this.inputBuffer === '') return
+    
+    const value = parseFloat(this.inputBuffer)
+    if (isNaN(value)) return
+    
+    // Update the parameter value with proper type conversion
+    if (this.currentParam === 'r' || this.currentParam === 'k') {
+      // For integer parameters, only accept whole numbers
+      const intValue = Math.floor(Math.abs(value))
+      if (this.currentParam === 'r') {
+        this[this.currentParam] = Math.max(1, intValue) // r must be >= 1
+      } else {
+        this[this.currentParam] = Math.max(0, intValue) // k must be >= 0
+      }
+    } else if (this.currentParam === 'p') {
+      // For probability, allow decimals but clamp to (0,1]
+      this[this.currentParam] = Math.max(0.001, Math.min(1, value))
+    }
+    
     this.hasResult = false
     this.errorMessage = ""
   },
 
-  updateP(e) {
-    this.p = parseFloat(e.value) || 0.5
-    this.hasResult = false
-    this.errorMessage = ""
-  },
-
-  updateK(e) {
-    this.k = parseInt(e.value) || 0
-    this.hasResult = false
-    this.errorMessage = ""
+  confirmInput() {
+    // Simply close the keyboard since parameters are updated in real-time
+    this.showKeyboard = false
+    this.inputBuffer = ''
+    this.currentParam = ''
+    this.currentParamName = ''
+    this.$forceUpdate()
   },
 
   calculate() {
@@ -145,7 +312,7 @@ export default {
 }
 
 .title {
-  font-size: 18px;
+  font-size: 20px;
   color: #ffffff;
   font-weight: bold;
 }
@@ -165,7 +332,7 @@ export default {
 }
 
 .back-text {
-  font-size: 18px;
+  font-size: 20px;
   color: #ffffff;
   font-weight: bold;
 }
@@ -194,21 +361,37 @@ export default {
 }
 
 .param-label {
-  font-size: 18px;
+  font-size: 20px;
   color: #ffffff;
   font-weight: 500;
 }
 
-.param-input {
+.param-display {
   width: 65px;
   height: 35px;
   background-color: #333333;
   border: 1px solid #555555;
   border-radius: 6px;
+  justify-content: center;
+  align-items: center;
+}
+
+.param-value {
   color: #ffffff;
   text-align: center;
-  font-size: 18px;
-  padding: 0 5px;
+  font-size: 20px;
+}
+
+.keyboard-page {
+  width: 100%;
+  height: 480px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  background-color: #000000;
 }
 
 .calc-section {
@@ -226,7 +409,7 @@ export default {
 }
 
 .calc-text {
-  font-size: 18px;
+  font-size: 20px;
   color: #ffffff;
   font-weight: bold;
 }

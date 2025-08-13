@@ -1,21 +1,24 @@
 <template>
   <div class="container">
-    <!-- 顶部导航栏 -->
     <div class="top-bar">
-      <text class="back-button" onclick="goBack">返回</text>
       <text class="page-title">关于应用</text>
     </div>
 
-    <!-- 主内容区域 -->
-    <div class="content">
-      <text class="developer-label">Developer:</text>
-      <text class="developer-name">@goge</text>
-      
-      <text class="version-label">Version:</text>
-      <text class="version-number">1.0</text>
-      
-      <text class="date-label">Date:</text>
-      <text class="date-text">2025.08</text>
+    <div class="main-content">
+      <div class="content">
+        <text class="developer-label">Developer:</text>
+        <text class="developer-name">@goge</text>
+        
+        <text class="version-label">Version:</text>
+        <text class="version-number">1.0</text>
+        
+        <text class="date-label">Date:</text>
+        <text class="date-text">2025.08</text>
+      </div>
+
+      <div class="back-button-container">
+        <text class="back-button" @click="goBack">返回</text>
+      </div>
     </div>
   </div>
 </template>
@@ -46,39 +49,59 @@ export default {
 }
 
 .top-bar {
-  height: 70px;
+  height: 60px;
   background-color: #111111;
   flex-direction: row;
   align-items: center;
+  justify-content: center;
   padding: 0 15px;
   border-bottom: 1px solid #333333;
 }
 
-.back-button {
-  font-size: 16px;
-  color: #ffffff;
-  padding: 10px 15px;
-}
-
 .page-title {
-  font-size: 20px;
+  font-size: 22px;
   color: #ffffff;
   font-weight: bold;
-  margin-left: 10px;
+}
+
+.main-content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 20px;
 }
 
 .content {
   flex: 1;
   flex-direction: column;
-  padding: 40px;
   justify-content: center;
   align-items: center;
+}
+
+.back-button-container {
+  margin-top: 22px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.back-button {
+  width: 60%;
+  height: 50px;
+  font-size: 20px;
+  color: #ffffff;
+  background-color: #333333;
+  border: 1px solid #555555;
+  border-radius: 8px;
+  padding: 12px 24px;
+  text-align: center;
+  cursor: pointer;
 }
 
 .developer-label,
 .version-label,
 .date-label {
-  font-size: 16px;
+  font-size: 22px;
   color: #cccccc;
   margin-bottom: 8px;
   margin-top: 20px;
@@ -91,7 +114,7 @@ export default {
 .developer-name,
 .version-number,
 .date-text {
-  font-size: 20px;
+  font-size: 22px;
   color: #ffffff;
   font-weight: bold;
   margin-bottom: 15px;

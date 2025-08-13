@@ -9,21 +9,21 @@
     <div class="content">
       <div class="param-section">
         <div class="param-item" @click="selectInput('mu')">
-          <text class="param-label">均值 μ</text>
+          <text class="param-label">均值μ</text>
           <div class="param-display">
             <text class="param-value">{{ mu }}</text>
           </div>
         </div>
         
         <div class="param-item" @click="selectInput('sigma')">
-          <text class="param-label">标准差 σ</text>
+          <text class="param-label">标准差σ</text>
           <div class="param-display">
             <text class="param-value">{{ sigma }}</text>
           </div>
         </div>
         
         <div class="param-item" @click="selectInput('x')">
-          <text class="param-label">计算值 x</text>
+          <text class="param-label">计算值x</text>
           <div class="param-display">
             <text class="param-value">{{ x }}</text>
           </div>
