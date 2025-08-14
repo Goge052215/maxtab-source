@@ -1,5 +1,5 @@
 <center>
-  <img src='headimg.png' width="800" height=auto>
+  <img src='Page-1.png' width="800" height=auto>
 </center>
 
 # 📊 Mi Band 10 统计计算器 | StatsModels
