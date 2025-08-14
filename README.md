@@ -1,3 +1,7 @@
+<center>
+  <img src='headimg.png' width="800" height=auto>
+</center>
+
 # 📊 Mi Band 10 统计计算器 | StatsModels
 
 一款针对小米手环 10 开发的专业级统计计算快应用，为用户提供便捷高效的数据分析工具支持。
