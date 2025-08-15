@@ -90,6 +90,24 @@
       "pages/distributions/beta": {
         "component": "beta"
       },
+      "pages/distributions/weibull": {
+        "component": "weibull"
+      },
+      "pages/distributions/chisquare": {
+        "component": "chisquare"
+      },
+      "pages/distributions/student": {
+        "component": "student"
+      },
+      "pages/distributions/f": {
+        "component": "f"
+      },
+      "pages/distributions/pareto": {
+        "component": "pareto"
+      },
+      "pages/distributions/rayleigh": {
+        "component": "rayleigh"
+      },
       "pages/guide": {
         "component": "guide"
       },

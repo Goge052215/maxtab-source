@@ -1,0 +1,358 @@
+<import name="input-method" src="../../../components/InputMethod/InputMethod.ux"></import>
+
+<template>
+  <div class="container">
+    <div class="top-bar">
+      <text class="title">Weibull分布</text>
+    </div>
+
+    <div class="content">
+      <div class="param-section">
+        <div class="param-item" @click="selectInput('k')">
+          <text class="param-label">形状参数k</text>
+          <div class="param-display">
+            <text class="param-value">{{ currentParam === 'k' && inputBuffer ? inputBuffer : k }}</text>
+          </div>
+        </div>
+        
+        <div class="param-item" @click="selectInput('lambda')">
+          <text class="param-label">尺度参数λ</text>
+          <div class="param-display">
+            <text class="param-value">{{ currentParam === 'lambda' && inputBuffer ? inputBuffer : lambda }}</text>
+          </div>
+        </div>
+        
+        <div class="param-item" @click="selectInput('x')">
+          <text class="param-label">计算值x</text>
+          <div class="param-display">
+            <text class="param-value">{{ currentParam === 'x' && inputBuffer ? inputBuffer : x }}</text>
+          </div>
+        </div>
+      </div>
+
+      <div class="calc-section" if="{{ !showKeyboard }}">
+        <div class="calc-btn" onclick="calculate">
+          <text class="calc-text">计算</text>
+        </div>
+      </div>
+
+      <div class="error-message" if="{{ errorMessage }}">
+        <text class="error-text">{{ errorMessage }}</text>
+      </div>
+
+      <div class="keyboard-page" style="flex-direction: column;" if="{{ showKeyboard }}">
+        <input-method
+          hide="{{!showKeyboard}}"
+          keyboardtype="NUMERIC"
+          maxlength="10"
+          vibratemode="{{vibratemode}}"
+          screentype="{{screentype}}"
+          @visibility-change="onVisibilityChange"
+          @key-down="onKeyDown"
+          @delete="onDelete"
+          @complete="onComplete"
+        ></input-method>
+      </div>
+    </div>
+
+    <div class="bottom-section" if="{{ !showKeyboard }}">
+      <div class="back-btn" onclick="goBack">
+        <text class="back-text">返回</text>
+      </div>
+    </div>
+  </div>
+</template>
+
+<script>
+import router from "@system.router"
+import { NativeBridge } from "../../../common/native_bridge"
+import { globalState } from "../../../common/global_state.js"
+
+export default {
+  private: {
+    k: 1,
+    lambda: 1,
+    x: 0,
+    hasResult: false,
+    errorMessage: "",
+    showKeyboard: false,
+    currentParam: '',
+    currentParamName: '',
+    inputBuffer: '',
+    originalValue: undefined,
+    vibratemode: "short",
+    screentype: "pill-shaped"
+  },
+
+  onInit() {
+    this.$page.setTitleBar({ text: 'Weibull分布' })
+    this.importFromCalculator()
+  },
+
+  onShow() {
+    this.importFromCalculator()
+  },
+
+  importFromCalculator() {
+    const payload = globalState.getCalculatorExport()
+    if (!payload) return
+
+    const { distributionType, paramValues, inputValue } = payload
+    if (distributionType === 'weibull' && Array.isArray(paramValues)) {
+      if (paramValues.length >= 2) {
+        this.k = paramValues[0] || 1
+        this.lambda = paramValues[1] || 1
+      }
+      if (typeof inputValue !== 'undefined') {
+        this.x = inputValue || 0
+      }
+      this.$forceUpdate()
+    }
+  },
+
+  goBack() {
+    router.back()
+  },
+
+  selectInput(inputType) {
+    let parameterName = ''
+    if (inputType === 'k') parameterName = '形状参数'
+    else if (inputType === 'lambda') parameterName = '尺度参数'
+    else if (inputType === 'x') parameterName = '计算值'
+    
+    this.currentParam = inputType
+    this.currentParamName = parameterName
+    this.inputBuffer = ''
+    this.originalValue = this[inputType]
+    this.showKeyboard = true
+    this.$forceUpdate()
+  },
+
+  onVisibilityChange(evt) {
+    if (!evt.detail.visible) {
+      this.showKeyboard = false
+      this.inputBuffer = ''
+      this.currentParam = ''
+      this.currentParamName = ''
+      this.$forceUpdate()
+    }
+  },
+
+  onKeyDown(evt) {
+    // Handled by component
+  },
+
+  onDelete() {
+    if (this.inputBuffer.length > 0) {
+      this.inputBuffer = this.inputBuffer.slice(0, -1)
+      this.updateParameterFromBuffer()
+    } else {
+      if (this.currentParam === 'k') this.k = 1
+      else if (this.currentParam === 'lambda') this.lambda = 1
+      else if (this.currentParam === 'x') this.x = 0
+    }
+    this.$forceUpdate()
+  },
+
+  onComplete(evt) {
+    const char = evt.detail.content
+    
+    if (char === '.' && this.inputBuffer.indexOf('.') !== -1) {
+      return
+    }
+    
+    if (this.inputBuffer === '0' && char !== '.') {
+      this.inputBuffer = char
+    } else if (this.inputBuffer === '0' && char === '.') {
+      this.inputBuffer = '0.'
+    } else {
+      this.inputBuffer += char
+    }
+    
+    this.updateParameterFromBuffer()
+    this.$forceUpdate()
+  },
+
+  updateParameterFromBuffer() {
+    if (!this.inputBuffer || this.inputBuffer === '') return
+    
+    const value = parseFloat(this.inputBuffer)
+    if (isNaN(value)) return
+    
+    this[this.currentParam] = value
+    
+    if ((this.currentParam === 'k' || this.currentParam === 'lambda') && value <= 0) {
+      this[this.currentParam] = Math.abs(value) || 1
+    }
+    
+    this.hasResult = false
+    this.errorMessage = ""
+  },
+
+  calculate() {
+    if (this.k <= 0 || this.lambda <= 0) {
+      this.errorMessage = "参数必须大于0"
+      return
+    }
+
+    const result = NativeBridge.calculateWeibullDistribution(this.k, this.lambda, this.x)
+    
+    if (result.success) {
+      router.push({
+        uri: 'pages/detail_continuous',
+        params: {
+          distributionName: 'Weibull分布',
+          pdfValue: result.pdfResult.toFixed(6),
+          cdfValue: result.cdfResult.toFixed(6),
+          inputParams: [
+            { key: '形状参数k', value: this.k },
+            { key: '尺度参数λ', value: this.lambda },
+            { key: '计算值x', value: this.x }
+          ]
+        }
+      })
+      this.hasResult = true
+      this.errorMessage = ""
+    } else {
+      this.errorMessage = result.errorMessage || "计算失败"
+      this.hasResult = false
+    }
+  }
+}
+</script>
+
+<style>
+.container {
+  flex-direction: column;
+  background-color: #000000;
+  height: 100%;
+}
+
+.top-bar {
+  height: 60px;
+  background-color: #111111;
+  flex-direction: row;
+  align-items: center;
+  padding: 0 20px;
+  border-bottom: 1px solid #333333;
+  justify-content: center;
+}
+
+.title {
+  font-size: 20px;
+  color: #ffffff;
+  font-weight: bold;
+}
+
+.bottom-section {
+  padding: 0px 20px 50px 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.back-btn {
+  height: 50px;
+  width: 100px;
+  background-color: #333333;
+  border-radius: 10px;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid #555555;
+}
+
+.back-text {
+  font-size: 20px;
+  color: #ffffff;
+  font-weight: bold;
+}
+
+.content {
+  flex: 1;
+  flex-direction: column;
+  padding: 30px 15px;
+}
+
+.param-section {
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
+.param-item {
+  height: 70px;
+  background-color: #1a1a1a;
+  border-radius: 8px;
+  padding: 0 15px;
+  margin-bottom: 10px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+  border: 1px solid #333333;
+}
+
+.param-label {
+  font-size: 20px;
+  color: #ffffff;
+  font-weight: 500;
+}
+
+.param-display {
+  width: 50px;
+  height: 35px;
+  background-color: #333333;
+  border: 1px solid #555555;
+  border-radius: 6px;
+  justify-content: center;
+  align-items: center;
+}
+
+.param-value {
+  color: #ffffff;
+  text-align: center;
+  font-size: 20px;
+}
+
+.calc-section {
+  margin-bottom: 10px;
+}
+
+.calc-btn {
+  height: 45px;
+  width: 100%;
+  background-color: #0066cc;
+  border-radius: 10px;
+  justify-content: center;
+  align-items: center;
+}
+
+.calc-text {
+  font-size: 20px;
+  color: #ffffff;
+  font-weight: bold;
+}
+
+.error-message {
+  margin-bottom: 15px;
+  padding: 10px;
+  background-color: #2d1f1f;
+  border: 1px solid #cc4444;
+  border-radius: 8px;
+}
+
+.error-text {
+  font-size: 12px;
+  color: #ff6666;
+  text-align: center;
+}
+
+.keyboard-page {
+  width: 100%;
+  height: 480px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  background-color: #000000;
+}
+</style>

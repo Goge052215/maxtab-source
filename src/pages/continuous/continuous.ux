@@ -5,39 +5,80 @@
     </div>
 
     <div class="main-menu">
-      <div class="menu-list-item menu-entry" onclick="routeToNormal()">
-        <div class="menu-item">
-          <text class="menu-title">正态分布</text>
-        </div>
-      </div>
-      
-      <div class="menu-list-item menu-entry" onclick="routeToExponential()">
-        <div class="menu-item">
-          <text class="menu-title">指数分布</text>
-        </div>
-      </div>
-      
-      <div class="menu-list-item menu-entry" onclick="routeToUniform()">
-        <div class="menu-item">
-          <text class="menu-title">均匀分布</text>
-        </div>
-      </div>
-      
-      <div class="menu-list-item menu-entry" onclick="routeToGamma()">
-        <div class="menu-item">
-          <text class="menu-title">伽马分布</text>
-        </div>
-      </div>
-      
-      <div class="menu-list-item menu-entry" onclick="routeToBeta()">
-        <div class="menu-item">
-          <text class="menu-title">β分布</text>
-        </div>
-      </div>
+      <scroll id="menuScroll" scroll-y="{{true}}" onscroll="handleScroll" class="scroll-container">
+        <div class="menu-content">
+          <div class="menu-list-item menu-entry" onclick="routeToNormal()">
+            <div class="menu-item">
+              <text class="menu-title">正态分布</text>
+            </div>
+          </div>
+          
+          <div class="menu-list-item menu-entry" onclick="routeToExponential()">
+            <div class="menu-item">
+              <text class="menu-title">指数分布</text>
+            </div>
+          </div>
+          
+          <div class="menu-list-item menu-entry" onclick="routeToUniform()">
+            <div class="menu-item">
+              <text class="menu-title">均匀分布</text>
+            </div>
+          </div>
+          
+          <div class="menu-list-item menu-entry" onclick="routeToGamma()">
+            <div class="menu-item">
+              <text class="menu-title">伽马分布</text>
+            </div>
+          </div>
+          
+          <div class="menu-list-item menu-entry" onclick="routeToBeta()">
+            <div class="menu-item">
+              <text class="menu-title">β分布</text>
+            </div>
+          </div>
 
-      <div class="back-button-container">
-        <text class="back-button" @click="goBack">返回</text>
-      </div>
+          <!-- Additional distributions -->
+          <div class="menu-list-item menu-entry" onclick="routeToWeibull()">
+            <div class="menu-item">
+              <text class="menu-title">Weibull分布</text>
+            </div>
+          </div>
+          
+          <div class="menu-list-item menu-entry" onclick="routeToChiSquare()">
+            <div class="menu-item">
+              <text class="menu-title">卡方分布</text>
+            </div>
+          </div>
+          
+          <div class="menu-list-item menu-entry" onclick="routeToStudent()">
+            <div class="menu-item">
+              <text class="menu-title">t分布</text>
+            </div>
+          </div>
+          
+          <div class="menu-list-item menu-entry" onclick="routeToF()">
+            <div class="menu-item">
+              <text class="menu-title">F分布</text>
+            </div>
+          </div>
+          
+          <div class="menu-list-item menu-entry" onclick="routeToPareto()">
+            <div class="menu-item">
+              <text class="menu-title">Pareto分布</text>
+            </div>
+          </div>
+          
+          <div class="menu-list-item menu-entry" onclick="routeToRayleigh()">
+            <div class="menu-item">
+              <text class="menu-title">Rayleigh分布</text>
+            </div>
+          </div>
+
+          <div class="back-button-container">
+            <text class="back-button" @click="goBack">返回</text>
+          </div>
+        </div>
+      </scroll>
     </div>
   </div>
 </template>
@@ -47,11 +88,16 @@ import router from "@system.router"
 
 export default {
   private: {
-    
+    scrollY: 0
   },
 
   onInit() {
     this.$page.setTitleBar({ text: '连续分布' })
+  },
+
+  handleScroll(event) {
+    this.scrollY = event.scrollY;
+    // You can add scroll-based animations or effects here if needed
   },
 
   goBack() {
@@ -76,6 +122,31 @@ export default {
 
   routeToBeta() {
     router.push({ uri: 'pages/distributions/beta' })
+  },
+
+  // New route methods for additional distributions
+  routeToWeibull() {
+    router.push({ uri: 'pages/distributions/weibull' })
+  },
+
+  routeToChiSquare() {
+    router.push({ uri: 'pages/distributions/chisquare' })
+  },
+
+  routeToStudent() {
+    router.push({ uri: 'pages/distributions/student' })
+  },
+
+  routeToF() {
+    router.push({ uri: 'pages/distributions/f' })
+  },
+
+  routeToPareto() {
+    router.push({ uri: 'pages/distributions/pareto' })
+  },
+
+  routeToRayleigh() {
+    router.push({ uri: 'pages/distributions/rayleigh' })
   }
 }
 </script>
@@ -124,10 +195,21 @@ export default {
 }
 
 .main-menu {
-  display: flex;
   flex: 1;
+  flex-direction: column;
+  height: 0; /* Important: forces the scroll container to respect flex sizing */
+}
+
+.scroll-container {
+  flex: 1;
+  width: 100%;
+  flex-direction: column;
+}
+
+.menu-content {
   padding: 20px;
   flex-direction: column;
+  width: 100%;
 }
 
 /* Added style for the new list-item wrapper */

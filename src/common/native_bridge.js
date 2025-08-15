@@ -36,11 +36,11 @@ try {
     }
   }
 
-  // If no native module found, will use JavaScript fallback
+  // If no native module found, will use JavaScript implementation
   if (!NativeModule) {
-    console.log('Native module initialization: FALLBACK MODE (JavaScript only)')
+    console.log('Native module initialization: JavaScript implementation mode')
   } else {
-    console.log('Native module initialization: SUCCESS (real C engine)')
+    console.log('Native module initialization: Native C engine mode')
   }
 } catch (error) {
   console.warn('Native module initialization failed:', error)
@@ -96,11 +96,11 @@ class NativeBridge {
   }
 
   /**
-   * Force use of JavaScript fallback for testing purposes
-   * @param {boolean} forceFallback - Whether to force fallback mode
+   * Force use of JavaScript implementation for testing purposes
+   * @param {boolean} forceJavaScript - Whether to force JavaScript mode
    */
-  static setForceFallback(forceFallback) {
-    if (forceFallback) {
+  static setForceJavaScript(forceJavaScript) {
+    if (forceJavaScript) {
       this._originalNativeModule = NativeModule
       NativeModule = null
     } else if (this._originalNativeModule) {
@@ -111,13 +111,13 @@ class NativeBridge {
 
   /**
    * Get current calculation mode
-   * @returns {string} 'native' or 'fallback'
+   * @returns {string} 'native' or 'javascript'
    */
   static getCalculationMode() {
     if (NativeModule && typeof NativeModule.call === 'function') {
       return 'native'
     } else {
-      return 'fallback'
+      return 'javascript'
     }
   }
 
@@ -148,13 +148,13 @@ class NativeBridge {
           result.error_message
         )
       } else {
-        // Fall back to JavaScript implementation
-        console.log('Using JavaScript fallback for binomial calculation')
-        return this.fallbackBinomial(n, p, k)
+        // Use JavaScript implementation
+        console.log('Using JavaScript implementation for binomial calculation')
+        return this.jsBinomial(n, p, k)
       }
     } catch (error) {
-      console.error('Native binomial calculation failed, using fallback:', error)
-      return this.fallbackBinomial(n, p, k)
+      console.error('Native binomial calculation failed, using JavaScript implementation:', error)
+      return this.jsBinomial(n, p, k)
     }
   }
 
@@ -184,13 +184,13 @@ class NativeBridge {
           result.error_message
         )
       } else {
-        // Fall back to JavaScript implementation
-        console.log('Using JavaScript fallback for Poisson calculation')
-        return this.fallbackPoisson(lambda, k)
+        // Use JavaScript implementation
+        console.log('Using JavaScript implementation for Poisson calculation')
+        return this.jsPoisson(lambda, k)
       }
     } catch (error) {
-      console.error('Native Poisson calculation failed, using fallback:', error)
-      return this.fallbackPoisson(lambda, k)
+      console.error('Native Poisson calculation failed, using JavaScript implementation:', error)
+      return this.jsPoisson(lambda, k)
     }
   }
 
@@ -220,13 +220,13 @@ class NativeBridge {
           result.error_message
         )
       } else {
-        // Fall back to JavaScript implementation
-        console.log('Using JavaScript fallback for geometric calculation')
-        return this.fallbackGeometric(p, k)
+        // Use JavaScript implementation
+        console.log('Using JavaScript implementation for geometric calculation')
+        return this.jsGeometric(p, k)
       }
     } catch (error) {
-      console.error('Native geometric calculation failed, using fallback:', error)
-      return this.fallbackGeometric(p, k)
+      console.error('Native geometric calculation failed, using JavaScript implementation:', error)
+      return this.jsGeometric(p, k)
     }
   }
 
@@ -257,13 +257,13 @@ class NativeBridge {
           result.error_message
         )
       } else {
-        // Fall back to JavaScript implementation
-        console.log('Using JavaScript fallback for negative binomial calculation')
-        return this.fallbackNegativeBinomial(r, p, k)
+        // Use JavaScript implementation
+        console.log('Using JavaScript implementation for negative binomial calculation')
+        return this.jsNegativeBinomial(r, p, k)
       }
     } catch (error) {
-      console.error('Native negative binomial calculation failed, using fallback:', error)
-      return this.fallbackNegativeBinomial(r, p, k)
+      console.error('Native negative binomial calculation failed, using JavaScript implementation:', error)
+      return this.jsNegativeBinomial(r, p, k)
     }
   }
 
@@ -294,13 +294,13 @@ class NativeBridge {
           result.error_message
         )
       } else {
-        // Fall back to JavaScript implementation
-        console.log('Using JavaScript fallback for normal distribution calculation')
-        return this.fallbackNormalDistribution(mu, sigma, x)
+        // Use JavaScript implementation
+        console.log('Using JavaScript implementation for normal distribution calculation')
+        return this.jsNormalDistribution(mu, sigma, x)
       }
     } catch (error) {
-      console.error('Native normal distribution calculation failed, using fallback:', error)
-      return this.fallbackNormalDistribution(mu, sigma, x)
+      console.error('Native normal distribution calculation failed, using JavaScript implementation:', error)
+      return this.jsNormalDistribution(mu, sigma, x)
     }
   }
 
@@ -332,13 +332,13 @@ class NativeBridge {
           result.error_message
         )
       } else {
-        // Fall back to JavaScript implementation
-        console.log('Using JavaScript fallback for hypergeometric calculation')
-        return this.fallbackHypergeometric(N, K, n, k)
+        // Use JavaScript implementation
+        console.log('Using JavaScript implementation for hypergeometric calculation')
+        return this.jsHypergeometric(N, K, n, k)
       }
     } catch (error) {
-      console.error('Native hypergeometric calculation failed, using fallback:', error)
-      return this.fallbackHypergeometric(N, K, n, k)
+      console.error('Native hypergeometric calculation failed, using JavaScript implementation:', error)
+      return this.jsHypergeometric(N, K, n, k)
     }
   }
 
@@ -368,13 +368,13 @@ class NativeBridge {
           result.error_message
         )
       } else {
-        // Fall back to JavaScript implementation
-        console.log('Using JavaScript fallback for exponential distribution calculation')
-        return this.fallbackExponentialDistribution(lambda, x)
+        // Use JavaScript implementation
+        console.log('Using JavaScript implementation for exponential distribution calculation')
+        return this.jsExponentialDistribution(lambda, x)
       }
     } catch (error) {
-      console.error('Native exponential distribution calculation failed, using fallback:', error)
-      return this.fallbackExponentialDistribution(lambda, x)
+      console.error('Native exponential distribution calculation failed, using JavaScript implementation:', error)
+      return this.jsExponentialDistribution(lambda, x)
     }
   }
 
@@ -404,13 +404,13 @@ class NativeBridge {
           result.error_message
         )
       } else {
-        // Fall back to JavaScript implementation
-        console.log('Using JavaScript fallback for chi-square distribution calculation')
-        return this.fallbackChiSquareDistribution(k, x)
+        // Use JavaScript implementation
+        console.log('Using JavaScript implementation for chi-square distribution calculation')
+        return this.jsChiSquareDistribution(k, x)
       }
     } catch (error) {
-      console.error('Native chi-square distribution calculation failed, using fallback:', error)
-      return this.fallbackChiSquareDistribution(k, x)
+      console.error('Native chi-square distribution calculation failed, using JavaScript implementation:', error)
+      return this.jsChiSquareDistribution(k, x)
     }
   }
 
@@ -440,13 +440,13 @@ class NativeBridge {
           result.error_message
         )
       } else {
-        // Fall back to JavaScript implementation
-        console.log('Using JavaScript fallback for t-distribution calculation')
-        return this.fallbackTDistribution(nu, t)
+        // Use JavaScript implementation
+        console.log('Using JavaScript implementation for t-distribution calculation')
+        return this.jsTDistribution(nu, t)
       }
     } catch (error) {
-      console.error('Native t-distribution calculation failed, using fallback:', error)
-      return this.fallbackTDistribution(nu, t)
+      console.error('Native t-distribution calculation failed, using JavaScript implementation:', error)
+      return this.jsTDistribution(nu, t)
     }
   }
 
@@ -477,13 +477,13 @@ class NativeBridge {
           result.error_message
         )
       } else {
-        // Fall back to JavaScript implementation
-        console.log('Using JavaScript fallback for F-distribution calculation')
-        return this.fallbackFDistribution(d1, d2, x)
+        // Use JavaScript implementation
+        console.log('Using JavaScript implementation for F-distribution calculation')
+        return this.jsFDistribution(d1, d2, x)
       }
     } catch (error) {
-      console.error('Native F-distribution calculation failed, using fallback:', error)
-      return this.fallbackFDistribution(d1, d2, x)
+      console.error('Native F-distribution calculation failed, using JavaScript implementation:', error)
+      return this.jsFDistribution(d1, d2, x)
     }
   }
 
@@ -495,9 +495,9 @@ class NativeBridge {
    * @returns {CalculationResult}
    */
   static calculateUniformDistribution(a, b, x) {
-    // Uniform distribution only available in JavaScript (not in C module)
+    // Uniform distribution implemented in JavaScript
     console.log('Using JavaScript implementation for uniform distribution calculation')
-    return this.fallbackUniformDistribution(a, b, x)
+    return this.jsUniformDistribution(a, b, x)
   }
 
   /**
@@ -508,9 +508,9 @@ class NativeBridge {
    * @returns {CalculationResult}
    */
   static calculateGammaDistribution(k, theta, x) {
-    // Gamma distribution only available in JavaScript (not in C module)
+    // Gamma distribution implemented in JavaScript
     console.log('Using JavaScript implementation for gamma distribution calculation')
-    return this.fallbackGammaDistribution(k, theta, x)
+    return this.jsGammaDistribution(k, theta, x)
   }
 
   /**
@@ -521,15 +521,64 @@ class NativeBridge {
    * @returns {CalculationResult}
    */
   static calculateBetaDistribution(alpha, beta, x) {
-    // Beta distribution only available in JavaScript (not in C module)
+    // Beta distribution implemented in JavaScript
     console.log('Using JavaScript implementation for beta distribution calculation')
-    return this.fallbackBetaDistribution(alpha, beta, x)
+    return this.jsBetaDistribution(alpha, beta, x)
   }
 
-  // JavaScript fallback implementations
-  // Used when native C module is not available
+  /**
+   * Calculate Weibull distribution
+   * @param {number} k - shape parameter
+   * @param {number} lambda - scale parameter
+   * @param {number} x - input value
+   * @returns {CalculationResult}
+   */
+  static calculateWeibullDistribution(k, lambda, x) {
+    // Weibull distribution implemented in JavaScript
+    console.log('Using JavaScript implementation for Weibull distribution calculation')
+    return this.jsWeibullDistribution(k, lambda, x)
+  }
 
-  static fallbackBinomial(n, p, k) {
+  /**
+   * Calculate Student's t distribution
+   * @param {number} df - degrees of freedom
+   * @param {number} x - input value
+   * @returns {CalculationResult}
+   */
+  static calculateStudentTDistribution(df, x) {
+    // Use the existing t-distribution method
+    return this.calculateTDistribution(df, x)
+  }
+
+  /**
+   * Calculate Pareto distribution
+   * @param {number} alpha - shape parameter
+   * @param {number} xm - scale parameter
+   * @param {number} x - input value
+   * @returns {CalculationResult}
+   */
+  static calculateParetoDistribution(alpha, xm, x) {
+    // Pareto distribution implemented in JavaScript
+    console.log('Using JavaScript implementation for Pareto distribution calculation')
+    return this.jsParetoDistribution(alpha, xm, x)
+  }
+
+  /**
+   * Calculate Rayleigh distribution
+   * @param {number} sigma - scale parameter
+   * @param {number} x - input value
+   * @returns {CalculationResult}
+   */
+  static calculateRayleighDistribution(sigma, x) {
+    // Rayleigh distribution implemented in JavaScript
+    console.log('Using JavaScript implementation for Rayleigh distribution calculation')
+    return this.jsRayleighDistribution(sigma, x)
+  }
+
+  // JavaScript implementations
+  // Used when native C module is not available or for distributions not implemented in C
+
+  static jsBinomial(n, p, k) {
     try {
       const logCombo = this.logCombination(n, k)
       const logProb = logCombo + k * Math.log(p) + (n - k) * Math.log(1 - p)
@@ -544,11 +593,11 @@ class NativeBridge {
       
       return new CalculationResult(true, pmf, cdf)
     } catch (error) {
-      return new CalculationResult(false, 0, 0, 'Fallback calculation failed')
+      return new CalculationResult(false, 0, 0, 'JavaScript calculation failed')
     }
   }
 
-  static fallbackPoisson(lambda, k) {
+  static jsPoisson(lambda, k) {
     try {
       const logProb = k * Math.log(lambda) - lambda - this.logFactorial(k)
       const pmf = Math.exp(logProb)
@@ -561,11 +610,11 @@ class NativeBridge {
       
       return new CalculationResult(true, pmf, cdf)
     } catch (error) {
-      return new CalculationResult(false, 0, 0, 'Fallback calculation failed')
+      return new CalculationResult(false, 0, 0, 'JavaScript calculation failed')
     }
   }
 
-  static fallbackGeometric(p, k) {
+  static jsGeometric(p, k) {
     try {
       const logProb = (k - 1) * Math.log(1 - p) + Math.log(p)
       const pmf = Math.exp(logProb)
@@ -573,11 +622,11 @@ class NativeBridge {
       
       return new CalculationResult(true, pmf, cdf)
     } catch (error) {
-      return new CalculationResult(false, 0, 0, 'Fallback calculation failed')
+      return new CalculationResult(false, 0, 0, 'JavaScript calculation failed')
     }
   }
 
-  static fallbackNegativeBinomial(r, p, k) {
+  static jsNegativeBinomial(r, p, k) {
     try {
       const logCombo = this.logCombination(k + r - 1, k)
       const logProb = logCombo + r * Math.log(p) + k * Math.log(1 - p)
@@ -592,11 +641,11 @@ class NativeBridge {
       
       return new CalculationResult(true, pmf, cdf)
     } catch (error) {
-      return new CalculationResult(false, 0, 0, 'Fallback calculation failed')
+      return new CalculationResult(false, 0, 0, 'JavaScript calculation failed')
     }
   }
 
-  static fallbackNormalDistribution(mu, sigma, x) {
+  static jsNormalDistribution(mu, sigma, x) {
     try {
       // Standard normal PDF calculation
       const z = (x - mu) / sigma
@@ -607,11 +656,11 @@ class NativeBridge {
       
       return new CalculationResult(true, pdf, cdf)
     } catch (error) {
-      return new CalculationResult(false, 0, 0, 'Fallback calculation failed')
+      return new CalculationResult(false, 0, 0, 'JavaScript calculation failed')
     }
   }
 
-  static fallbackHypergeometric(N, K, n, k) {
+  static jsHypergeometric(N, K, n, k) {
     try {
       const logProb = this.logCombination(K, k) + 
                       this.logCombination(N - K, n - k) - 
@@ -629,11 +678,11 @@ class NativeBridge {
       
       return new CalculationResult(true, pmf, cdf)
     } catch (error) {
-      return new CalculationResult(false, 0, 0, 'Fallback calculation failed')
+      return new CalculationResult(false, 0, 0, 'JavaScript calculation failed')
     }
   }
 
-  static fallbackExponentialDistribution(lambda, x) {
+  static jsExponentialDistribution(lambda, x) {
     try {
       if (lambda <= 0 || x < 0) {
         return new CalculationResult(false, 0, 0, 'Invalid parameters')
@@ -644,11 +693,11 @@ class NativeBridge {
       
       return new CalculationResult(true, pdf, cdf)
     } catch (error) {
-      return new CalculationResult(false, 0, 0, 'Fallback calculation failed')
+      return new CalculationResult(false, 0, 0, 'JavaScript calculation failed')
     }
   }
 
-  static fallbackChiSquareDistribution(k, x) {
+  static jsChiSquareDistribution(k, x) {
     try {
       if (k <= 0 || x < 0) {
         return new CalculationResult(false, 0, 0, 'Invalid parameters')
@@ -664,11 +713,11 @@ class NativeBridge {
       
       return new CalculationResult(true, pdf, cdf)
     } catch (error) {
-      return new CalculationResult(false, 0, 0, 'Fallback calculation failed')
+      return new CalculationResult(false, 0, 0, 'JavaScript calculation failed')
     }
   }
 
-  static fallbackTDistribution(nu, t) {
+  static jsTDistribution(nu, t) {
     try {
       if (nu <= 0) {
         return new CalculationResult(false, 0, 0, 'Invalid degrees of freedom')
@@ -679,11 +728,11 @@ class NativeBridge {
       
       return new CalculationResult(true, pdf, cdf)
     } catch (error) {
-      return new CalculationResult(false, 0, 0, 'Fallback calculation failed')
+      return new CalculationResult(false, 0, 0, 'JavaScript calculation failed')
     }
   }
 
-  static fallbackFDistribution(d1, d2, x) {
+  static jsFDistribution(d1, d2, x) {
     try {
       if (d1 <= 0 || d2 <= 0 || x < 0) {
         return new CalculationResult(false, 0, 0, 'Invalid parameters')
@@ -694,11 +743,11 @@ class NativeBridge {
       
       return new CalculationResult(true, pdf, cdf)
     } catch (error) {
-      return new CalculationResult(false, 0, 0, 'Fallback calculation failed')
+      return new CalculationResult(false, 0, 0, 'JavaScript calculation failed')
     }
   }
 
-  static fallbackUniformDistribution(a, b, x) {
+  static jsUniformDistribution(a, b, x) {
     try {
       if (a >= b) {
         return new CalculationResult(false, 0, 0, 'Invalid parameters: a must be less than b')
@@ -720,11 +769,11 @@ class NativeBridge {
       
       return new CalculationResult(true, pdf, cdf)
     } catch (error) {
-      return new CalculationResult(false, 0, 0, 'Fallback calculation failed')
+      return new CalculationResult(false, 0, 0, 'JavaScript calculation failed')
     }
   }
 
-  static fallbackGammaDistribution(k, theta, x) {
+  static jsGammaDistribution(k, theta, x) {
     try {
       if (k <= 0 || theta <= 0 || x < 0) {
         return new CalculationResult(false, 0, 0, 'Invalid parameters')
@@ -738,11 +787,11 @@ class NativeBridge {
       
       return new CalculationResult(true, pdf, cdf)
     } catch (error) {
-      return new CalculationResult(false, 0, 0, 'Fallback calculation failed')
+      return new CalculationResult(false, 0, 0, 'JavaScript calculation failed')
     }
   }
 
-  static fallbackBetaDistribution(alpha, beta, x) {
+  static jsBetaDistribution(alpha, beta, x) {
     try {
       if (alpha <= 0 || beta <= 0 || x < 0 || x > 1) {
         return new CalculationResult(false, 0, 0, 'Invalid parameters')
@@ -756,11 +805,56 @@ class NativeBridge {
       
       return new CalculationResult(true, pdf, cdf)
     } catch (error) {
-      return new CalculationResult(false, 0, 0, 'Fallback calculation failed')
+      return new CalculationResult(false, 0, 0, 'JavaScript calculation failed')
     }
   }
 
-  // Helper mathematical functions for JavaScript fallback calculations
+  static jsWeibullDistribution(k, lambda, x) {
+    try {
+      if (k <= 0 || lambda <= 0 || x < 0) {
+        return new CalculationResult(false, 0, 0, 'Invalid parameters')
+      }
+      
+      const pdf = (k / lambda) * Math.pow(x / lambda, k - 1) * Math.exp(-Math.pow(x / lambda, k))
+      const cdf = 1 - Math.exp(-Math.pow(x / lambda, k))
+      
+      return new CalculationResult(true, pdf, cdf)
+    } catch (error) {
+      return new CalculationResult(false, 0, 0, 'JavaScript calculation failed')
+    }
+  }
+
+  static jsParetoDistribution(alpha, xm, x) {
+    try {
+      if (alpha <= 0 || xm <= 0 || x < xm) {
+        return new CalculationResult(false, 0, 0, 'Invalid parameters: α > 0, xm > 0, x ≥ xm')
+      }
+      
+      const pdf = (alpha * Math.pow(xm, alpha)) / Math.pow(x, alpha + 1)
+      const cdf = 1 - Math.pow(xm / x, alpha)
+      
+      return new CalculationResult(true, pdf, cdf)
+    } catch (error) {
+      return new CalculationResult(false, 0, 0, 'JavaScript calculation failed')
+    }
+  }
+
+  static jsRayleighDistribution(sigma, x) {
+    try {
+      if (sigma <= 0 || x < 0) {
+        return new CalculationResult(false, 0, 0, 'Invalid parameters')
+      }
+      
+      const pdf = (x / (sigma * sigma)) * Math.exp(-(x * x) / (2 * sigma * sigma))
+      const cdf = 1 - Math.exp(-(x * x) / (2 * sigma * sigma))
+      
+      return new CalculationResult(true, pdf, cdf)
+    } catch (error) {
+      return new CalculationResult(false, 0, 0, 'JavaScript calculation failed')
+    }
+  }
+
+  // Helper mathematical functions for JavaScript calculations
   static logCombination(n, k) {
     if (k > n || k < 0) return -Infinity
     if (k === 0 || k === n) return 0
