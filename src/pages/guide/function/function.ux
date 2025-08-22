@@ -1,125 +1,135 @@
 <template>
   <div class="container">
     <div class="top-bar">
-      <text class="page-title">概率函数</text>
+      <text class="page-title">函数说明</text>
     </div>
 
-    <div class="content">
-      <div class="guide-section">
-        <text class="section-title">概率密度函数(PDF)</text>
-        
-        <text class="text-content">
-          连续分布的PDF
-          概率密度函数描述连续随机变量在某点的相对可能性
-        </text>
-        
-        <text class="text-content">
-          • 数学定义：f(x) ≥ 0，且∫(-∞,∞) f(x)dx = 1
-          • 物理意义：某点的"密度"而非概率
-          • 计算应用：P(a ≤ X ≤ b) = ∫[a,b] f(x)dx
-          • 重要性质：密度值可以大于1，但区间概率必须在0-1之间
-        </text>
-        
-        <text class="text-content">
-          示例：正态分布N(0,1)在x=0处密度为1/√(2π) ≈ 0.4
-          但这不表示P(X=0)=0.4，而是该点附近相对可能性
-        </text>
-      </div>
+    <div class="main-menu">
+      <scroll class="scroll-container" scroll-y="true">
+        <div class="menu-content">
+          <div class="content-block">
+            <text class="block-title">概率密度函数 (PDF)</text>
+            <text class="block-content">
+              概率密度函数描述连续随机变量在各个可能取值上的概率密度
 
-      <div class="guide-section">
-        <text class="section-title">概率质量函数(PMF)</text>
-        
-        <text class="text-content">
-          离散分布的PMF
-          概率质量函数给出离散随机变量取某个特定值的精确概率
-        </text>
-        
-        <text class="text-content">
-          • 数学定义：p(k) = P(X = k)，其中0 ≤ p(k) ≤ 1
-          • 归一化：Σ p(k) = 1（对所有可能取值求和）
-          • 物理意义：直接给出某点的概率值
-          • 计算应用：P(a ≤ X ≤ b) = Σ[k=a→b] p(k)
-        </text>
-        
-        <text class="text-content">
-          示例：二项分布B(n=10,p=0.3)中
-          P(X=3) = C(10,3) × 0.3³ × 0.7⁷ ≈ 0.267
-          这表示"10次试验中恰好成功3次"的精确概率
-        </text>
-      </div>
+              定义：f(x) = dF(x)/dx，其中F(x)是累积分布函数
+              性质：f(x) ≥ 0，∫f(x)dx = 1
+              应用：计算区间概率，描述数据分布形状
+              
+              使用示例：
+              - 正态分布PDF：计算某个值附近的概率密度
+              - 指数分布PDF：分析设备故障率
+            </text>
+          </div>
+          
+          <div class="content-block">
+            <text class="block-title">概率质量函数 (PMF)</text>
+            <text class="block-content">
+              概率质量函数描述离散随机变量取各个可能值的概率
 
-      <div class="guide-section">
-        <text class="section-title">累积分布函数(CDF)</text>
-        
-        <text class="text-content">
-          通用CDF定义
-          累积分布函数给出随机变量不超过某值的概率
+              定义：P(X = x) = p(x)
+              性质：p(x) ≥ 0，Σp(x) = 1
+              应用：计算离散事件的精确概率
+              
+              使用示例：
+              - 二项分布PMF：计算恰好成功k次的概率
+              - 泊松分布PMF：计算单位时间内事件发生次数概率
+            </text>
+          </div>
           
-          • 数学定义：F(x) = P(X ≤ x)
-          • 连续分布：F(x) = ∫(-∞,x] f(t)dt
-          • 离散分布：F(x) = Σ[k≤x] p(k)
-          • 重要性质：单调不减，右连续，F(-∞)=0，F(∞)=1
-          
-          应用价值：
-          • 计算区间概率：P(a < X ≤ b) = F(b) - F(a)
-          • 计算分位数：给定概率p，求x使得F(x)=p
-          • 统计检验：计算p值和置信区间
-          
-          
-          CDF与PDF/PMF的关系
-          三者之间的数学关系
-          
-          • 连续分布：
-            - F'(x) = f(x)（CDF的导数是PDF）
-            - F(x) = ∫(-∞,x] f(t)dt（CDF是PDF的积分）
-          
-          • 离散分布：
-            - F(x) - F(x⁻) = p(x)（CDF的跳跃高度是PMF）
-            - F(x) = Σ[k≤x] p(k)（CDF是PMF的累加和）
-          
-          • 计算优势：
-            - CDF通常有解析表达式，便于计算
-            - 避免复杂的积分或求和运算
-            - 现代统计软件都内置CDF计算函数
-        </text>
-      </div>
+          <div class="content-block">
+            <text class="block-title">累积分布函数 (CDF)</text>
+            <text class="block-content">
+              累积分布函数描述随机变量小于等于某个值的概率
 
-      <div class="guide-section">
-        <text class="section-title">函数使用实例</text>
-        
-        <text class="text-content">
-          正态分布示例
-          标准正态分布N(0,1)的计算演示
+              定义：F(x) = P(X ≤ x)
+              性质：单调递增，F(-∞) = 0，F(+∞) = 1
+              应用：计算区间概率，分位数计算
+              
+              使用示例：
+              - 正态分布CDF：计算标准化考试成绩排名
+              - 指数分布CDF：计算设备在时间t前故障的概率
+            </text>
+          </div>
           
-          • PDF计算：φ(1.96) = 1/√(2π) × e^(-1.96²/2) ≈ 0.058
-          • CDF计算：Φ(1.96) ≈ 0.975
-          • 区间概率：P(-1.96 ≤ Z ≤ 1.96) = Φ(1.96) - Φ(-1.96) ≈ 0.95
-          
-          实际应用：
-          • 假设检验：计算Z统计量的p值
-          • 置信区间：构建95%置信区间
-          • 质量控制：设定控制限
-          
-          
-          二项分布示例
-          二项分布B(n=20,p=0.4)的计算演示
-          
-          • PMF计算：P(X=8) = C(20,8) × 0.4⁸ × 0.6¹² ≈ 0.179
-          • CDF计算：P(X≤8) ≈ 0.596
-          • 区间概率：P(6≤X≤10) = F(10) - F(5) ≈ 0.746 - 0.125 = 0.621
-          
-          实际应用：
-          • 产品质检：计算批次合格率
-          • 医学试验：评估治疗效果
-          • 投资决策：分析成功概率
-        </text>
-      </div>
-    </div>
+          <div class="content-block">
+            <text class="block-title">分位数函数 (Quantile Function)</text>
+            <text class="block-content">
+              分位数函数是累积分布函数的反函数
 
-    <div class="bottom-section">
-      <div class="back-btn" onclick="goBack">
-        <text class="back-text">返回</text>
-      </div>
+              定义：Q(p) = F⁻¹(p)，其中0 ≤ p ≤ 1
+              应用：计算百分位数，置信区间构造
+              
+              使用示例：
+              - 正态分布分位数：计算95%置信区间
+              - t分布分位数：假设检验临界值
+            </text>
+          </div>
+          
+          <div class="content-block">
+            <text class="block-title">随机数生成</text>
+            <text class="block-content">
+              从指定概率分布中生成随机样本
+
+              方法：逆变换法、接受-拒绝法、Box-Muller变换
+              应用：蒙特卡罗模拟、统计推断、数据增强
+              
+              使用示例：
+              - 正态分布随机数：模拟测量误差
+              - 泊松分布随机数：模拟客户到达过程
+            </text>
+          </div>
+          
+          <div class="content-block">
+            <text class="block-title">参数估计</text>
+            <text class="block-content">
+              从样本数据估计分布参数
+
+              方法：最大似然估计、矩估计、贝叶斯估计
+              评价：无偏性、一致性、有效性
+              
+              使用示例：
+              - 正态分布：估计均值和方差
+              - 指数分布：估计率参数
+              - 二项分布：估计成功概率
+            </text>
+          </div>
+          
+          <div class="content-block">
+            <text class="block-title">假设检验</text>
+            <text class="block-content">
+              使用概率分布进行统计假设检验
+
+              步骤：建立假设、选择检验统计量、计算p值、做出决策
+              类型：单样本检验、双样本检验、拟合优度检验
+              
+              使用示例：
+              - t检验：比较均值差异
+              - 卡方检验：检验分布拟合度
+              - F检验：比较方差
+            </text>
+          </div>
+          
+          <div class="content-block">
+            <text class="block-title">置信区间</text>
+            <text class="block-content">
+              构造参数的置信区间
+
+              原理：基于抽样分布构造区间估计
+              解释：区间包含真实参数的概率
+              
+              使用示例：
+              - 均值置信区间：使用t分布或正态分布
+              - 比例置信区间：使用二项分布近似
+              - 方差置信区间：使用卡方分布
+            </text>
+          </div>
+
+          <div class="back-button-container">
+            <text class="back-button" @click="goBack">返回</text>
+          </div>
+        </div>
+      </scroll>
     </div>
   </div>
 </template>
@@ -144,75 +154,107 @@ export default {
 
 <style>
 .container {
-  display: flex;
   flex-direction: column;
   background-color: #000000;
   height: 100%;
 }
 
 .top-bar {
-  display: flex;
   height: 60px;
   background-color: #111111;
-  padding: 0 20px;
-  justify-content: center;
+  flex-direction: row;
   align-items: center;
+  justify-content: center;
+  padding: 0 15px;
   border-bottom: 1px solid #333333;
 }
 
 .page-title {
-  font-size: 22px;
-  color: #ffffff;
-  font-weight: bold;
-}
-
-.content {
-  flex: 1;
-  flex-direction: column;
-  padding: 20px 15px;
-  overflow-y: auto;
-}
-
-.guide-section {
-  margin-bottom: 25px;
-}
-
-.section-title {
   font-size: 20px;
   color: #ffffff;
   font-weight: bold;
-  margin-bottom: 15px;
-  text-align: center;
 }
 
-.text-content {
-  font-size: 14px;
+.main-menu {
+  flex: 1;
+  flex-direction: column;
+  height: 0;
+}
+
+.scroll-container {
+  flex: 1;
+  width: 100%;
+  flex-direction: column;
+}
+
+.menu-content {
+  padding: 30px 5px;
+  flex-direction: column;
+  width: 100%;
+}
+
+.content-block {
+  margin-bottom: 40px;
+  background-color: #222222;
+  border: 1px solid #444444;
+  border-radius: 16px;
+  padding: 40px 15px;
+  flex-direction: column;
+  min-height: 280px;
+  width: 98%;
+  align-self: center;
+}
+
+.block-title {
+  font-size: 24px;
+  color: #ffffff;
+  font-weight: bold;
+  margin-bottom: 25px;
+  font-family: sans-serif;
+  padding: 0 10px;
+}
+
+.block-content {
+  font-size: 18px;
   color: #cccccc;
-  line-height: 1.6;
+  line-height: 2.8;
   white-space: pre-line;
-  margin-bottom: 15px;
+  font-family: sans-serif;
+  letter-spacing: 0.8px;
+  width: 100%;
+  padding: 10px 5px;
+  font-weight: 500;
+  word-spacing: 2px;
 }
 
-.bottom-section {
-  padding: 20px;
+.block-title {
+  font-size: 26px;
+  color: #ffffff;
+  font-weight: bold;
+  margin-bottom: 25px;
+  font-family: sans-serif;
+  padding: 0 5px;
+  letter-spacing: 1px;
+  word-spacing: 3px;
+}
+
+.back-button-container {
+  margin-top: 40px;
   display: flex;
-  justify-content: center;
-  border-top: 1px solid #333333;
-}
-
-.back-btn {
-  height: 45px;
-  width: 120px;
-  background-color: #333333;
-  border: 1px solid #555555;
-  border-radius: 10px;
   justify-content: center;
   align-items: center;
 }
 
-.back-text {
-  font-size: 18px;
+.back-button {
+  width: 60%;
+  height: 60px;
+  font-size: 22px;
   color: #ffffff;
-  font-weight: bold;
+  background-color: #333333;
+  border: 1px solid #555555;
+  border-radius: 16px;
+  padding: 15px 30px;
+  text-align: center;
+  cursor: pointer;
 }
 </style>

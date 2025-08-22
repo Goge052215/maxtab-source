@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <div class="top-bar">
-      <text class="app-title">统计分布计算器</text>
+      <text class="app-title">MaxTab</text>
     </div>
 
     <div class="main-menu">

@@ -5,13 +5,31 @@
     </div>
 
     <div class="main-menu">
-      <div class="writing-text">
-        <text style="font-size: 24px; color: #ffffff;">正在编写</text>
-      </div>
+      <scroll class="scroll-container" scroll-y="true">
+        <div class="menu-content">
+          <div class="menu-list-item menu-entry" onclick="routeToDistributionGuide()">
+            <div class="menu-item">
+              <text class="menu-title">分布介绍</text>
+            </div>
+          </div>
+          
+          <div class="menu-list-item menu-entry" onclick="routeToTipsGuide()">
+            <div class="menu-item">
+              <text class="menu-title">使用技巧</text>
+            </div>
+          </div>
+          
+          <div class="menu-list-item menu-entry" onclick="routeToFunctionGuide()">
+            <div class="menu-item">
+              <text class="menu-title">函数说明</text>
+            </div>
+          </div>
 
-      <div class="back-button-container">
-        <text class="back-button" @click="goBack">返回</text>
-      </div>
+          <div class="back-button-container">
+            <text class="back-button" @click="goBack">返回</text>
+          </div>
+        </div>
+      </scroll>
     </div>
   </div>
 </template>
@@ -20,17 +38,26 @@
 import router from "@system.router"
 
 export default {
-  private: {
-    
-  },
-
   onInit() {
     this.$page.setTitleBar({ text: '使用指南' })
   },
 
   goBack() {
     router.back()
-  }}
+  },
+
+  routeToDistributionGuide() {
+    router.push({ uri: 'pages/guide/distribution' })
+  },
+
+  routeToTipsGuide() {
+    router.push({ uri: 'pages/guide/tips' })
+  },
+
+  routeToFunctionGuide() {
+    router.push({ uri: 'pages/guide/function' })
+  }
+}
 </script>
 
 <style>
@@ -77,10 +104,21 @@ export default {
 }
 
 .main-menu {
-  display: flex;
   flex: 1;
+  flex-direction: column;
+  height: 0;
+}
+
+.scroll-container {
+  flex: 1;
+  width: 100%;
+  flex-direction: column;
+}
+
+.menu-content {
   padding: 20px;
   flex-direction: column;
+  width: 100%;
 }
 
 /* Added style for the new list-item wrapper */
@@ -90,13 +128,6 @@ export default {
 
 .menu-entry {
   cursor: pointer;
-}
-
-.writing-text {
-  display: flex;
-  flex: 1;
-  justify-content: center;
-  align-items: center;
 }
 
 /* Enhanced menu items */
