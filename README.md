@@ -83,7 +83,7 @@ npm run watch
 ## 📐 架构设计
 
 <center>
-  <img src='imgs/maxtab_workflow.png' width="800" height=auto>
+  <img src='imgs/maxtab_wf.png' width="800" height=auto>
 </center>
 
 ## 📊 支持的分布类型
