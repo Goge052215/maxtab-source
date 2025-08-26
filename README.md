@@ -1,8 +1,8 @@
 <center>
-  <img src='Page-1.png' width="800" height=auto>
+  <img src='imgs/Head_img.png' width="800" height=auto>
 </center>
 
-# 📊 Mi Band 10 统计计算器 | StatsModels
+# 📊 Mi Band 10 统计计算器 | MaxTab
 
 一款针对小米手环 10 开发的专业级统计计算快应用，为用户提供便捷高效的数据分析工具支持。
 
@@ -80,6 +80,11 @@ npm run release
 npm run watch
 ```
 
+## 📐 架构设计
+
+<center>
+  <img src='imgs/maxtab_workflow.png' width="800" height=auto>
+</center>
 
 ## 📊 支持的分布类型
 ### 离散分布
