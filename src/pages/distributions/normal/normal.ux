@@ -270,7 +270,7 @@ export default {
     }
 
     // Use optimized C calculation
-    const result = NativeBridge.calculateNormalDistribution(this.mu, this.sigma, this.x)
+    const result = NativeBridge.normalDistribution(this.mu, this.sigma, this.x)
     
     if (result.success) {
       router.push({

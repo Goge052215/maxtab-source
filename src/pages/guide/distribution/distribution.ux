@@ -13,57 +13,52 @@
           
           <div class="content-block">
             <text class="block-title">二项分布</text>
-            <text class="block-content">
-              描述n次独立试验中成功次数的概率分布
-
-              应用场景：抛硬币、质量检测、投票结果
-              参数：n(试验次数), p(单次成功概率)
-              特点：每次试验只有成功/失败两种结果
-            </text>
+            <div class="block-content">
+              <text class="content-line">描述n次独立试验中成功次数的概率分布</text>
+              <text class="content-line">应用场景:抛硬币、质量检测、投票结果</text>
+              <text class="content-line">参数:n(试验次数),p(单次成功概率)</text>
+              <text class="content-line">特点:每次试验只有成功/失败两种结果</text>
+            </div>
           </div>
           
           <div class="content-block">
             <text class="block-title">泊松分布</text>
-            <text class="block-content">
-              描述单位时间或空间内随机事件发生次数的概率分布
-
-              应用场景：客服电话呼入、交通事故、放射性衰变
-              参数：λ(平均发生率)
-              特点：事件独立发生，平均发生率恒定
-            </text>
+            <div class="block-content">
+              <text class="content-line">描述单位时间或空间内随机事件发生次数的概率分布</text>
+              <text class="content-line">应用场景:客服电话呼入、交通事故、放射性衰变</text>
+              <text class="content-line">参数:λ(平均发生率)</text>
+              <text class="content-line">特点:事件独立发生,平均发生率恒定</text>
+            </div>
           </div>
           
           <div class="content-block">
             <text class="block-title">几何分布</text>
-            <text class="block-content">
-              描述首次成功所需试验次数的概率分布
-
-              应用场景：首次中奖、首次故障、首次成功
-              参数：p(单次成功概率)
-              特点：无记忆性，之前失败不影响未来概率
-            </text>
+            <div class="block-content">
+              <text class="content-line">描述首次成功所需试验次数的概率分布</text>
+              <text class="content-line">应用场景:首次中奖、首次故障、首次成功</text>
+              <text class="content-line">参数:p(单次成功概率)</text>
+              <text class="content-line">特点:无记忆性,之前失败不影响未来概率</text>
+            </div>
           </div>
           
           <div class="content-block">
             <text class="block-title">负二项分布</text>
-            <text class="block-content">
-              描述达到指定成功次数所需试验次数的概率分布
-
-              应用场景：收集全套卡片、达到销售目标
-              参数：r(成功次数), p(单次成功概率)
-              特点：几何分布的推广形式
-            </text>
+            <div class="block-content">
+              <text class="content-line">描述达到指定成功次数所需试验次数的概率分布</text>
+              <text class="content-line">应用场景:收集全套卡片、达到销售目标</text>
+              <text class="content-line">参数:r(成功次数),p(单次成功概率)</text>
+              <text class="content-line">特点:几何分布的推广形式</text>
+            </div>
           </div>
           
           <div class="content-block">
             <text class="block-title">超几何分布</text>
-            <text class="block-content">
-              描述不放回抽样中成功次数的概率分布
-
-              应用场景：质量抽检、扑克牌游戏
-              参数：N(总数), K(成功总数), n(抽样数)
-              特点：不放回抽样，概率随抽样变化
-            </text>
+            <div class="block-content">
+              <text class="content-line">描述不放回抽样中成功次数的概率分布</text>
+              <text class="content-line">应用场景:质量抽检、扑克牌游戏</text>
+              <text class="content-line">参数:N(总数),K(成功总数),n(抽样数)</text>
+              <text class="content-line">特点:不放回抽样,概率随抽样变化</text>
+            </div>
           </div>
 
           <div class="section-header">
@@ -72,57 +67,52 @@
           
           <div class="content-block">
             <text class="block-title">正态分布</text>
-            <text class="block-content">
-              最重要的连续概率分布，呈钟形曲线
-
-              应用场景：身高体重、考试成绩、测量误差
-              参数：μ(均值), σ²(方差)
-              特点：68-95-99.7法则，中心极限定理
-            </text>
+            <div class="block-content">
+              <text class="content-line">最重要的连续概率分布,呈钟形曲线</text>
+              <text class="content-line">应用场景:身高体重、考试成绩、测量误差</text>
+              <text class="content-line">参数:μ(均值), σ²(方差)</text>
+              <text class="content-line">特点:68-95-99.7法则，中心极限定理</text>
+            </div>
           </div>
           
           <div class="content-block">
             <text class="block-title">指数分布</text>
-            <text class="block-content">
-              描述泊松过程中事件间隔时间的概率分布
-
-              应用场景：设备寿命、客服等待时间、地震间隔
-              参数：λ(率参数)
-              特点：无记忆性，常用于可靠性分析
-            </text>
+            <div class="block-content">
+              <text class="content-line">描述泊松过程中事件间隔时间的概率分布</text>
+              <text class="content-line">应用场景:设备寿命、客服等待时间、地震间隔</text>
+              <text class="content-line">参数:λ(率参数)</text>
+              <text class="content-line">特点:无记忆性，常用于可靠性分析</text>
+            </div>
           </div>
           
           <div class="content-block">
             <text class="block-title">均匀分布</text>
-            <text class="block-content">
-              在区间内所有取值等可能的连续分布
-
-              应用场景：随机数生成、轮盘赌、舍入误差
-              参数：a(最小值), b(最大值)
-              特点：简单直观，每个区间概率相等
-            </text>
+            <div class="block-content">
+              <text class="content-line">在区间内所有取值等可能的连续分布</text>
+              <text class="content-line">应用场景:随机数生成、轮盘赌、舍入误差</text>
+              <text class="content-line">参数:a(最小值), b(最大值)</text>
+              <text class="content-line">特点:简单直观，每个区间概率相等</text>
+            </div>
           </div>
           
           <div class="content-block">
             <text class="block-title">伽马分布</text>
-            <text class="block-content">
-              描述多个独立指数变量之和的概率分布
-
-              应用场景：总等待时间、总降雨量、系统寿命
-              参数：k(形状参数), θ(尺度参数)
-              特点：指数分布和卡方分布的特例
-            </text>
+            <div class="block-content">
+              <text class="content-line">描述多个独立指数变量之和的概率分布</text>
+              <text class="content-line">应用场景:总等待时间、总降雨量、系统寿命</text>
+              <text class="content-line">参数:k(形状参数), θ(尺度参数)</text>
+              <text class="content-line">特点:指数分布和卡方分布的特例</text>
+            </div>
           </div>
           
           <div class="content-block">
             <text class="block-title">贝塔分布</text>
-            <text class="block-content">
-              定义在(0,1)区间的连续概率分布
-
-              应用场景：比例估计、成功率分析、贝叶斯统计
-              参数：α, β(形状参数)
-              特点：灵活性高，可呈现多种形状
-            </text>
+            <div class="block-content">
+              <text class="content-line">定义在(0,1)区间的连续概率分布</text>
+              <text class="content-line">应用场景:比例估计、成功率分析、贝叶斯统计</text>
+              <text class="content-line">参数:α,β(形状参数)</text>
+              <text class="content-line">特点:灵活性高，可呈现多种形状</text>
+            </div>
           </div>
 
           <div class="back-button-container">
@@ -188,41 +178,48 @@ export default {
 }
 
 .menu-content {
-  padding: 30px 5px;
+  padding: 10px 5px;
   flex-direction: column;
   width: 100%;
 }
 
 .content-block {
-  margin-bottom: 25px;
+  margin-bottom: 20px;
   background-color: #222222;
   border: 1px solid #444444;
   border-radius: 16px;
-  padding: 40px 15px;
+  padding: 40px 20px;
   flex-direction: column;
-  min-height: 280px;
-  width: 95%;
+  min-height: 420px;
+  width: 100%;
   align-self: center;
 }
 
 .block-title {
-  font-size: 20px;
+  font-size: 22px;
   color: #ffffff;
   font-weight: bold;
-  margin-bottom: 25px;
-  font-family: sans-serif;
-  padding: 0 10px;
+  margin-bottom: 15px;
+  padding: 0 0px;
+  text-align: left;
 }
 
 .block-content {
-  font-size: 18px;
   color: #cccccc;
-  line-height: 4.0;
-  white-space: pre-line;
-  font-family: sans-serif;
-  letter-spacing: 0.5px;
   width: 100%;
-  padding: 10px 10px;
+  padding: 10px 0;
+  flex-direction: column;
+}
+
+.bottom-section {
+  padding: 0px 20px 50px 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.content-line {
+  font-size: 20px;
+  margin-bottom: 10px;
 }
 
 .section-header {
@@ -231,65 +228,14 @@ export default {
 }
 
 .section-title {
-  font-size: 20px;
-  color: #ffffff;
-  font-weight: bold;
-  text-align: center;
-}
-
-.content-block {
-  margin-bottom: 40px;
-  background-color: #222222;
-  border: 1px solid #444444;
-  border-radius: 16px;
-  padding: 40px 50px;
-  flex-direction: column;
-  min-height: 200px;
-}
-
-.block-title {
   font-size: 22px;
   color: #ffffff;
   font-weight: bold;
-  margin-bottom: 25px;
-  font-family: sans-serif;
-}
-
-.block-content {
-  font-size: 20px;
-  color: #cccccc;
-  line-height: 2.8;
-  white-space: pre-line;
-  font-family: sans-serif;
-  letter-spacing: 0.8px;
-  width: 100%;
-  padding: 10px 5px;
-  font-weight: 500;
-  word-spacing: 2px;
-}
-
-.block-title {
-  font-size: 26px;
-  color: #ffffff;
-  font-weight: bold;
-  margin-bottom: 25px;
-  font-family: sans-serif;
-  padding: 0 5px;
-  letter-spacing: 1px;
-  word-spacing: 3px;
-}
-
-.block-content {
-  font-size: 16px;
-  color: #cccccc;
-  line-height: 2.2;
-  white-space: pre-line;
-  font-family: sans-serif;
-  letter-spacing: 0.5px;
+  text-align: left;
 }
 
 .back-button-container {
-  margin-top: 40px;
+  margin-top: 20px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -297,14 +243,15 @@ export default {
 
 .back-button {
   width: 60%;
-  height: 60px;
-  font-size: 22px;
+  height: 50px;
+  font-size: 20px;
   color: #ffffff;
   background-color: #333333;
   border: 1px solid #555555;
-  border-radius: 16px;
-  padding: 15px 30px;
+  border-radius: 12px;
+  padding: 12px 24px;
   text-align: center;
   cursor: pointer;
+  margin-bottom: 20px;
 }
 </style>

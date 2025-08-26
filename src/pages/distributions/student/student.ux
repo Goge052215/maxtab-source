@@ -195,7 +195,7 @@ export default {
       return
     }
 
-    const result = NativeBridge.calculateStudentTDistribution(this.df, this.x)
+    const result = NativeBridge.tDistribution(this.df, this.x)
     
     if (result.success) {
       router.push({

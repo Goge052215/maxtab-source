@@ -184,7 +184,7 @@ export default {
       return
     }
 
-    const result = NativeBridge.calculateChiSquareDistribution(this.df, this.x)
+    const result = NativeBridge.chiSquareDistribution(this.df, this.x)
     
     if (result.success) {
       router.push({

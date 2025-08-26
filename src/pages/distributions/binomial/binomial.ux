@@ -41,19 +41,18 @@
       </div>
 
       <!-- VelaOS Input Method Container -->
-      <div class="keyboard-page" style="flex-direction: column;" if="{{ showKeyboard }}">
-        <input-method
-          hide="{{!showKeyboard}}"
-          keyboardtype="NUMERIC"
-          maxlength="10"
-          vibratemode="{{vibratemode}}"
-          screentype="{{screentype}}"
-          @visibility-change="onVisibilityChange"
-          @key-down="onKeyDown"
-          @delete="onDelete"
-          @complete="onComplete"
-        ></input-method>
-      </div>
+      <input-method
+        if="{{ showKeyboard }}"
+        hide="{{!showKeyboard}}"
+        keyboardtype="NUMERIC"
+        maxlength="10"
+        vibratemode="{{vibratemode}}"
+        screentype="{{screentype}}"
+        @visibility-change="onVisibilityChange"
+        @key-down="onKeyDown"
+        @delete="onDelete"
+        @complete="onComplete"
+      ></input-method>
     </div>
 
     <div class="bottom-section" if="{{ !showKeyboard }}">
@@ -275,7 +274,7 @@ export default {
     }
 
     // Use optimized C calculation
-    const result = NativeBridge.calculateBinomial(this.n, this.p, this.k)
+    const result = NativeBridge.binomial(this.n, this.p, this.k)
     
     if (result.success) {
       router.push({

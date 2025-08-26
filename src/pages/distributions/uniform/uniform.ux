@@ -265,7 +265,7 @@ export default {
     }
 
     // Use optimized C calculation
-    const result = NativeBridge.calculateUniformDistribution(this.a, this.b, this.x)
+    const result = NativeBridge.uniformDistribution(this.a, this.b, this.x)
     
     if (result.success) {
       router.push({

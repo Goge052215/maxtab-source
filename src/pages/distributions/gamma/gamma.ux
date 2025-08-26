@@ -262,7 +262,7 @@ export default {
     }
 
     // Use optimized C calculation
-    const result = NativeBridge.calculateGammaDistribution(this.alpha, this.beta, this.x)
+    const result = NativeBridge.gammaDistribution(this.alpha, this.beta, this.x)
     
     if (result.success) {
       router.push({

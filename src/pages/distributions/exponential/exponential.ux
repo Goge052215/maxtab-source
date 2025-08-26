@@ -246,7 +246,7 @@ export default {
     }
 
     // Use optimized C calculation
-    const result = NativeBridge.calculateExponentialDistribution(this.lambda, this.x)
+    const result = NativeBridge.exponentialDistribution(this.lambda, this.x)
     
     if (result.success) {
       router.push({

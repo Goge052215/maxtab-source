@@ -277,7 +277,7 @@ export default {
     }
 
     // Use optimized C calculation
-    const result = NativeBridge.calculateHypergeometric(this.N, this.K, this.n, this.k)
+    const result = NativeBridge.hypergeometric(this.N, this.K, this.n, this.k)
     
     if (result.success) {
       router.push({

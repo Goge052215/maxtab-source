@@ -1,4 +1,4 @@
- <import name="input-method" src="../../../components/InputMethod/InputMethod.ux"></import>
+<import name="input-method" src="../../../components/InputMethod/InputMethod.ux"></import>
 
 <template>
   <div class="container">
@@ -270,7 +270,7 @@ export default {
     }
 
     // Use optimized C calculation
-    const result = NativeBridge.calculateNegativeBinomial(this.r, this.p, this.k)
+    const result = NativeBridge.negativeBinomial(this.r, this.p, this.k)
     
     if (result.success) {
       router.push({

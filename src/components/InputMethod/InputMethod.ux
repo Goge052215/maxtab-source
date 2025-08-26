@@ -2,8 +2,8 @@
   <div class="page" style="flex-direction: column;" show="{{!hide}}">
     <div style="background-color:black" >
       <!-- 胶囊屏66 -->
-      <div if="{{screentype==='pill-shaped'}}" style="width: 100%;height: 305px">
-        <div static style="position:absolute;left:0px;top:34px;width:100%;height:276px;">
+      <div if="{{screentype==='pill-shaped'}}" style="width: 100%;height: 271px">
+        <div static style="position:absolute;left:0px;top:0px;width:100%;height:276px;">
           <progress percent="{{30+percent66}}" type="arc" style="start-angle:204deg;total-angle:-48deg;width:188px;height:188px;top:82px;left:2px;position:absolute;color:#ffffff;stroke-width:6px;layer-color:#262626;margin-left: {{(screenWidth - 192)/2}}px;"></progress>
           <scroll id="keyboard66" scroll-x="{{true}}" onscroll="handelScroll" style="padding-left: {{(screenWidth - 192)/2}}px;padding-right: {{(screenWidth - 192)/2}}px;">
             <div if="{{!numFlag}}" style="left: 3px; flex-direction: column;">
@@ -31,7 +31,7 @@
             </div>
           </scroll>
         </div>
-        <div static style="position: absolute;left: {{(screenWidth - 192)/2}}px;top: 60px;width: 192px;height: 50px;"> 
+        <div static style="position: absolute;left: {{(screenWidth - 192)/2}}px;top: 26px;width: 192px;height: 50px;"> 
           <!-- 带变量的相对路径在 aiot-tookit 2.0.4 中修复 -->
           <img src="./assets/arc/del.png" style="position: absolute;left: 120px;top: 5px;width: 48px;height: 42px;" @click="onBtnClick('D')" />
         </div>
@@ -298,9 +298,6 @@ export default {
 <style>
 .page {
 	width:100%;
-	position:absolute;
-	left:0;
-	bottom:0
 }
 .item {
 	height:52px;

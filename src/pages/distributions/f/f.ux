@@ -195,7 +195,7 @@ export default {
       return
     }
 
-    const result = NativeBridge.calculateFDistribution(this.df1, this.df2, this.x)
+    const result = NativeBridge.fDistribution(this.df1, this.df2, this.x)
     
     if (result.success) {
       router.push({

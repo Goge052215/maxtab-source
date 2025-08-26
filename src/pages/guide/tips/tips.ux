@@ -9,91 +9,42 @@
         <div class="menu-content">
           <div class="content-block">
             <text class="block-title">输入技巧</text>
-            <text class="block-content">
-              参数输入规范
-              • 数值参数：支持小数和整数，如 μ=0, σ=1.5
-              • 范围限制：注意参数的有效范围，如概率p∈[0,1]
-              • 特殊值：支持科学计数法，如 1e-6
-              • 负数输入：使用负号，如 μ=-2.5
-
-              常见输入错误
-              • 概率参数超出[0,1]范围
-              • 方差或标准差为负值
-              • 整数参数输入小数（如试验次数n=10.5）
-              • 遗漏必需参数
-
-              快速输入方法
-              • 使用预设值：点击常用参数组合
-              • 滑块调节：拖动滑块快速调整参数
-              • 键盘快捷键：Tab键切换参数输入框
-              • 历史记录：选择之前使用过的参数组合
-            </text>
+            <div class="block-content">
+              <text class="content-line">参数输入规范</text>
+              <text class="content-line">• 数值参数:支持小数和整数,如μ=0,σ=1.5</text>
+              <text class="content-line">• 范围限制:注意参数的有效范围,如概率p∈[0,1]</text>
+              <text class="content-line">• 特殊值:支持科学计数法,如1e-6</text>
+              <text class="content-line">• 负数输入:使用负号,如μ=-2.5</text>
+              <text class="content-line"></text>
+              <text class="content-line">常见输入错误</text>
+              <text class="content-line">• 概率参数超出[0,1]范围</text>
+              <text class="content-line">• 方差或标准差为负值</text>
+              <text class="content-line">• 整数参数输入小数(如试验次数n=10.5)</text>
+              <text class="content-line">• 遗漏必需参数</text>
+              <text class="content-line"></text>
+              <text class="content-line">快速输入方法</text>
+              <text class="content-line">• 使用预设值:点击常用参数组合</text>
+              <text class="content-line">• 滑块调节:拖动滑块快速调整参数</text>
+              <text class="content-line">• 键盘快捷键:Tab键切换参数输入框</text>
+              <text class="content-line">• 历史记录:选择之前使用过的参数组合</text>
+            </div>
           </div>
           
           <div class="content-block">
-            <text class="block-title">结果解读技巧</text>
-            <text class="block-content">
-              概率值理解
-              • 概率范围：所有概率值都在[0,1]之间
-              • 小概率事件：p<0.05通常认为是小概率事件
-              • 累积概率：CDF值表示"不超过某值"的概率
-              • 密度vs概率：PDF值可能大于1，但不是概率
-
-              图形解读
-              • 分布形状：观察对称性、偏度、峰度
-              • 参数影响：调整参数观察图形变化
-              • 面积含义：曲线下面积表示概率
-              • 比较分析：多个分布的叠加显示
-
-              数值精度
-              • 显示精度：默认保留4位小数
-              • 科学计数法：极小值自动转换格式
-              • 舍入误差：注意计算精度限制
-              • 数值稳定性：极端参数可能导致计算不稳定
-
-              统计意义
-              • 期望值：分布的中心位置
-              • 方差：衡量分布的离散程度
-              • 偏度：分布的不对称程度
-              • 峰度：分布的尖锐程度
-            </text>
+            <text class="block-title">结果解读</text>
+            <div class="block-content">
+              <text class="content-line">概率值理解</text>
+              <text class="content-line">• 概率范围:所有概率值都在[0,1]之间</text>
+              <text class="content-line">• 累积概率:CDF值表示"不超过某值"的概率</text>
+              <text class="content-line">• 密度vs概率:PDF值可能大于1, 但不是概率</text>
+              <text class="content-line"></text>
+              <text class="content-line">数值精度</text>
+              <text class="content-line">• 显示精度:默认保留4位小数</text>
+              <text class="content-line">• 科学计数法:极小值自动转换格式</text>
+              <text class="content-line">• 舍入误差:注意计算精度限制</text>
+              <text class="content-line">• 数值稳定性:极端参数可能导致计算不稳定</text>
+            </div>
           </div>
-          
-          <div class="content-block">
-            <text class="block-title">高级应用技巧</text>
-            <text class="block-content">
-              参数估计应用
-              • 样本数据：上传CSV文件进行参数估计
-              • 估计方法：选择最大似然估计或矩估计
-              • 拟合检验：使用K-S检验验证拟合效果
-              • 置信区间：计算参数的置信区间
-
-              假设检验设计
-              • 原假设设定：明确H0和H1
-              • 显著性水平：通常选择α=0.05
-              • 检验统计量：根据问题选择合适的统计量
-              • 功效分析：计算检验的统计功效
-
-              蒙特卡罗模拟
-              • 样本量选择：平衡精度和计算时间
-              • 随机种子：设置种子保证结果可重现
-              • 收敛诊断：检查模拟结果的收敛性
-              • 结果分析：计算置信区间和预测区间
-
-              实际问题建模
-              • 分布选择：根据数据特征选择合适分布
-              • 参数解释：理解参数的实际含义
-              • 模型验证：使用独立数据验证模型
-              • 敏感性分析：分析参数变化对结果的影响
-
-              软件集成
-              • 数据导出：支持导出为Excel、CSV格式
-              • 图形保存：保存高质量的分布图形
-              • 报告生成：自动生成分析报告
-              • API接口：通过API集成到其他系统
-            </text>
-          </div>
-
           <div class="back-button-container">
             <text class="back-button" @click="goBack">返回</text>
           </div>
@@ -157,60 +108,69 @@ export default {
 }
 
 .menu-content {
-  padding: 30px 5px;
+  padding: 10px 20px;
   flex-direction: column;
+  align-items: center;
   width: 100%;
 }
 
 .content-block {
-  margin-bottom: 40px;
-  background-color: #222222;
-  border: 1px solid #444444;
-  border-radius: 16px;
-  padding: 40px 15px;
-  flex-direction: column;
-  min-height: 280px;
-  width: 98%;
-  align-self: center;
-}
-
-.block-title {
-  font-size: 24px;
-  color: #ffffff;
-  font-weight: bold;
-  margin-bottom: 25px;
-  font-family: sans-serif;
-  padding: 0 10px;
-}
+    margin-bottom: 40px;
+    background-color: #222222;
+    border: 1px solid #444444;
+    border-radius: 16px;
+    padding: 40px 20px;
+    flex-direction: column;
+    min-height: 420px;
+    width: 100%;
+    align-self: center;
+  }
+  
+  .block-title {
+    font-size: 22px;
+    color: #ffffff;
+    font-weight: bold;
+    margin-bottom: 15px;
+    padding: 0 0px;
+    text-align: left;
+  }
 
 .block-content {
-  font-size: 18px;
-  color: #cccccc;
-  line-height: 2.8;
-  white-space: pre-line;
-  font-family: sans-serif;
-  letter-spacing: 0.5px;
+  flex-direction: column;
   width: 100%;
-  padding: 10px 10px;
+}
+
+.bottom-section {
+  padding: 0px 20px 50px 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.content-line {
+  font-size: 20px;
+  color: #e0e0e0;
+  margin-bottom: 10px;
 }
 
 .back-button-container {
-  margin-top: 40px;
+  margin-top: 20px;
   display: flex;
   justify-content: center;
   align-items: center;
+  width: 100%;
 }
 
 .back-button {
   width: 60%;
-  height: 60px;
-  font-size: 22px;
+  height: 50px;
+  font-size: 20px;
   color: #ffffff;
   background-color: #333333;
   border: 1px solid #555555;
-  border-radius: 16px;
-  padding: 15px 30px;
+  border-radius: 12px;
+  padding: 12px 24px;
   text-align: center;
   cursor: pointer;
+  margin-bottom: 20px;
 }
 </style>

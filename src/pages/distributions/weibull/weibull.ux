@@ -195,7 +195,7 @@ export default {
       return
     }
 
-    const result = NativeBridge.calculateWeibullDistribution(this.k, this.lambda, this.x)
+    const result = NativeBridge.weibullDistribution(this.k, this.lambda, this.x)
     
     if (result.success) {
       router.push({

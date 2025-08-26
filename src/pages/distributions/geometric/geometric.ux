@@ -250,7 +250,7 @@ export default {
     }
 
     // Use optimized C calculation
-    const result = NativeBridge.calculateGeometric(this.p, this.k)
+    const result = NativeBridge.geometric(this.p, this.k)
     
     if (result.success) {
       router.push({

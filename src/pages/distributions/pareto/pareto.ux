@@ -195,7 +195,7 @@ export default {
       return
     }
 
-    const result = NativeBridge.calculateParetoDistribution(this.alpha, this.xm, this.x)
+    const result = NativeBridge.paretoDistribution(this.alpha, this.xm, this.x)
     
     if (result.success) {
       router.push({

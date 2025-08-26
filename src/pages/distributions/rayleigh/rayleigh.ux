@@ -184,7 +184,7 @@ export default {
       return
     }
 
-    const result = NativeBridge.calculateRayleighDistribution(this.sigma, this.x)
+    const result = NativeBridge.rayleighDistribution(this.sigma, this.x)
     
     if (result.success) {
       router.push({

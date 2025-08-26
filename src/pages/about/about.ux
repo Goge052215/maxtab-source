@@ -5,13 +5,15 @@
     </div>
 
     <div class="main-content">
-      <div class="content">
+      <div class="content-block">
         <text class="developer-label">Developer:</text>
         <text class="developer-name">@goge</text>
-        
+      </div>
+      <div class="content-block">
         <text class="version-label">Version:</text>
         <text class="version-number">1.0</text>
-        
+      </div>
+      <div class="content-block">
         <text class="date-label">Date:</text>
         <text class="date-text">2025.08</text>
       </div>
@@ -78,8 +80,19 @@ export default {
   align-items: center;
 }
 
+.content-block {
+  background-color: #222222;
+  border-radius: 16px;
+  padding: 10px;
+  margin-bottom: 20px;
+  width: 100%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
 .back-button-container {
-  margin-top: 22px;
+  margin-top: 15px;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -101,14 +114,10 @@ export default {
 .developer-label,
 .version-label,
 .date-label {
-  font-size: 22px;
+  font-size: 18px;
   color: #cccccc;
-  margin-bottom: 8px;
-  margin-top: 20px;
-}
-
-.developer-label {
-  margin-top: 0;
+  margin-bottom: 10px;
+  text-align: left;
 }
 
 .developer-name,
@@ -117,7 +126,7 @@ export default {
   font-size: 22px;
   color: #ffffff;
   font-weight: bold;
-  margin-bottom: 15px;
-  text-align: center;
+  text-align: left;
+  margin-bottom: 10px;
 }
 </style>

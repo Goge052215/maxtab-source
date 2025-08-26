@@ -59,23 +59,23 @@ export default {
   },
 
   routeToBin() {
-    router.push({ uri: 'pages/distributions/binomial' })
+    router.push({ uri: '/pages/distributions/binomial' })
   },
 
   routeToPoisson() {
-    router.push({ uri: 'pages/distributions/poisson' })
+    router.push({ uri: '/pages/distributions/poisson' })
   },
 
   routeToGeometric() {
-    router.push({ uri: 'pages/distributions/geometric' })
+    router.push({ uri: '/pages/distributions/geometric' })
   },
 
   routeToNegativeBinomial() {
-    router.push({ uri: 'pages/distributions/negative_binomial' })
+    router.push({ uri: '/pages/distributions/negative_binomial' })
   },
 
   routeToHypergeometric() {
-    router.push({ uri: 'pages/distributions/hypergeometric' })
+    router.push({ uri: '/pages/distributions/hypergeometric' })
   }
 }
 </script>
