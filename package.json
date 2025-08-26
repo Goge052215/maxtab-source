@@ -8,7 +8,7 @@
   "scripts": {
     "start": "aiot start --watch",
     "build": "aiot build",
-    "release": "aiot release",
+    "test": "mocha",
     "lint": "eslint --format codeframe --fix --ext .ux,.js src/"
   },
   "lint-staged": {
@@ -27,5 +27,9 @@
     "@aiot-toolkit/jsc": "^1.0.3",
     "aiot-toolkit": "^2.0.5",
     "eslint-formatter-codeframe": "^7.32.1"
+  },
+  "dependencies": {
+    "mocha": "^10.2.0",
+    "jstat": "^1.9.6"
   }
 }
