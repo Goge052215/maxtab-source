@@ -7,4 +7,7 @@
 .husky/
 .kiro
 .vscode
+.DS_store
 /cursor_css
+.claude
+.kiro
