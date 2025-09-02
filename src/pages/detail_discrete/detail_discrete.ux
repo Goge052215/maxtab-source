@@ -5,6 +5,7 @@
     </div>
 
     <div class="content">
+      <chart :chart-data="chartData" chart-type="bar"></chart>
       <div class="result-display">
         <text class="pmf-result">PMF: {{ pmfValue }}</text>
         <text class="cdf-result">CDF: {{ cdfValue }}</text>
@@ -20,24 +21,43 @@
 </template>
 
 <script>
-import router from "@system.router"
+  import router from "@system.router"
 
-export default {
-  private: {
-    distribution_name: "计算结果",
-    pmf: "-",
-    cdf: "-",
-    params: []
-  },
+  export default {
+    private: {
+      distribution_name: "计算结果",
+      pmf: "-",
+      cdf: "-",
+      params: [],
+      chartData: {},
+    },
 
-  onInit() {
-    this.$page.setTitleBar({ text: this.distributionName || "计算结果" })
-  },
+    onInit() {
+      this.$page.setTitleBar({ text: this.distributionName || "计算结果" })
+      // Mock data for the chart
+      const mockData = [
+        { x: 0, y: 0.1 },
+        { x: 1, y: 0.2 },
+        { x: 2, y: 0.4 },
+        { x: 3, y: 0.2 },
+        { x: 4, y: 0.1 },
+      ]
+      this.chartData = {
+        labels: mockData.map((d) => d.x),
+        datasets: [
+          {
+            label: "PMF",
+            data: mockData.map((d) => d.y),
+            backgroundColor: "#00ff88",
+          },
+        ],
+      }
+    },
 
-  goBack() {
-    router.back()
+    goBack() {
+      router.back()
+    }
   }
-}
 </script>
 
 <style>

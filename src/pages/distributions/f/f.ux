@@ -7,25 +7,33 @@
     </div>
 
     <div class="content">
-      <div class="param-section">
+      <div class="param-section" if="{{ !showKeyboard }}">
         <div class="param-item" @click="selectInput('df1')">
           <text class="param-label">自由度1</text>
           <div class="param-display">
-            <text class="param-value">{{ currentParam === 'df1' && inputBuffer ? inputBuffer : df1 }}</text>
+            <text class="param-value">{{ df1 }}</text>
           </div>
         </div>
         
         <div class="param-item" @click="selectInput('df2')">
           <text class="param-label">自由度2</text>
           <div class="param-display">
-            <text class="param-value">{{ currentParam === 'df2' && inputBuffer ? inputBuffer : df2 }}</text>
+            <text class="param-value">{{ df2 }}</text>
           </div>
         </div>
         
         <div class="param-item" @click="selectInput('x')">
           <text class="param-label">计算值x</text>
           <div class="param-display">
-            <text class="param-value">{{ currentParam === 'x' && inputBuffer ? inputBuffer : x }}</text>
+            <text class="param-value">{{ x }}</text>
+          </div>
+        </div>
+      </div>
+      <div class="param-section" if="{{ showKeyboard }}">
+        <div class="param-item">
+          <text class="param-label">{{ currentParamName }}</text>
+          <div class="param-display">
+            <text class="param-value">{{ inputBuffer }}</text>
           </div>
         </div>
       </div>

@@ -9,53 +9,9 @@ import {
 let app = null
 let NativeModule = null
 
-try {
-  if (!NativeModule && app) {
-    if (app.invokeNativePlugin) {
-      NativeModule = {
-        call: (functionName, params) => {
-          return app.invokeNativePlugin({
-            plugin: 'StatisticalCalculator',
-            method: functionName,
-            args: params
-          })
-        },
-        type: 'system_plugin'
-      }
-      console.log('Native module initialization: System plugin mode')
-    } else if (app.callNative) {
-      NativeModule = {
-        call: (functionName, params) => {
-          return app.callNative({
-            component: 'StatisticalCalculator',
-            method: functionName,
-            params: params
-          })
-        },
-        type: 'system_native'
-      }
-      console.log('Native module initialization: System native mode')
-    } else if (typeof global !== 'undefined' && global.requireNativePlugin) {
-      const nativeModule = global.requireNativePlugin('StatisticalCalculator')
-      if (nativeModule && nativeModule.orchestrator_calculate_with_request) {
-        NativeModule = {
-          call: (functionName, params) => {
-            return nativeModule[functionName](params)
-          },
-          type: 'global_plugin'
-        }
-        console.log('Native module initialization: Global plugin mode')
-      }
-    }
-  }
-
-  if (!NativeModule) {
-    console.log('Native module initialization: JavaScript implementation mode (fallback)')
-  }
-} catch (error) {
-  console.warn('Native module initialization failed:', error)
-  NativeModule = null
-}
+// Directly use the JS calculation to prevent error output in console and cause delay
+console.log('Native module initialization: JavaScript implementation mode (fallback)');
+NativeModule = null;
 
 const DISTRIBUTION_TYPES = {
   DIST_NORMAL: 0,

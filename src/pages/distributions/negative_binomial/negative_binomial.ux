@@ -7,7 +7,7 @@
     </div>
 
     <div class="content">
-      <div class="param-section">
+      <div class="param-section" if="{{ !showKeyboard }}">
         <div class="param-item" @click="selectInput('r')">
           <text class="param-label">成功次数r</text>
           <div class="param-display">
@@ -18,7 +18,7 @@
         <div class="param-item" @click="selectInput('p')">
           <text class="param-label">成功概率p</text>
           <div class="param-display">
-            <text class="param-value">{{ currentParam === 'p' && inputBuffer ? inputBuffer : p }}</text>
+            <text class="param-value">{{ p }}</text>
           </div>
         </div>
         
@@ -26,6 +26,14 @@
           <text class="param-label">失败次数k</text>
           <div class="param-display">
             <text class="param-value">{{ k }}</text>
+          </div>
+        </div>
+      </div>
+      <div class="param-section" if="{{ showKeyboard }}">
+        <div class="param-item">
+          <text class="param-label">{{ currentParamName }}</text>
+          <div class="param-display">
+            <text class="param-value">{{ inputBuffer }}</text>
           </div>
         </div>
       </div>

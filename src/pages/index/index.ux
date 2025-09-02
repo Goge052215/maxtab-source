@@ -43,7 +43,7 @@
     </div>
 
     <div class="footer">
-      <text class="footer-text">v1.0</text>
+      <text class="footer-text">v1.0.1</text>
     </div>
   </div>
 </template>

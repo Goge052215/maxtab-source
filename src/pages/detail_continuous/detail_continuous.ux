@@ -5,6 +5,10 @@
     </div>
 
     <div class="content">
+      <import name="chart" src="../../components/Chart/Chart.ux"></import>
+      <div class="chart-container">
+        <chart :chart-data="chartData" chart-type="line"></chart>
+      </div>
       <div class="result-display">
         <text class="pdf-result">PDF: {{ pdfValue }}</text>
         <text class="cdf-result">CDF: {{ cdfValue }}</text>
@@ -20,24 +24,44 @@
 </template>
 
 <script>
-import router from "@system.router"
+  import router from "@system.router"
 
-export default {
-  private: {
-    distribution_name: "计算结果",
-    pdf: "-",
-    cdf: "-",
-    params: []
-  },
+  export default {
+    private: {
+      distribution_name: "计算结果",
+      pdf: "-",
+      cdf: "-",
+      params: [],
+      chartData: {},
+    },
 
-  onInit() {
-    this.$page.setTitleBar({ text: this.distributionName || "计算结果" })
-  },
+    onInit() {
+      this.$page.setTitleBar({ text: this.distributionName || "计算结果" })
+      // Mock data for the chart
+      const mockData = [
+        { x: 0, y: 0.1 },
+        { x: 1, y: 0.5 },
+        { x: 2, y: 1 },
+        { x: 3, y: 0.5 },
+        { x: 4, y: 0.1 },
+      ]
+      this.chartData = {
+        labels: mockData.map((d) => d.x),
+        datasets: [
+          {
+            label: "PDF",
+            data: mockData.map((d) => d.y),
+            borderColor: "#00ff88",
+            fill: false,
+          },
+        ],
+      }
+    },
 
-  goBack() {
-    router.back()
+    goBack() {
+      router.back()
+    }
   }
-}
 </script>
 
 <style>

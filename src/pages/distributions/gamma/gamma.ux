@@ -7,25 +7,33 @@
     </div>
 
     <div class="content">
-      <div class="param-section">
+      <div class="param-section" if="{{ !showKeyboard }}">
         <div class="param-item" @click="selectInput('alpha')">
           <text class="param-label">形状参数α</text>
           <div class="param-display">
-            <text class="param-value">{{ currentParam === 'alpha' && inputBuffer ? inputBuffer : alpha }}</text>
+            <text class="param-value">{{ alpha }}</text>
           </div>
         </div>
         
         <div class="param-item" @click="selectInput('beta')">
           <text class="param-label">率参数β</text>
           <div class="param-display">
-            <text class="param-value">{{ currentParam === 'beta' && inputBuffer ? inputBuffer : beta }}</text>
+            <text class="param-value">{{ beta }}</text>
           </div>
         </div>
         
         <div class="param-item" @click="selectInput('x')">
           <text class="param-label">计算值x</text>
           <div class="param-display">
-            <text class="param-value">{{ currentParam === 'x' && inputBuffer ? inputBuffer : x }}</text>
+            <text class="param-value">{{ x }}</text>
+          </div>
+        </div>
+      </div>
+      <div class="param-section" if="{{ showKeyboard }}">
+        <div class="param-item">
+          <text class="param-label">{{ currentParamName }}</text>
+          <div class="param-display">
+            <text class="param-value">{{ inputBuffer }}</text>
           </div>
         </div>
       </div>

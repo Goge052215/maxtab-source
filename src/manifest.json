@@ -1,7 +1,7 @@
 {
   "package": "com.application.watch.demo",
   "name": "maxtab",
-  "versionName": "1.0.0",
+  "versionName": "1.0.1",
   "versionCode": 1,
   "minPlatformVersion": 1000,
   "icon": "/common/logo.png",
@@ -120,6 +120,12 @@
       "pages/guide/tips": {
         "component": "tips"
       }
+    }
+  },
+  "window": {
+    "animation": {
+      "enter": "/animation/slide_in_right.js",
+      "exit": "/animation/slide_out_left.js"
     }
   }
 }

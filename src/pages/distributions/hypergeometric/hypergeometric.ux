@@ -7,7 +7,7 @@
     </div>
 
     <div class="content">
-      <div class="param-section">
+      <div class="param-section" if="{{ !showKeyboard }}">
         <div class="param-item" @click="selectInput('N')">
           <text class="param-label">总体大小N</text>
           <div class="param-display">
@@ -33,6 +33,14 @@
           <text class="param-label">成功次数k</text>
           <div class="param-display">
             <text class="param-value">{{ k }}</text>
+          </div>
+        </div>
+      </div>
+      <div class="param-section" if="{{ showKeyboard }}">
+        <div class="param-item">
+          <text class="param-label">{{ currentParamName }}</text>
+          <div class="param-display">
+            <text class="param-value">{{ inputBuffer }}</text>
           </div>
         </div>
       </div>

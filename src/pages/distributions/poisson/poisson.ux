@@ -7,18 +7,26 @@
     </div>
 
     <div class="content">
-      <div class="param-section">
+      <div class="param-section" if="{{ !showKeyboard }}">
         <div class="param-item" @click="selectInput('lambda')">
           <text class="param-label">发生率λ</text>
           <div class="param-display">
-            <text class="param-value">{{ currentParam === 'lambda' && inputBuffer ? inputBuffer : lambda }}</text>
+            <text class="param-value">{{ lambda }}</text>
           </div>
         </div>
         
         <div class="param-item" @click="selectInput('k')">
           <text class="param-label">计算值k</text>
           <div class="param-display">
-            <text class="param-value">{{ currentParam === 'k' && inputBuffer ? inputBuffer : k }}</text>
+            <text class="param-value">{{ k }}</text>
+          </div>
+        </div>
+      </div>
+      <div class="param-section" if="{{ showKeyboard }}">
+        <div class="param-item">
+          <text class="param-label">{{ currentParamName }}</text>
+          <div class="param-display">
+            <text class="param-value">{{ inputBuffer }}</text>
           </div>
         </div>
       </div>
