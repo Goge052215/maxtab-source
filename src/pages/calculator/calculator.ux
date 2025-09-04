@@ -1,5 +1,5 @@
 <template>
-  <div class="container" onswipe="touchMove">
+  <div class="container" @swipe="handleSwipe">
     <div class="resultBox">
       <text class="resultShow result-text">{{resultShow}}</text>
     </div>
@@ -186,8 +186,10 @@ export default {
     app.terminate()
   },
 
-  touchMove() {
-    // Handle touch/swipe events if needed
+  handleSwipe(event) {
+    if (event.direction === 'right') {
+      this.goBack();
+    }
   },
 
   goBack() {

@@ -1,7 +1,7 @@
 <import name="input-method" src="../../../components/InputMethod/InputMethod.ux"></import>
 
 <template>
-  <div class="container">
+  <div class="container" @swipe="handleSwipe">
     <div class="top-bar">
       <text class="title">超几何分布</text>
     </div>
@@ -138,6 +138,12 @@ export default {
 
   goBack() {
     router.back()
+  },
+
+  handleSwipe(event) {
+    if (event.direction === 'right') {
+      this.goBack()
+    }
   },
 
   selectInput(inputType) {

@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container" @swipe="handleSwipe">
     <div class="top-bar">
       <text class="page-title">计算历史</text>
     </div>
@@ -112,6 +112,12 @@ export default {
 
   goBack() {
     router.back()
+  },
+
+  handleSwipe(event) {
+    if (event.direction === 'right') {
+      this.goBack()
+    }
   },
 
   clearHistory() {

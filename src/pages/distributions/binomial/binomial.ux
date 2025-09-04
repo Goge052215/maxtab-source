@@ -1,7 +1,7 @@
 <import name="input-method" src="../../../components/InputMethod/InputMethod.ux"></import>
 
 <template>
-  <div class="container">
+  <div class="container" @swipe="handleSwipe">
     <div class="top-bar">
       <text class="title">二项分布</text>
     </div>
@@ -107,6 +107,12 @@ export default {
 
   goBack() {
     router.back()
+  },
+
+  handleSwipe(event) {
+    if (event.direction === 'right') {
+      this.goBack()
+    }
   },
 
   importFromCalculator() {
@@ -291,6 +297,7 @@ export default {
           distributionName: '二项分布',
           pmfValue: result.pdfResult.toFixed(6),
           cdfValue: result.cdfResult.toFixed(6),
+          chartData: result.chartData,
           inputParams: [
             { key: '试验次数n', value: this.n },
             { key: '成功概率p', value: this.p },
@@ -442,10 +449,4 @@ export default {
   z-index: 1000;
   background-color: #000000;
 }
-
-
-
-
-
-
 </style>

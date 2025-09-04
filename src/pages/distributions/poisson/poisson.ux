@@ -1,7 +1,7 @@
 <import name="input-method" src="../../../components/InputMethod/InputMethod.ux"></import>
 
 <template>
-  <div class="container">
+  <div class="container" @swipe="handleSwipe">
     <div class="top-bar">
       <text class="title">泊松分布</text>
     </div>
@@ -120,6 +120,12 @@ export default {
 
   goBack() {
     router.back()
+  },
+
+  handleSwipe(event) {
+    if (event.direction === 'right') {
+      this.goBack()
+    }
   },
 
   selectInput(inputType) {
@@ -267,6 +273,7 @@ export default {
           distributionName: '泊松分布',
           pmfValue: result.pdfResult.toFixed(6),
           cdfValue: result.cdfResult.toFixed(6),
+          chartData: result.chartData,
           inputParams: [
             { key: '事件发生率λ', value: this.lambda },
             { key: '计算值k', value: this.k }

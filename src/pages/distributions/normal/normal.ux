@@ -1,7 +1,7 @@
 <import name="input-method" src="../../../components/InputMethod/InputMethod.ux"></import>
 
 <template>
-  <div class="container">
+  <div class="container" @swipe="handleSwipe">
     <div class="top-bar">
       <text class="title">正态分布</text>
     </div>
@@ -131,6 +131,12 @@ export default {
 
   goBack() {
     router.back()
+  },
+
+  handleSwipe(event) {
+    if (event.direction === 'right') {
+      this.goBack()
+    }
   },
 
   selectInput(inputType) {
@@ -287,6 +293,7 @@ export default {
           distributionName: '正态分布',
           pdfValue: result.pdfResult.toFixed(6),
           cdfValue: result.cdfResult.toFixed(6),
+          chartData: result.chartData,
           inputParams: [
             { key: '均值μ', value: this.mu },
             { key: '标准差σ', value: this.sigma },

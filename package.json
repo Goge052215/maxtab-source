@@ -1,6 +1,6 @@
 {
   "name": "maxtab",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "",
   "engines": {
     "node": ">=8.10"
@@ -9,7 +9,7 @@
     "start": "aiot start --watch",
     "build": "aiot build",
     "test": "mocha",
-    "lint": "eslint --format codeframe --fix --ext .ux,.js src/"
+    "lint": "eslint --format codeframe --fix --ext .js src/"
   },
   "lint-staged": {
     "*.{ux,js}": [
@@ -25,11 +25,15 @@
   },
   "devDependencies": {
     "@aiot-toolkit/jsc": "^1.0.3",
+    "@babel/eslint-parser": "^7.28.0",
+    "@babel/preset-env": "^7.28.3",
     "aiot-toolkit": "^2.0.5",
     "eslint-formatter-codeframe": "^7.32.1"
   },
   "dependencies": {
+    "chart.js": "^4.5.0",
+    "jstat": "^1.9.6",
     "mocha": "^10.2.0",
-    "jstat": "^1.9.6"
+    "node-avd": "^0.1.2-beta.1"
   }
 }

@@ -42,12 +42,13 @@ const MATH_CONSTANTS = {
 }
 
 class CalculationResult {
-  constructor(success = false, pdfResult = 0, cdfResult = 0, errorMessage = null) {
+  constructor(success = false, pdfResult = 0, cdfResult = 0, errorMessage = null, chartData = null) {
     this.success = success
     this.pdfResult = pdfResult
     this.pmfResult = pdfResult
     this.cdfResult = cdfResult
     this.errorMessage = errorMessage
+    this.chartData = chartData
   }
 }
 
@@ -134,7 +135,32 @@ class NativeBridge {
       }
     }
 
-    return this.createResult(true, pmf, cdf)
+    const chartData = this.generateBinomialChartData(n, p);
+    return this.createResult(true, pmf, cdf, null, chartData);
+  }
+
+  static generateBinomialChartData(n, p) {
+    const labels = [];
+    const data = [];
+    for (let k = 0; k <= n; k++) {
+      labels.push(k);
+      const logCombo = this.logCombination(n, k);
+      const logP = Math.log(p);
+      const log1MinusP = Math.log(1 - p);
+      const logProb = logCombo + k * logP + (n - k) * log1MinusP;
+      data.push(Math.exp(logProb));
+    }
+
+    return {
+      labels,
+      datasets: [
+        {
+          label: "PMF",
+          data,
+          backgroundColor: "#00ff88",
+        },
+      ],
+    };
   }
 
   static poisson(lambda, k) {
@@ -152,7 +178,31 @@ class NativeBridge {
       }
     }
 
-    return this.createResult(true, pmf, cdf)
+    const chartData = this.generatePoissonChartData(lambda);
+    return this.createResult(true, pmf, cdf, null, chartData);
+  }
+
+  static generatePoissonChartData(lambda) {
+    const labels = [];
+    const data = [];
+    const maxK = Math.max(20, Math.ceil(lambda + 5 * Math.sqrt(lambda)));
+
+    for (let k = 0; k <= maxK; k++) {
+      labels.push(k);
+      const logProb = k * Math.log(lambda) - lambda - this.logFactorial(k);
+      data.push(Math.exp(logProb));
+    }
+
+    return {
+      labels,
+      datasets: [
+        {
+          label: "PMF",
+          data,
+          backgroundColor: "#00ff88",
+        },
+      ],
+    };
   }
 
   static geometric(p, k) {
@@ -216,7 +266,38 @@ class NativeBridge {
     const z = (x - mu) / sigma
     const pdf = (MATH_CONSTANTS.INV_SQRT_2PI / sigma) * Math.exp(-0.5 * z * z)
     const cdf = this.standardNormalCDF(z)
-    return this.createResult(true, pdf, cdf)
+    const chartData = this.generateNormalChartData(mu, sigma)
+    return this.createResult(true, pdf, cdf, null, chartData)
+  }
+
+  static generateNormalChartData(mu, sigma) {
+    const dataPoints = 100;
+    const range = 8 * sigma;
+    const step = range / dataPoints;
+    const startX = mu - 4 * sigma;
+    
+    const labels = [];
+    const data = [];
+    
+    for (let i = 0; i <= dataPoints; i++) {
+      const x = startX + i * step;
+      const z = (x - mu) / sigma;
+      const pdf = (MATH_CONSTANTS.INV_SQRT_2PI / sigma) * Math.exp(-0.5 * z * z);
+      labels.push(x.toFixed(2));
+      data.push(pdf);
+    }
+    
+    return {
+      labels,
+      datasets: [
+        {
+          label: "PDF",
+          data,
+          borderColor: "#00ff88",
+          fill: false,
+        },
+      ],
+    };
   }
 
   static exponentialDistribution(lambda, x) {

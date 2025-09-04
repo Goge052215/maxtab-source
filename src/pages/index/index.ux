@@ -1,5 +1,5 @@
 <template>
-  <div class="container">
+  <div class="container" @swipe="handleSwipe">
     <div class="top-bar">
       <text class="app-title">MaxTab</text>
     </div>
@@ -43,7 +43,7 @@
     </div>
 
     <div class="footer">
-      <text class="footer-text">v1.0.1</text>
+      <text class="footer-text">v1.0.2</text>
     </div>
   </div>
 </template>
