@@ -1,10 +1,174 @@
 <script>
+import { globalState } from './common/global_state.js'
+import { memoryMonitor } from './common/memory_monitor.js'
+
 export default {
   onCreate() {
     console.log("app created")
+    
+    // Set up global memory management
+    this.setupMemoryOptimization()
   },
+  
   onDestroy() {
     console.log("app destroyed")
+    
+    // Clean up all global resources
+    this.cleanupMemoryResources()
+  },
+  
+  // Setup comprehensive memory management
+  setupMemoryOptimization() {
+    try {
+      // Initialize memory monitoring
+      console.log('Setting up memory optimization for Vela OS')
+      
+      // Setup memory thresholds for Vela OS (conservative values)
+      memoryMonitor.setThresholds(
+        30 * 1024 * 1024, // 30MB warning
+        50 * 1024 * 1024, // 50MB cleanup
+        70 * 1024 * 1024  // 70MB critical
+      )
+      
+      // Setup custom cleanup callbacks
+      memoryMonitor.onMemoryWarning((usage) => {
+        console.log('Memory warning - usage:', memoryMonitor.formatBytes(usage.heapUsed))
+        this.performLightCleanup()
+      })
+      
+      memoryMonitor.onMemoryCleanup((usage) => {
+        console.log('Memory cleanup triggered - usage:', memoryMonitor.formatBytes(usage.heapUsed))
+        this.performGlobalMemoryCleanup()
+      })
+      
+      memoryMonitor.onMemoryCritical((usage) => {
+        console.warn('Critical memory usage - usage:', memoryMonitor.formatBytes(usage.heapUsed))
+        this.performAggressiveCleanup()
+      })
+      
+      // Force cleanup every 60 seconds for Vela OS memory efficiency
+      this.memoryCleanupInterval = setInterval(() => {
+        this.performGlobalMemoryCleanup()
+      }, 60000)
+      
+      // Listen for low memory warnings if available
+      if (typeof system !== 'undefined' && system.onLowMemory) {
+        system.onLowMemory(() => {
+          console.log('System low memory warning - performing aggressive cleanup')
+          this.performAggressiveCleanup()
+        })
+      }
+      
+      console.log('Memory optimization setup completed')
+    } catch (error) {
+      console.error('Memory optimization setup failed:', error)
+    }
+  },
+  
+  // Memory optimization: Light cleanup for warning threshold
+  performLightCleanup() {
+    try {
+      // Clean global state lightly
+      if (globalState && typeof globalState._performMemoryCleanup === 'function') {
+        globalState._performMemoryCleanup()
+      }
+      
+      console.log('Light memory cleanup completed')
+    } catch (error) {
+      console.error('Light cleanup error:', error)
+    }
+  },
+  
+  // Memory optimization: Perform global memory cleanup
+  performGlobalMemoryCleanup() {
+    try {
+      // Clean global state
+      if (globalState && typeof globalState.forceCleanup === 'function') {
+        globalState.forceCleanup()
+      }
+      
+      // Clear any cached DOM references
+      if (typeof document !== 'undefined') {
+        // Clear any event listeners that might be holding references
+        const elements = document.querySelectorAll('[data-cached]')
+        elements.forEach(el => {
+          el.removeAttribute('data-cached')
+        })
+      }
+      
+      // Force garbage collection if available
+      if (typeof global !== 'undefined' && global.gc) {
+        global.gc()
+      }
+      
+      console.log('Global memory cleanup completed')
+    } catch (error) {
+      console.error('Memory cleanup error:', error)
+    }
+  },
+  
+  // Memory optimization: Aggressive cleanup for critical memory situations
+  performAggressiveCleanup() {
+    try {
+      // Clear all caches
+      this.performGlobalMemoryCleanup()
+      
+      // Clear any large data structures
+      if (typeof window !== 'undefined') {
+        // Clear any window-level caches
+        Object.keys(window).forEach(key => {
+          if (key.startsWith('cache_') || key.startsWith('_cache')) {
+            delete window[key]
+          }
+        })
+      }
+      
+      // Trigger input method cleanup if available
+      if (typeof window !== 'undefined' && window.SimpleInputMethod) {
+        window.SimpleInputMethod.cleanup()
+      }
+      
+      // Multiple GC attempts for aggressive cleanup
+      for (let i = 0; i < 3; i++) {
+        setTimeout(() => {
+          if (typeof global !== 'undefined' && global.gc) {
+            global.gc()
+          }
+        }, i * 100)
+      }
+      
+      console.log('Aggressive memory cleanup completed')
+    } catch (error) {
+      console.error('Aggressive cleanup error:', error)
+    }
+  },
+  
+  // Memory optimization: Clean up all resources
+  cleanupMemoryResources() {
+    try {
+      // Clear cleanup interval
+      if (this.memoryCleanupInterval) {
+        clearInterval(this.memoryCleanupInterval)
+        this.memoryCleanupInterval = null
+      }
+      
+      // Final cleanup
+      this.performAggressiveCleanup()
+      
+      // Destroy global state
+      if (globalState && typeof globalState.destroy === 'function') {
+        globalState.destroy()
+      }
+      
+      // Destroy memory monitor
+      if (memoryMonitor && typeof memoryMonitor.destroy === 'function') {
+        memoryMonitor.destroy()
+      }
+      
+      console.log('All memory resources cleaned up')
+    } catch (error) {
+      console.error('Resource cleanup error:', error)
+    }
   }
 }
 </script>

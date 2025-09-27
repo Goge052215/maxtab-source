@@ -4,12 +4,11 @@
 /sign
 /dist
 /build
+/test
 .husky/
-.kiro
 .vscode
 .DS_store
 /cursor_css
 .claude
-.kiro
 demo
 avd

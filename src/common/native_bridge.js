@@ -55,14 +55,14 @@ class CalculationResult {
 import LRUCache from './lru_cache.js'
 
 const memoCache = {
-  logFactorial: new LRUCache(1000),
-  logGamma: new LRUCache(1000),
-  logCombination: new LRUCache(1000)
+  logFactorial: new LRUCache(500), // Reduced from 1000 for memory efficiency
+  logGamma: new LRUCache(500),     // Reduced from 1000 for memory efficiency  
+  logCombination: new LRUCache(500) // Reduced from 1000 for memory efficiency
 }
 
 const resultPool = {
   pool: [],
-  maxSize: 50,
+  maxSize: 25, // Reduced from 50 for memory efficiency <mcreference link="https://www.makeuseof.com/improve-performance-free-up-ram-on-linux/" index="4">4</mcreference>
   
   get() {
     if (this.pool.length > 0) {
@@ -73,15 +73,41 @@ const resultPool = {
   
   release(result) {
     if (this.pool.length < this.maxSize) {
+      // Clear all references
       result.success = false
       result.pdfResult = 0
       result.pmfResult = 0
       result.cdfResult = 0
       result.errorMessage = null
+      result.chartData = null // Clear chart data to free memory
       this.pool.push(result)
     }
+  },
+  
+  // Force cleanup of result pool
+  cleanup() {
+    this.pool.length = 0
   }
 }
+
+// Add periodic cleanup for caches
+let cacheCleanupInterval = setInterval(() => {
+  // Clear caches if they get too large
+  if (memoCache.logFactorial.size > 300) {
+    memoCache.logFactorial.clear()
+  }
+  if (memoCache.logGamma.size > 300) {
+    memoCache.logGamma.clear()
+  }
+  if (memoCache.logCombination.size > 300) {
+    memoCache.logCombination.clear()
+  }
+  
+  // Cleanup result pool periodically
+  if (resultPool.pool.length > 15) {
+    resultPool.cleanup()
+  }
+}, 30000) // Every 30 seconds
 
 class NativeBridge {
   static_originalNativeModule = null

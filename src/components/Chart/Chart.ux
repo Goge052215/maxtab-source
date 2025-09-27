@@ -21,28 +21,112 @@
     data() {
       return {
         chart: null,
+        watcherCleanup: null,
       };
     },
     onInit() {
-      this.$watch('chartData', 'renderChart');
+      // Store watcher cleanup function
+      this.watcherCleanup = this.$watch('chartData', 'renderChart');
     },
     onReady() {
       this.renderChart();
     },
-    renderChart() {
-      if (this.chart) {
-        this.chart.destroy();
-      }
-      const ctx = this.$element('chart-canvas').getContext('2d');
-      this.chart = new Chart(ctx, {
-        type: this.chartType,
-        data: this.chartData,
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-        },
-      });
+    onDestroy() {
+      // Clean up chart and watchers
+      this.cleanup();
     },
+    onHide() {
+      // Clean up when component is hidden
+      this.cleanup();
+    },
+    renderChart() {
+      try {
+        // Destroy previous chart instance
+        if (this.chart) {
+          this.chart.destroy();
+          this.chart = null;
+        }
+        
+        const canvas = this.$element('chart-canvas');
+        if (!canvas) {
+          console.warn('Chart canvas not found');
+          return;
+        }
+        
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          console.warn('Chart context not available');
+          return;
+        }
+        
+        // Create chart with memory-efficient options
+        this.chart = new Chart(ctx, {
+          type: this.chartType,
+          data: this.chartData,
+          options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            // Disable animations for better performance
+            animation: {
+              duration: 0
+            },
+            // Limit data points for better memory usage
+            elements: {
+              point: {
+                radius: 2,
+                hoverRadius: 4
+              }
+            },
+            // Optimize scales
+            scales: {
+              x: {
+                ticks: {
+                  maxTicksLimit: 10
+                }
+              },
+              y: {
+                ticks: {
+                  maxTicksLimit: 8
+                }
+              }
+            }
+          },
+        });
+      } catch (error) {
+        console.error('Chart rendering error:', error);
+        this.cleanup();
+      }
+    },
+    
+    // Comprehensive cleanup method
+    cleanup() {
+      try {
+        // Destroy chart instance
+        if (this.chart) {
+          this.chart.destroy();
+          this.chart = null;
+        }
+        
+        // Clean up watcher
+        if (this.watcherCleanup && typeof this.watcherCleanup === 'function') {
+          this.watcherCleanup();
+          this.watcherCleanup = null;
+        }
+        
+        // Clear canvas context
+        const canvas = this.$element('chart-canvas');
+        if (canvas) {
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+          }
+        }
+        
+        console.log('Chart component cleaned up');
+      } catch (error) {
+        console.error('Chart cleanup error:', error);
+      }
+    }
   };
 </script>
 
