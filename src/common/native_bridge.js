@@ -62,7 +62,8 @@ const memoCache = {
 
 const resultPool = {
   pool: [],
-  maxSize: 25, // Reduced from 50 for memory efficiency <mcreference link="https://www.makeuseof.com/improve-performance-free-up-ram-on-linux/" index="4">4</mcreference>
+  maxSize: 25, // Reduced from 50 for memory efficiency 
+  // "https://www.makeuseof.com/improve-performance-free-up-ram-on-linux/"
   
   get() {
     if (this.pool.length > 0) {
