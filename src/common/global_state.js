@@ -242,28 +242,6 @@ class GlobalState {
     }
   }
 
-  // Memory optimization: Enhanced memory stats with monitoring integration
-  getMemoryStats() {
-    const baseStats = {
-      keyboardResultSize: this._keyboardResult ? JSON.stringify(this._keyboardResult).length : 0,
-      calculatorResultSize: this._calculatorResult ? JSON.stringify(this._calculatorResult).length : 0,
-      calculatorExportSize: this._calculatorExport ? JSON.stringify(this._calculatorExport).length : 0,
-      activeReferences: this._activeReferences.size,
-      lastCleanup: this._lastCleanup,
-      cleanupInterval: this._cleanupInterval ? 'active' : 'inactive'
-    }
-    
-    // Add system memory stats if available
-    try {
-      const systemStats = memoryMonitor.getMemoryStats()
-      return {
-        ...baseStats,
-        system: systemStats
-      }
-    } catch (error) {
-      return baseStats
-    }
-  }
 }
 
 export const globalState = new GlobalState()

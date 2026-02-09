@@ -2,16 +2,10 @@ import jstat from 'jstat';
 import { 
   STAT_SQRT_2PI, 
   ABRAMOWITZ_STEGUN_COEFF, 
-  ABRAMOWITZ_STEGUN_CONST, 
-  ITERATION_LIMIT, 
-  PRECISION_TOLERANCE } from './constants.js';
-
-let app = null
-let NativeModule = null
+  ABRAMOWITZ_STEGUN_CONST } from './constants.js';
 
 // Directly use the JS calculation to prevent error output in console and cause delay
 console.log('Native module initialization: JavaScript implementation mode (fallback)');
-NativeModule = null;
 
 const DISTRIBUTION_TYPES = {
   DIST_NORMAL: 0,
@@ -92,7 +86,7 @@ const resultPool = {
 }
 
 // Add periodic cleanup for caches
-let cacheCleanupInterval = setInterval(() => {
+setInterval(() => {
   // Clear caches if they get too large
   if (memoCache.logFactorial.size > 300) {
     memoCache.logFactorial.clear()
@@ -111,7 +105,6 @@ let cacheCleanupInterval = setInterval(() => {
 }, 30000) // Every 30 seconds
 
 class NativeBridge {
-  static_originalNativeModule = null
 
   static createResult(success = false, pdfResult = 0, cdfResult = 0, errorMessage = null) {
     const result = resultPool.get()

@@ -41,9 +41,19 @@ class LRUCache {
   }
 
   set(key, value) {
+    if (this.maxSize <= 0) {
+      return;
+    }
+
     if (this.cache.has(key)) {
-      this._remove(this.cache.get(key));
-    } else if (this.cache.size >= this.maxSize) {
+      const existingNode = this.cache.get(key);
+      existingNode.value = value;
+      this._remove(existingNode);
+      this._add(existingNode);
+      return;
+    }
+
+    if (this.cache.size >= this.maxSize) {
       const oldestNode = this.tail.prev;
       this._remove(oldestNode);
       this.cache.delete(oldestNode.key);

@@ -80,7 +80,6 @@ SimpleInputMethod.getHanzi = function(pinyin) {
     let result = this.getSingleHanzi(pinyin);
     if (result) return [result.split(''), pinyin];
 
-    let temp = '';
     let start = Math.min(pinyin.length, 6);
 
     for (let i = start; i >= 1; i--) {

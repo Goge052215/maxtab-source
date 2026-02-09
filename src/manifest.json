@@ -20,6 +20,12 @@
     },
     {
       "name": "system.device"
+    },
+    {
+      "name": "system.configuration"
+    },
+    {
+      "name": "system.storage"
     }
   ],
   "nativePlugins": [
@@ -59,6 +65,9 @@
       },
       "pages/about": {
         "component": "about"
+      },
+      "pages/settings": {
+        "component": "settings"
       },
       "pages/distributions/binomial": {
         "component": "binomial"

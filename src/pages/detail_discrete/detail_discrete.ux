@@ -6,14 +6,14 @@
 
     <div class="content">
       <div class="result-display">
-        <text class="pmf-result">PMF: {{ pmfValue }}</text>
-        <text class="cdf-result">CDF: {{ cdfValue }}</text>
+        <text class="pmf-result">{{ i18n.labels.pmf }}: {{ pmfValue }}</text>
+        <text class="cdf-result">{{ i18n.labels.cdf }}: {{ cdfValue }}</text>
       </div>
     </div>
 
     <div class="bottom-section">
       <div class="back-btn" onclick="goBack">
-        <text class="back-text">返回</text>
+        <text class="back-text">{{ i18n.pages.detail_discrete.back }}</text>
       </div>
     </div>
   </div>
@@ -21,18 +21,38 @@
 
 <script>
   import router from "@system.router";
+  import i18n from "../../common/i18n";
 
   export default {
     private: {
-      distributionName: "计算结果",
+      distributionName: "",
       pmfValue: "-",
       cdfValue: "-",
       inputParams: [],
-      chartData: null
+      chartData: null,
+      currentLang: 'zh-CN',
+      i18n: i18n.getLocaleStrings()
+    },
+
+    onInit() {
+      this.refreshI18n()
+    },
+
+    onShow() {
+      this.refreshI18n()
+    },
+
+    refreshI18n() {
+      this.currentLang = i18n.getCurrentLang()
+      this.i18n = i18n.getLocaleStrings(this.currentLang)
+      if (!this.distributionName) {
+        this.distributionName = i18n.t('pages.detail_discrete.title', this.currentLang)
+      }
+      this.$forceUpdate()
     },
 
     onReady() {
-      this.$page.setTitleBar({ text: this.distributionName || "计算结果" });
+      this.$page.setTitleBar({ text: this.distributionName || i18n.t('pages.detail_discrete.title', this.currentLang) });
     },
 
     goBack() {
@@ -55,39 +75,40 @@
 }
 
 .top-bar {
-  height: 60px;
-  background-color: #111111;
+  height: 75px;
   flex-direction: row;
   align-items: center;
-  padding: 0 20px;
-  border-bottom: 1px solid #333333;
   justify-content: center;
+  padding: 15px 20px;
 }
 
 .title {
-  font-size: 20px;
+  font-size: 24px;
   color: #ffffff;
   font-weight: bold;
 }
 
 .bottom-section {
-  padding: 0px 20px 50px 20px;
+  margin-top: 6px;
+  margin-bottom: 50px;
   display: flex;
   justify-content: center;
+  align-items: center;
 }
 
 .back-btn {
-  height: 50px;
-  width: 100px;
+  width: 80%;
+  height: 70px;
   background-color: #333333;
-  border-radius: 10px;
+  border-radius: 12px;
+  padding: 15px 20px;
   justify-content: center;
   align-items: center;
-  border: 1px solid #555555;
+  cursor: pointer;
 }
 
 .back-text {
-  font-size: 20px;
+  font-size: 24px;
   color: #ffffff;
   font-weight: bold;
 }

@@ -1,1 +1,324 @@
-{"a":{"b":"你好"}}
+{
+  "common": {
+    "back": "返回",
+    "ok": "确定",
+    "cancel": "取消",
+    "calculate": "计算",
+    "calculator": "计算器",
+    "calculation_result": "计算结果",
+    "calculation_history": "计算历史",
+    "error_failed": "计算失败",
+    "input_value": "输入值",
+    "pmf": "PMF",
+    "cdf": "CDF",
+    "pdf": "PDF"
+  },
+  "index": {
+    "title": "MaxTab",
+    "menu": {
+      "discrete": "离散分布",
+      "continuous": "连续分布",
+      "hypothesis": "假设检验",
+      "simulation": "概率模拟",
+      "guide": "使用指南",
+      "calculator": "计算器",
+      "settings": "设置",
+      "about": "关于",
+      "history": "计算历史"
+    },
+    "footer_version": "v1.1.0"
+  },
+  "pages": {
+    "discrete": {
+      "title": "离散分布",
+      "binomial": "二项分布",
+      "poisson": "泊松分布",
+      "geometric": "几何分布",
+      "negative_binomial": "负二项分布",
+      "hypergeometric": "超几何分布",
+      "back": "返回"
+    },
+    "continuous": {
+      "title": "连续分布",
+      "normal": "正态分布",
+      "exponential": "指数分布",
+      "uniform": "均匀分布",
+      "gamma": "伽马分布",
+      "beta": "β分布",
+      "weibull": "Weibull分布",
+      "chisquare": "卡方分布",
+      "student": "t分布",
+      "f": "F分布",
+      "pareto": "Pareto分布",
+      "rayleigh": "Rayleigh分布",
+      "back": "返回"
+    },
+    "guide": {
+      "title": "使用指南",
+      "distribution": "分布介绍",
+      "function": "函数说明",
+      "tips": "使用技巧",
+      "sections": {
+        "input_tips": "输入技巧",
+        "common_errors": "常见错误",
+        "quick_input_methods": "快速输入"
+      },
+      "distribution_content": {
+        "discrete_title": "离散分布",
+        "continuous_title": "连续分布",
+        "binomial_title": "二项分布",
+        "binomial_line_1": "描述n次独立试验中成功次数的概率分布",
+        "binomial_line_2": "应用场景:抛硬币、质量检测、投票结果",
+        "binomial_line_3": "参数:n(试验次数),p(单次成功概率)",
+        "binomial_line_4": "特点:每次试验只有成功/失败两种结果",
+        "poisson_title": "泊松分布",
+        "poisson_line_1": "描述单位时间或空间内随机事件发生次数的概率分布",
+        "poisson_line_2": "应用场景:客服电话呼入、交通事故、放射性衰变",
+        "poisson_line_3": "参数:λ(平均发生率)",
+        "poisson_line_4": "特点:事件独立发生,平均发生率恒定",
+        "geometric_title": "几何分布",
+        "geometric_line_1": "描述首次成功所需试验次数的概率分布",
+        "geometric_line_2": "应用场景:首次中奖、首次故障、首次成功",
+        "geometric_line_3": "参数:p(单次成功概率)",
+        "geometric_line_4": "特点:无记忆性,之前失败不影响未来概率",
+        "negative_binomial_title": "负二项分布",
+        "negative_binomial_line_1": "描述达到指定成功次数所需试验次数的概率分布",
+        "negative_binomial_line_2": "应用场景:收集全套卡片、达到销售目标",
+        "negative_binomial_line_3": "参数:r(成功次数),p(单次成功概率)",
+        "negative_binomial_line_4": "特点:几何分布的推广形式",
+        "hypergeometric_title": "超几何分布",
+        "hypergeometric_line_1": "描述不放回抽样中成功次数的概率分布",
+        "hypergeometric_line_2": "应用场景:质量抽检、扑克牌游戏",
+        "hypergeometric_line_3": "参数:N(总数),K(成功总数),n(抽样数)",
+        "hypergeometric_line_4": "特点:不放回抽样,概率随抽样变化",
+        "normal_title": "正态分布",
+        "normal_line_1": "最重要的连续概率分布,呈钟形曲线",
+        "normal_line_2": "应用场景:身高体重、考试成绩、测量误差",
+        "normal_line_3": "参数:μ(均值), σ²(方差)",
+        "normal_line_4": "特点:68-95-99.7法则，中心极限定理",
+        "exponential_title": "指数分布",
+        "exponential_line_1": "描述泊松过程中事件间隔时间的概率分布",
+        "exponential_line_2": "应用场景:设备寿命、客服等待时间、地震间隔",
+        "exponential_line_3": "参数:λ(率参数)",
+        "exponential_line_4": "特点:无记忆性，常用于可靠性分析",
+        "uniform_title": "均匀分布",
+        "uniform_line_1": "在区间内所有取值等可能的连续分布",
+        "uniform_line_2": "应用场景:随机数生成、轮盘赌、舍入误差",
+        "uniform_line_3": "参数:a(最小值), b(最大值)",
+        "uniform_line_4": "特点:简单直观，每个区间概率相等",
+        "gamma_title": "伽马分布",
+        "gamma_line_1": "描述多个独立指数变量之和的概率分布",
+        "gamma_line_2": "应用场景:总等待时间、总降雨量、系统寿命",
+        "gamma_line_3": "参数:k(形状参数), θ(尺度参数)",
+        "gamma_line_4": "特点:指数分布和卡方分布的特例",
+        "beta_title": "贝塔分布",
+        "beta_line_1": "定义在(0,1)区间的连续概率分布",
+        "beta_line_2": "应用场景:比例估计、成功率分析、贝叶斯统计",
+        "beta_line_3": "参数:α,β(形状参数)",
+        "beta_line_4": "特点:灵活性高，可呈现多种形状"
+      },
+      "function_content": {
+        "pdf_title": "概率密度函数 (PDF)",
+        "pdf_line_1": "概率密度函数描述连续随机变量在各个可能取值上的概率密度",
+        "pdf_line_2": "定义:",
+        "pdf_line_3": "f(x) = dF(x)/dx,",
+        "pdf_line_4": "其中F(x)是累积分布函数",
+        "pdf_line_5": "性质:f(x) ≥ 0, ∫f(x)dx = 1",
+        "pdf_line_6": "应用:计算区间概率, 描述数据分布形状",
+        "pdf_line_7": "使用示例:",
+        "pdf_line_8": "- 正态分布PDF:计算某个值附近的概率密度",
+        "pdf_line_9": "- 指数分布PDF:分析设备故障率",
+        "pmf_title": "概率质量函数 (PMF)",
+        "pmf_line_1": "概率质量函数描述离散随机变量取各个可能值的概率",
+        "pmf_line_2": "定义:",
+        "pmf_line_3": "Pr(X = x) = p(x)",
+        "pmf_line_4": "性质:",
+        "pmf_line_5": "Pr(X = x) ≥ 0, ΣPr(X = x) = 1",
+        "pmf_line_6": "应用:计算离散事件的精确概率",
+        "pmf_line_7": "使用示例:",
+        "pmf_line_8": "- 二项分布PMF:计算恰好成功k次的概率",
+        "pmf_line_9": "- 泊松分布PMF:计算单位时间内事件发生次数概率",
+        "cdf_title": "累积分布函数 (CDF)",
+        "cdf_line_1": "累积分布函数描述随机变量小于等于某个值的概率",
+        "cdf_line_2": "定义:",
+        "cdf_line_3": "F(x) = Pr(X ≤ x)",
+        "cdf_line_4": "性质:",
+        "cdf_line_5": "F(-∞) = 0, F(+∞) = 1",
+        "cdf_line_6": "应用:计算区间概率, 分位数计算",
+        "cdf_line_7": "使用示例:",
+        "cdf_line_8": "- 正态分布CDF:计算标准化考试成绩排名",
+        "cdf_line_9": "- 指数分布CDF:计算设备在时间t前故障的概率"
+      },
+      "tips_content": {
+        "input_title": "输入技巧",
+        "input_line_1": "参数输入规范",
+        "input_line_2": "• 数值参数:支持小数和整数,如μ=0,σ=1.5",
+        "input_line_3": "• 范围限制:注意参数的有效范围,如概率p∈[0,1]",
+        "input_line_4": "• 特殊值:支持科学计数法,如1e-6",
+        "input_line_5": "• 负数输入:使用负号,如μ=-2.5",
+        "input_line_6": "",
+        "input_line_7": "常见输入错误",
+        "input_line_8": "• 概率参数超出[0,1]范围",
+        "input_line_9": "• 方差或标准差为负值",
+        "input_line_10": "• 整数参数输入小数(如试验次数n=10.5)",
+        "input_line_11": "• 遗漏必需参数",
+        "input_line_12": "",
+        "input_line_13": "快速输入方法",
+        "input_line_14": "• 使用预设值:点击常用参数组合",
+        "input_line_15": "• 滑块调节:拖动滑块快速调整参数",
+        "input_line_16": "• 键盘快捷键:Tab键切换参数输入框",
+        "input_line_17": "• 历史记录:选择之前使用过的参数组合",
+        "result_title": "结果解读",
+        "result_line_1": "概率值理解",
+        "result_line_2": "• 概率范围:所有概率值都在[0,1]之间",
+        "result_line_3": "• 累积概率:CDF值表示\"不超过某值\"的概率",
+        "result_line_4": "• 密度vs概率:PDF值可能大于1, 但不是概率",
+        "result_line_5": "",
+        "result_line_6": "数值精度",
+        "result_line_7": "• 显示精度:默认保留4位小数",
+        "result_line_8": "• 科学计数法:极小值自动转换格式",
+        "result_line_9": "• 舍入误差:注意计算精度限制",
+        "result_line_10": "• 数值稳定性:极端参数可能导致计算不稳定"
+      }
+    },
+    "about": {
+      "title": "关于应用",
+      "developer": "开发者:",
+      "version": "版本:",
+      "date": "日期:",
+      "back": "返回"
+    },
+    "calculator": {
+      "title": "快速计算",
+      "back": "返回"
+    },
+    "settings": {
+      "title": "设置",
+      "languages": {
+        "zh": "简体中文",
+        "en": "英语"
+      }
+    },
+    "history": {
+      "title": "计算历史",
+      "empty_title": "暂无计算历史",
+      "empty_desc": "开始计算后，历史记录将显示在这里",
+      "clear": "清空历史",
+      "input_value": "输入值",
+      "density": "概率密度",
+      "today": "今天",
+      "yesterday": "昨天"
+    },
+    "detail_discrete": {
+      "title": "计算结果",
+      "back": "返回"
+    },
+    "detail_continuous": {
+      "title": "计算结果",
+      "back": "返回"
+    }
+  },
+  "distributions": {
+    "binomial": {
+      "title": "二项分布"
+    },
+    "poisson": {
+      "title": "泊松分布"
+    },
+    "geometric": {
+      "title": "几何分布"
+    },
+    "negative_binomial": {
+      "title": "负二项分布"
+    },
+    "hypergeometric": {
+      "title": "超几何分布"
+    },
+    "normal": {
+      "title": "正态分布"
+    },
+    "exponential": {
+      "title": "指数分布"
+    },
+    "uniform": {
+      "title": "均匀分布"
+    },
+    "gamma": {
+      "title": "伽马分布"
+    },
+    "beta": {
+      "title": "β分布"
+    },
+    "weibull": {
+      "title": "Weibull分布"
+    },
+    "chisquare": {
+      "title": "卡方分布"
+    },
+    "student": {
+      "title": "t分布"
+    },
+    "f": {
+      "title": "F分布"
+    },
+    "pareto": {
+      "title": "Pareto分布"
+    },
+    "rayleigh": {
+      "title": "Rayleigh分布"
+    }
+  },
+  "params": {
+    "df": "自由度",
+    "df1": "自由度1",
+    "df2": "自由度2",
+    "x": "计算值",
+    "k": "计算值",
+    "n": "试验次数",
+    "p": "成功概率",
+    "r": "成功次数",
+    "N": "总体大小",
+    "K": "成功项数",
+    "lambda": "发生率",
+    "rate": "率参数",
+    "mean": "均值",
+    "stddev": "标准差",
+    "shape": "形状参数",
+    "scale": "尺度参数",
+    "alpha": "形状参数α",
+    "beta": "形状参数β",
+    "upper": "上限",
+    "lower": "下限",
+    "sigma": "尺度参数"
+  },
+  "labels": {
+    "pmf": "PMF",
+    "cdf": "CDF",
+    "pdf": "PDF",
+    "not_exceed": "不超过",
+    "clear_history": "清空",
+    "no_history": "暂无数据"
+  },
+  "errors": {
+    "must_be_positive": "必须大于0",
+    "must_be_nonnegative": "必须大于等于0",
+    "must_be_between_0_and_1": "必须在0和1之间",
+    "k_between_0_and_n": "k必须在0到n之间",
+    "lower_less_than_upper": "下限必须小于上限",
+    "N_must_be_positive": "总体大小N必须大于0",
+    "K_between_0_and_N": "成功项数K必须在0到N之间",
+    "n_between_0_and_N": "抽取数量n必须在0到N之间",
+    "k_between_min_and_max": "成功次数k必须在{min}到{max}之间",
+    "x_ge_xm_and_positive": "参数必须大于0，且x≥xm",
+    "k_at_least_one": "k必须大于等于1",
+    "df_must_be_positive": "自由度必须大于0",
+    "lambda_must_be_positive": "发生率λ必须大于0",
+    "sigma_must_be_positive": "尺度参数必须大于0",
+    "rate_must_be_positive": "率参数必须大于0",
+    "shape_must_be_positive": "形状参数必须大于0",
+    "scale_must_be_positive": "尺度参数必须大于0",
+    "alpha_must_be_positive": "形状参数α必须大于0",
+    "beta_must_be_positive": "形状参数β必须大于0",
+    "x_between_0_and_1": "计算值必须在0和1之间"
+  }
+}

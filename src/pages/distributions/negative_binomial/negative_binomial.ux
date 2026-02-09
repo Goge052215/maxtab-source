@@ -3,72 +3,75 @@
 <template>
   <div class="container" @swipe="handleSwipe">
     <div class="top-bar">
-      <text class="title">负二项分布</text>
+      <text class="title">{{ i18n.distributions.negative_binomial.title }}</text>
     </div>
 
-    <div class="content">
-      <div class="param-section" if="{{ !showKeyboard }}">
-        <div class="param-item" @click="selectInput('r')">
-          <text class="param-label">成功次数r</text>
-          <div class="param-display">
-            <text class="param-value">{{ r }}</text>
+    <scroll class="scroll-container" scroll-y="true">
+      <div class="scroll-content">
+        <div class="content">
+          <div class="param-section" if="{{ !showKeyboard }}">
+            <div class="param-item" @click="selectInput('r')">
+              <text class="param-label">{{ i18n.params.r }} r</text>
+              <div class="param-display">
+                <text class="param-value">{{ r }}</text>
+              </div>
+            </div>
+            
+            <div class="param-item" @click="selectInput('p')">
+              <text class="param-label">{{ i18n.params.p }} p</text>
+              <div class="param-display">
+                <text class="param-value">{{ p }}</text>
+              </div>
+            </div>
+            
+            <div class="param-item" @click="selectInput('k')">
+              <text class="param-label">{{ i18n.params.k }} k</text>
+              <div class="param-display">
+                <text class="param-value">{{ k }}</text>
+              </div>
+            </div>
+          </div>
+          <div class="param-section" if="{{ showKeyboard }}">
+            <div class="param-item">
+              <text class="param-label">{{ currentParamName }}</text>
+              <div class="param-display">
+                <text class="param-value">{{ inputBuffer }}</text>
+              </div>
+            </div>
+          </div>
+
+          <div class="calc-section" if="{{ !showKeyboard }}">
+            <div class="calc-btn" onclick="calculate">
+              <text class="calc-text">{{ i18n.common.calculate }}</text>
+            </div>
+          </div>
+
+          <div class="error-message" if="{{ errorMessage }}">
+            <text class="error-text">{{ errorMessage }}</text>
+          </div>
+
+          <div class="keyboard-page" style="flex-direction: column;" if="{{ showKeyboard }}">
+            <input-method
+              hide="{{!showKeyboard}}"
+              keyboardtype="NUMERIC"
+              maxlength="10"
+              vibratemode="{{vibratemode}}"
+              screentype="{{screentype}}"
+              @visibility-change="onVisibilityChange"
+              @key-down="onKeyDown"
+              @delete="onDelete"
+              @complete="onComplete"
+            ></input-method>
           </div>
         </div>
-        
-        <div class="param-item" @click="selectInput('p')">
-          <text class="param-label">成功概率p</text>
-          <div class="param-display">
-            <text class="param-value">{{ p }}</text>
-          </div>
-        </div>
-        
-        <div class="param-item" @click="selectInput('k')">
-          <text class="param-label">失败次数k</text>
-          <div class="param-display">
-            <text class="param-value">{{ k }}</text>
+
+        <div class="bottom-section" if="{{ !showKeyboard }}">
+          <div class="back-btn" onclick="goBack">
+            <text class="back-text">{{ i18n.common.back }}</text>
           </div>
         </div>
       </div>
-      <div class="param-section" if="{{ showKeyboard }}">
-        <div class="param-item">
-          <text class="param-label">{{ currentParamName }}</text>
-          <div class="param-display">
-            <text class="param-value">{{ inputBuffer }}</text>
-          </div>
-        </div>
-      </div>
-
-      <div class="calc-section" if="{{ !showKeyboard }}">
-        <div class="calc-btn" onclick="calculate">
-          <text class="calc-text">计算</text>
-        </div>
-      </div>
-
-      <div class="error-message" if="{{ errorMessage }}">
-        <text class="error-text">{{ errorMessage }}</text>
-      </div>
-
-      <!-- VelaOS Input Method Container -->
-      <div class="keyboard-page" style="flex-direction: column;" if="{{ showKeyboard }}">
-        <input-method
-          hide="{{!showKeyboard}}"
-          keyboardtype="NUMERIC"
-          maxlength="10"
-          vibratemode="{{vibratemode}}"
-          screentype="{{screentype}}"
-          @visibility-change="onVisibilityChange"
-          @key-down="onKeyDown"
-          @delete="onDelete"
-          @complete="onComplete"
-        ></input-method>
-      </div>
-    </div>
-
-    <div class="bottom-section" if="{{ !showKeyboard }}">
-      <div class="back-btn" onclick="goBack">
-        <text class="back-text">返回</text>
-      </div>
-    </div>
+    </scroll>
   </div>
 </template>
 
@@ -76,6 +79,7 @@
 import router from "@system.router"
 import { NativeBridge } from "../../../common/native_bridge"
 import { globalState } from "../../../common/global_state.js"
+import i18n from "../../../common/i18n"
 
 export default {
   private: {
@@ -91,19 +95,28 @@ export default {
     currentParamName: '',
     inputBuffer: '',
     originalValue: undefined,
+    currentLang: 'zh-CN',
+    i18n: i18n.getLocaleStrings(),
     // Template variables
     vibratemode: "short",
     screentype: "pill-shaped"
   },
 
   onInit() {
-    this.$page.setTitleBar({ text: '负二项分布' })
+    this.refreshI18n()
     this.importFromCalculator()
   },
 
   onShow() {
-    console.log('NegativeBinomial onShow called')
+    this.refreshI18n()
     this.importFromCalculator()
+  },
+
+  refreshI18n() {
+    this.currentLang = i18n.getCurrentLang()
+    this.i18n = i18n.getLocaleStrings(this.currentLang)
+    this.$page.setTitleBar({ text: i18n.t('distributions.negative_binomial.title', this.currentLang) })
+    this.$forceUpdate()
   },
 
   importFromCalculator() {
@@ -139,9 +152,9 @@ export default {
 
   selectInput(inputType) {
     let parameterName = ''
-    if (inputType === 'r') parameterName = '成功次数'
-    else if (inputType === 'p') parameterName = '成功概率'
-    else if (inputType === 'k') parameterName = '失败次数'
+    if (inputType === 'r') parameterName = this.i18n.params.r
+    else if (inputType === 'p') parameterName = this.i18n.params.p
+    else if (inputType === 'k') parameterName = this.i18n.params.k
     
     this.currentParam = inputType
     this.currentParamName = parameterName
@@ -269,17 +282,17 @@ export default {
   calculate() {
     // Validate input parameters
     if (this.r <= 0) {
-      this.errorMessage = "成功次数r必须大于0"
+      this.errorMessage = `${i18n.t('params.r', this.currentLang)} ${i18n.t('errors.must_be_positive', this.currentLang)}`
       return
     }
     
     if (this.p <= 0 || this.p > 1) {
-      this.errorMessage = "成功概率必须在0-1之间"
+      this.errorMessage = `${i18n.t('params.p', this.currentLang)} ${i18n.t('errors.must_be_between_0_and_1', this.currentLang)}`
       return
     }
     
     if (this.k < 0) {
-      this.errorMessage = "失败次数k必须非负"
+      this.errorMessage = `${i18n.t('params.k', this.currentLang)} ${i18n.t('errors.must_be_nonnegative', this.currentLang)}`
       return
     }
 
@@ -290,20 +303,20 @@ export default {
       router.push({
         uri: 'pages/detail_discrete',
         params: {
-          distributionName: '负二项分布',
+          distributionName: i18n.t('distributions.negative_binomial.title', this.currentLang),
           pmfValue: result.pdfResult.toFixed(6),
           cdfValue: result.cdfResult.toFixed(6),
           inputParams: [
-            { key: '成功次数r', value: this.r },
-            { key: '成功概率p', value: this.p },
-            { key: '计算值k', value: this.k }
+            { key: `${i18n.t('params.r', this.currentLang)} r`, value: this.r },
+            { key: `${i18n.t('params.p', this.currentLang)} p`, value: this.p },
+            { key: `${i18n.t('params.k', this.currentLang)} k`, value: this.k }
           ]
         }
       })
       this.hasResult = true
       this.errorMessage = ""
     } else {
-      this.errorMessage = result.errorMessage || "计算失败"
+      this.errorMessage = result.errorMessage || i18n.t('common.error_failed', this.currentLang)
       this.hasResult = false
     }
   }
@@ -318,47 +331,58 @@ export default {
 }
 
 .top-bar {
-  height: 60px;
-  background-color: #111111;
+  height: 80px;
   flex-direction: row;
   align-items: center;
-  padding: 0 20px;
-  border-bottom: 1px solid #333333;
   justify-content: center;
+  padding: 15px 20px;
 }
 
 .title {
-  font-size: 20px;
+  font-size: 24px;
   color: #ffffff;
   font-weight: bold;
 }
 
 .bottom-section {
-  padding: 0px 20px 50px 20px;
+  margin-top: 6px;
+  margin-bottom: 50px;
   display: flex;
   justify-content: center;
+  align-items: center;
 }
 
 .back-btn {
-  height: 50px;
-  width: 100px;
+  width: 80%;
+  height: 70px;
   background-color: #333333;
-  border-radius: 10px;
+  border-radius: 12px;
+  padding: 15px 20px;
   justify-content: center;
   align-items: center;
-  border: 1px solid #555555;
+  cursor: pointer;
 }
 
 .back-text {
-  font-size: 20px;
+  font-size: 24px;
   color: #ffffff;
   font-weight: bold;
 }
 
 .content {
-  flex: 1;
   flex-direction: column;
-  padding: 20px 15px;
+  padding: 20px;
+}
+
+.scroll-container {
+  flex: 1;
+  width: 100%;
+  flex-direction: column;
+}
+
+.scroll-content {
+  flex-direction: column;
+  width: 100%;
 }
 
 .param-section {
@@ -367,37 +391,36 @@ export default {
 }
 
 .param-item {
-  height: 65px;
   background-color: #1a1a1a;
   border-radius: 8px;
-  padding: 0 15px;
+  padding: 12px 15px;
   margin-bottom: 10px;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
+  align-items: flex-start;
   border: 1px solid #333333;
 }
 
 .param-label {
-  font-size: 20px;
+  font-size: 24px;
   color: #ffffff;
   font-weight: 500;
 }
 
 .param-display {
-  width: 50px;
-  height: 35px;
+  width: 100%;
+  height: 44px;
   background-color: #333333;
   border: 1px solid #555555;
   border-radius: 6px;
   justify-content: center;
   align-items: center;
+  margin-top: 8px;
 }
 
 .param-value {
   color: #ffffff;
   text-align: center;
-  font-size: 20px;
+  font-size: 24px;
 }
 
 .keyboard-page {
@@ -413,21 +436,21 @@ export default {
 }
 
 .calc-section {
-  margin-bottom: 0px;
+  margin-bottom: 6px;
 }
 
 .calc-btn {
-  height: 50px;
+  height: 70px;
   width: 100%;
   background-color: #0066cc;
-  border-radius: 10px;
-  margin-bottom: 10px;
+  border-radius: 12px;
+  padding: 15px 20px;
   justify-content: center;
   align-items: center;
 }
 
 .calc-text {
-  font-size: 20px;
+  font-size: 24px;
   color: #ffffff;
   font-weight: bold;
 }

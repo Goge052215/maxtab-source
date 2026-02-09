@@ -1,1 +1,324 @@
-{"a":{"b":"hello"}}
+{
+  "common": {
+    "back": "Back",
+    "ok": "OK",
+    "cancel": "Cancel",
+    "calculate": "Calc",
+    "calculator": "Calc",
+    "calculation_result": "Result",
+    "calculation_history": "History",
+    "error_failed": "Failed",
+    "input_value": "Input",
+    "pmf": "PMF",
+    "cdf": "CDF",
+    "pdf": "PDF"
+  },
+  "index": {
+    "title": "MaxTab",
+    "menu": {
+      "discrete": "Discrete",
+      "continuous": "Cont. Dist",
+      "hypothesis": "Hypothesis",
+      "simulation": "Simulation",
+      "guide": "Guide",
+      "calculator": "Calc",
+      "settings": "Settings",
+      "about": "About",
+      "history": "History"
+    },
+    "footer_version": "v1.1.0"
+  },
+  "pages": {
+    "discrete": {
+      "title": "Discrete",
+      "binomial": "Binomial",
+      "poisson": "Poisson",
+      "geometric": "Geometric",
+      "negative_binomial": "NegBin",
+      "hypergeometric": "Hypergeo",
+      "back": "Back"
+    },
+    "continuous": {
+      "title": "Continuous",
+      "normal": "Normal",
+      "exponential": "Exp Dist",
+      "uniform": "Uniform",
+      "gamma": "Gamma",
+      "beta": "Beta",
+      "weibull": "Weibull",
+      "chisquare": "Chi-Sq",
+      "student": "t-Dist",
+      "f": "F-Dist",
+      "pareto": "Pareto",
+      "rayleigh": "Rayleigh",
+      "back": "Back"
+    },
+    "guide": {
+      "title": "Guide",
+      "distribution": "Dist Info",
+      "function": "Funcs",
+      "tips": "Tips",
+      "sections": {
+        "input_tips": "Input",
+        "common_errors": "Errors",
+        "quick_input_methods": "Quick In"
+      },
+      "distribution_content": {
+        "discrete_title": "Discrete",
+        "continuous_title": "Continuous",
+        "binomial_title": "Binomial",
+        "binomial_line_1": "Counts successes in n independent trials",
+        "binomial_line_2": "Use cases: coin flips, QC checks, votes",
+        "binomial_line_3": "Params: n (trials), p (success probability)",
+        "binomial_line_4": "Each trial is success or failure",
+        "poisson_title": "Poisson",
+        "poisson_line_1": "Counts events in a fixed time/space",
+        "poisson_line_2": "Use cases: calls, accidents, decay",
+        "poisson_line_3": "Param: λ (average rate)",
+        "poisson_line_4": "Independent events, constant rate",
+        "geometric_title": "Geometric",
+        "geometric_line_1": "Trials until first success",
+        "geometric_line_2": "Use cases: first win, first fault",
+        "geometric_line_3": "Param: p (success probability)",
+        "geometric_line_4": "Memoryless property",
+        "negative_binomial_title": "NegBin",
+        "negative_binomial_line_1": "Trials to reach r successes",
+        "negative_binomial_line_2": "Use cases: collect set, hit target",
+        "negative_binomial_line_3": "Params: r (successes), p (success prob)",
+        "negative_binomial_line_4": "Generalizes geometric",
+        "hypergeometric_title": "Hypergeo",
+        "hypergeometric_line_1": "Successes in sampling without replacement",
+        "hypergeometric_line_2": "Use cases: quality sampling, cards",
+        "hypergeometric_line_3": "Params: N, K, n",
+        "hypergeometric_line_4": "Probability changes by sample",
+        "normal_title": "Normal",
+        "normal_line_1": "Most important continuous distribution",
+        "normal_line_2": "Use cases: heights, scores, errors",
+        "normal_line_3": "Params: μ (mean), σ² (variance)",
+        "normal_line_4": "68-95-99.7 rule, CLT",
+        "exponential_title": "Exponential",
+        "exponential_line_1": "Waiting time in Poisson process",
+        "exponential_line_2": "Use cases: lifetime, waiting, earthquakes",
+        "exponential_line_3": "Param: λ (rate)",
+        "exponential_line_4": "Memoryless, reliability analysis",
+        "uniform_title": "Uniform",
+        "uniform_line_1": "All values equally likely in interval",
+        "uniform_line_2": "Use cases: random numbers, roulette",
+        "uniform_line_3": "Params: a (min), b (max)",
+        "uniform_line_4": "Simple, equal interval probs",
+        "gamma_title": "Gamma",
+        "gamma_line_1": "Sum of independent exponentials",
+        "gamma_line_2": "Use cases: total wait, rainfall",
+        "gamma_line_3": "Params: k (shape), θ (scale)",
+        "gamma_line_4": "Special case of exp and chi-square",
+        "beta_title": "Beta",
+        "beta_line_1": "Continuous on (0,1)",
+        "beta_line_2": "Use cases: proportions, Bayesian stats",
+        "beta_line_3": "Params: α, β (shape)",
+        "beta_line_4": "Flexible shapes"
+      },
+      "function_content": {
+        "pdf_title": "Probability Density (PDF)",
+        "pdf_line_1": "Describes density of continuous variables",
+        "pdf_line_2": "Definition:",
+        "pdf_line_3": "f(x) = dF(x)/dx",
+        "pdf_line_4": "F(x) is the CDF",
+        "pdf_line_5": "Properties: f(x) ≥ 0, ∫f(x)dx = 1",
+        "pdf_line_6": "Uses: interval probs, shape description",
+        "pdf_line_7": "Examples:",
+        "pdf_line_8": "- Normal PDF: density near a value",
+        "pdf_line_9": "- Exponential PDF: failure rate",
+        "pmf_title": "Probability Mass (PMF)",
+        "pmf_line_1": "Probability for discrete values",
+        "pmf_line_2": "Definition:",
+        "pmf_line_3": "Pr(X = x) = p(x)",
+        "pmf_line_4": "Properties:",
+        "pmf_line_5": "Pr(X = x) ≥ 0, ΣPr(X = x) = 1",
+        "pmf_line_6": "Uses: exact discrete probabilities",
+        "pmf_line_7": "Examples:",
+        "pmf_line_8": "- Binomial PMF: exactly k successes",
+        "pmf_line_9": "- Poisson PMF: events in time",
+        "cdf_title": "Cumulative (CDF)",
+        "cdf_line_1": "Probability of being ≤ a value",
+        "cdf_line_2": "Definition:",
+        "cdf_line_3": "F(x) = Pr(X ≤ x)",
+        "cdf_line_4": "Properties:",
+        "cdf_line_5": "F(-∞)=0, F(+∞)=1",
+        "cdf_line_6": "Uses: intervals, quantiles",
+        "cdf_line_7": "Examples:",
+        "cdf_line_8": "- Normal CDF: rank by score",
+        "cdf_line_9": "- Exponential CDF: failure before t"
+      },
+      "tips_content": {
+        "input_title": "Input Tips",
+        "input_line_1": "Parameter input rules",
+        "input_line_2": "• Numeric params: decimals and integers, e.g., μ=0, σ=1.5",
+        "input_line_3": "• Range limits: keep params valid, e.g., p∈[0,1]",
+        "input_line_4": "• Special values: scientific notation, e.g., 1e-6",
+        "input_line_5": "• Negative values: use minus sign, e.g., μ=-2.5",
+        "input_line_6": "",
+        "input_line_7": "Common input errors",
+        "input_line_8": "• Probability outside [0,1]",
+        "input_line_9": "• Variance or std dev is negative",
+        "input_line_10": "• Integer param with decimals (e.g., n=10.5)",
+        "input_line_11": "• Missing required params",
+        "input_line_12": "",
+        "input_line_13": "Quick input methods",
+        "input_line_14": "• Use presets: tap common combos",
+        "input_line_15": "• Slider adjust: drag to change fast",
+        "input_line_16": "• Keyboard shortcuts: Tab to switch",
+        "input_line_17": "• History: reuse earlier parameters",
+        "result_title": "Result Reading",
+        "result_line_1": "Understanding probabilities",
+        "result_line_2": "• All probabilities are in [0,1]",
+        "result_line_3": "• CDF is probability of not exceeding",
+        "result_line_4": "• Density vs probability: PDF can exceed 1",
+        "result_line_5": "",
+        "result_line_6": "Numeric precision",
+        "result_line_7": "• Display precision: default 4 decimals",
+        "result_line_8": "• Scientific notation for tiny values",
+        "result_line_9": "• Rounding error exists",
+        "result_line_10": "• Extreme params may be unstable"
+      }
+    },
+    "about": {
+      "title": "About",
+      "developer": "Developer:",
+      "version": "Version:",
+      "date": "Date:",
+      "back": "Back"
+    },
+    "calculator": {
+      "title": "Calculator",
+      "back": "Back"
+    },
+    "settings": {
+      "title": "Settings",
+      "languages": {
+        "zh": "Chinese",
+        "en": "English"
+      }
+    },
+    "history": {
+      "title": "History",
+      "empty_title": "No History",
+      "empty_desc": "History appears after calculations",
+      "clear": "Clear",
+      "input_value": "Input",
+      "density": "Density",
+      "today": "Today",
+      "yesterday": "Yesterday"
+    },
+    "detail_discrete": {
+      "title": "Result",
+      "back": "Back"
+    },
+    "detail_continuous": {
+      "title": "Result",
+      "back": "Back"
+    }
+  },
+  "distributions": {
+    "binomial": {
+      "title": "Binomial"
+    },
+    "poisson": {
+      "title": "Poisson"
+    },
+    "geometric": {
+      "title": "Geometric"
+    },
+    "negative_binomial": {
+      "title": "NegBin"
+    },
+    "hypergeometric": {
+      "title": "Hypergeo"
+    },
+    "normal": {
+      "title": "Normal"
+    },
+    "exponential": {
+      "title": "Exp Dist"
+    },
+    "uniform": {
+      "title": "Uniform"
+    },
+    "gamma": {
+      "title": "Gamma"
+    },
+    "beta": {
+      "title": "Beta"
+    },
+    "weibull": {
+      "title": "Weibull"
+    },
+    "chisquare": {
+      "title": "Chi-Sq"
+    },
+    "student": {
+      "title": "t-Dist"
+    },
+    "f": {
+      "title": "F-Dist"
+    },
+    "pareto": {
+      "title": "Pareto"
+    },
+    "rayleigh": {
+      "title": "Rayleigh"
+    }
+  },
+  "params": {
+    "df": "Deg Free",
+    "df1": "Deg Free 1",
+    "df2": "Deg Free 2",
+    "x": "Val x",
+    "k": "Val k",
+    "n": "Trials",
+    "p": "Prob",
+    "r": "Succ r",
+    "N": "Pop N",
+    "K": "Succ K",
+    "lambda": "Rate λ",
+    "rate": "Rate",
+    "mean": "Mean μ",
+    "stddev": "StdDev σ",
+    "shape": "Shape",
+    "scale": "Scale",
+    "alpha": "Shape α",
+    "beta": "Shape β",
+    "upper": "Upper",
+    "lower": "Lower",
+    "sigma": "Sigma"
+  },
+  "labels": {
+    "pmf": "PMF",
+    "cdf": "CDF",
+    "pdf": "PDF",
+    "not_exceed": "Max Val",
+    "clear_history": "Clear",
+    "no_history": "No Data"
+  },
+  "errors": {
+    "must_be_positive": "Must > 0",
+    "must_be_nonnegative": "Must >= 0",
+    "must_be_between_0_and_1": "0 to 1",
+    "k_between_0_and_n": "0 <= k <= n",
+    "lower_less_than_upper": "Low < Up",
+    "N_must_be_positive": "N > 0",
+    "K_between_0_and_N": "0 <= K <= N",
+    "n_between_0_and_N": "0 <= n <= N",
+    "k_between_min_and_max": "k must be between {min} and {max}",
+    "x_ge_xm_and_positive": "x >= xm > 0",
+    "k_at_least_one": "k >= 1",
+    "df_must_be_positive": "DF > 0",
+    "lambda_must_be_positive": "λ > 0",
+    "sigma_must_be_positive": "Sigma > 0",
+    "rate_must_be_positive": "Rate > 0",
+    "shape_must_be_positive": "Shape > 0",
+    "scale_must_be_positive": "Scale > 0",
+    "alpha_must_be_positive": "α > 0",
+    "beta_must_be_positive": "β > 0",
+    "x_between_0_and_1": "0 <= x <= 1"
+  }
+}

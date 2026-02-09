@@ -6,26 +6,26 @@
     <div class="keyBoardBox">
       <text class="inputCommon input1" onclick="clearAll">AC</text>
       <text class="inputCommon input1" onclick="deleteLast">D</text>
-      <text class="inputCommon input1" onclick="operatorClick('%')">{{keyBoardNum[19]}}</text>
-      <text class="inputCommon input1" onclick="operatorClick('/')">{{keyBoardNum[15]}}</text>
+      <text class="inputCommon input1" style="{{activeOperator === '%' ? 'background-color:#ffffff;color:#000000;' : 'background-color:#3d3d3d;color:#ffffff;'}}" onclick="operatorClick('%')">{{keyBoardNum[19]}}</text>
+      <text class="inputCommon input1" style="{{activeOperator === '/' ? 'background-color:#ffffff;color:#000000;' : 'background-color:#3d3d3d;color:#ffffff;'}}" onclick="operatorClick('/')">{{keyBoardNum[15]}}</text>
     </div>
     <div class="keyBoardBox">
       <text class="inputCommon" onclick="numberClick(7)">{{keyBoardNum[1]}}</text>
       <text class="inputCommon" onclick="numberClick(8)">{{keyBoardNum[2]}}</text>
       <text class="inputCommon" onclick="numberClick(9)">{{keyBoardNum[3]}}</text>
-      <text class="inputCommon input1" onclick="operatorClick('*')">{{keyBoardNum[10]}}</text>
+      <text class="inputCommon input1" style="{{activeOperator === '*' ? 'background-color:#ffffff;color:#000000;' : 'background-color:#3d3d3d;color:#ffffff;'}}" onclick="operatorClick('*')">{{keyBoardNum[10]}}</text>
     </div>
     <div class="keyBoardBox">
       <text class="inputCommon" onclick="numberClick(4)">{{keyBoardNum[6]}}</text>
       <text class="inputCommon" onclick="numberClick(5)">{{keyBoardNum[7]}}</text>
       <text class="inputCommon" onclick="numberClick(6)">{{keyBoardNum[8]}}</text>
-      <text class="inputCommon input1" onclick="operatorClick('-')">{{keyBoardNum[14]}}</text>
+      <text class="inputCommon input1" style="{{activeOperator === '-' ? 'background-color:#ffffff;color:#000000;' : 'background-color:#3d3d3d;color:#ffffff;'}}" onclick="operatorClick('-')">{{keyBoardNum[14]}}</text>
     </div>
     <div class="keyBoardBox">
       <text class="inputCommon" onclick="numberClick(1)">{{keyBoardNum[11]}}</text>
       <text class="inputCommon" onclick="numberClick(2)">{{keyBoardNum[12]}}</text>
       <text class="inputCommon" onclick="numberClick(3)">{{keyBoardNum[13]}}</text>
-      <text  class="inputCommon input1" onclick="operatorClick('+')">{{keyBoardNum[9]}}</text>
+      <text  class="inputCommon input1" style="{{activeOperator === '+' ? 'background-color:#ffffff;color:#000000;' : 'background-color:#3d3d3d;color:#ffffff;'}}" onclick="operatorClick('+')">{{keyBoardNum[9]}}</text>
     </div>
     <div class="keyBoardBox">
       <text class="inputCommon" onclick="numberClick(0)">{{keyBoardNum[16]}}</text>
@@ -33,7 +33,7 @@
       <text class="inputCommon input1 expand-button" onclick="calculate">{{keyBoardNum[18]}}</text>
     </div>
     <div class="back-row">
-      <input onclick="goBack" class="back-button-full" value="返回" />
+      <input onclick="goBack" class="back-button-full" value="{{ i18n.common.back }}" />
     </div>
   </div>
 </template>
@@ -42,7 +42,7 @@
 import router from "@system.router"
 import app from '@system.app'
 import device from '@system.device'
-import { globalState } from "../../common/global_state.js"
+import i18n from "../../common/i18n"
 
 const MinusIcon = '+/-';
 const DelIcon = ' ';
@@ -52,51 +52,35 @@ export default {
     resultShow: '0',
     currentInput: '',
     operator: '',
+    activeOperator: '',
     previousInput: '',
     waitingForOperand: false,
     keyBoardNum: ['C', '7', '8', '9', MinusIcon, DelIcon, '4', '5', '6', '+', 'x', '1', '2', '3', '-', '/', '0', '.', '=', '%'],
     commonColorList: ['#F53333', '#505050', '#505050', '#505050', '#505050', '#FFA626', '#505050', '#505050', '#505050', '#FFA626', '#FFA626', '#505050', '#505050', '#505050', '#FFA626', '#FFA626', '#505050', '#505050', '#FFA626'],
     clickColorList: [],
     signColorList: ['#FFFFFF', '#FFFFFF', '#FFFFFF', '#FFFFFF'],
-    errorMessage: "",
-    currentCategory: 'discrete',
-    selectedDistribution: null,
-    parameters: [],
-    inputValue: 0,
-    pdfResult: "-",
-    pmfResult: "-",
-    cdfResult: "-",
-    discreteDistributions: [
-      { type: 'binomial', name: '二项分布', formula: 'Bin(n, p)' },
-      { type: 'poisson', name: '泊松分布', formula: 'Poi(λ)' },
-      { type: 'geometric', name: '几何分布', formula: 'Geo(p)' },
-      { type: 'negative_binomial', name: '负二项分布', formula: 'NB(r, p)' },
-      { type: 'hypergeometric', name: '超几何分布', formula: 'HG(N, K, n)' }
-    ],
-    continuousDistributions: [
-      { type: 'normal', name: '正态分布', formula: 'N(μ, σ²)' },
-      { type: 'exponential', name: '指数分布', formula: 'Exp(λ)' },
-      { type: 'uniform', name: '均匀分布', formula: 'U(a, b)' },
-      { type: 'gamma', name: '伽马分布', formula: 'Γ(α, β)' },
-      { type: 'beta', name: '贝塔分布', formula: 'Beta(α, β)' }
-    ]
+    currentLang: 'zh-CN',
+    i18n: i18n.getLocaleStrings()
   },
 
   onInit() {
-    this.$page.setTitleBar({ text: '快速计算' })
+    this.refreshI18n()
     this.clickColorList = this.commonColorList.slice()
-    this.selectCategory('discrete')
-    this.importFromGlobal()
   },
 
   onShow() {
-    console.log('Calculator onShow called')
-    this.importFromGlobal()
+    this.refreshI18n()
+  },
+
+  refreshI18n() {
+    this.currentLang = i18n.getCurrentLang()
+    this.i18n = i18n.getLocaleStrings(this.currentLang)
+    this.$page.setTitleBar({ text: i18n.t('pages.calculator.title', this.currentLang) })
+    this.$forceUpdate()
   },
 
   onReady() {
     console.log('Calculator onReady called')
-    this.importFromGlobal()
   },
 
   onResume() {
@@ -112,6 +96,7 @@ export default {
     } else {
       this.resultShow = this.resultShow === '0' ? String(num) : this.resultShow + num
     }
+    this.activeOperator = ''
     this.currentInput = this.resultShow
     this.$forceUpdate()
   },
@@ -130,6 +115,7 @@ export default {
 
     this.waitingForOperand = true
     this.operator = nextOperator
+    this.activeOperator = nextOperator
     this.$forceUpdate()
   },
 
@@ -159,6 +145,7 @@ export default {
     } else if (this.resultShow.indexOf('.') === -1) {
       this.resultShow += '.'
     }
+    this.activeOperator = ''
     this.currentInput = this.resultShow
     this.$forceUpdate()
   },
@@ -169,6 +156,7 @@ export default {
     this.previousInput = ''
     this.operator = ''
     this.waitingForOperand = false
+    this.activeOperator = ''
     this.$forceUpdate()
   },
 
@@ -193,74 +181,7 @@ export default {
   },
 
   goBack() {
-    // Export current values back for the source page to pick up
-    this.exportToGlobal()
     router.back()
-  },
-
-  selectCategory(category) {
-    this.currentCategory = category
-    this.selectedDistribution = null
-    this.parameters = []
-  },
-
-  selectDistribution(type) {
-    this.selectedDistribution = type
-    this.setupParameters(type)
-  },
-
-  setupParameters(type) {
-    const paramMap = {
-      binomial: [
-        { name: '试验次数 n', value: 10, min: 1, max: 100 },
-        { name: '成功概率 p', value: 0.5, min: 0.01, max: 0.99 }
-      ],
-      poisson: [
-        { name: '参数 λ', value: 3.0, min: 0.1, max: 50 }
-      ],
-      geometric: [
-        { name: '成功概率 p', value: 0.3, min: 0.01, max: 0.99 }
-      ],
-      negative_binomial: [
-        { name: '成功次数 r', value: 5, min: 1, max: 50 },
-        { name: '成功概率 p', value: 0.5, min: 0.01, max: 0.99 }
-      ],
-      hypergeometric: [
-        { name: '总体大小 N', value: 50, min: 10, max: 1000 },
-        { name: '成功项数 K', value: 20, min: 1, max: 50 },
-        { name: '抽取数量 n', value: 10, min: 1, max: 50 }
-      ],
-      normal: [
-        { name: '均值 μ', value: 0.0, min: -100, max: 100 },
-        { name: '标准差 σ', value: 1.0, min: 0.01, max: 50 }
-      ],
-      exponential: [
-        { name: '率参数 λ', value: 1.0, min: 0.01, max: 10 }
-      ],
-      uniform: [
-        { name: '下限 a', value: 0.0, min: -100, max: 100 },
-        { name: '上限 b', value: 1.0, min: -100, max: 100 }
-      ],
-      gamma: [
-        { name: '形状参数 α', value: 2.0, min: 0.1, max: 50 },
-        { name: '率参数 β', value: 1.0, min: 0.01, max: 10 }
-      ],
-      beta: [
-        { name: '形状参数 α', value: 2.0, min: 0.1, max: 50 },
-        { name: '形状参数 β', value: 2.0, min: 0.1, max: 50 }
-      ]
-    }
-    this.parameters = paramMap[type] || []
-  },
-
-  incrementInput() {
-    this.inputValue = parseFloat((this.inputValue + 0.1).toFixed(2))
-    this.$forceUpdate()
-  },
-
-  decrementInput() {
-    this.inputValue = parseFloat(Math.max(0, this.inputValue - 0.1).toFixed(2))
-    this.$forceUpdate()
   },
 
   calculate() {
@@ -271,68 +192,9 @@ export default {
       this.previousInput = ''
       this.operator = ''
       this.waitingForOperand = true
-    }
-    
-    // Also handle statistical calculations if parameters are set
-    if (this.parameters.length > 0) {
-      // 模拟计算结果
-      const randomResult = () => (Math.random() * 0.8 + 0.1).toFixed(4)
-      
-      if (this.currentCategory === 'discrete') {
-        this.pmfResult = randomResult()
-        this.pdfResult = "-"
-      } else {
-        this.pdfResult = randomResult()
-        this.pmfResult = "-"
-      }
-      this.cdfResult = randomResult()
+      this.activeOperator = ''
     }
   },
-
-
-
-  importFromGlobal() {
-    const payload = globalState.getCalculatorImport()
-    if (!payload) return
-
-    const { distributionType, paramValues, inputValue } = payload
-
-    // Set category by distribution type
-    const discreteTypes = ['binomial', 'poisson', 'geometric', 'negative_binomial', 'hypergeometric']
-    const isDiscrete = discreteTypes.indexOf(distributionType) !== -1
-    this.currentCategory = isDiscrete ? 'discrete' : 'continuous'
-    this.selectedDistribution = distributionType
-    this.setupParameters(distributionType)
-
-    if (Array.isArray(paramValues)) {
-      for (let i = 0; i < Math.min(paramValues.length, this.parameters.length); i++) {
-        this.parameters[i].value = paramValues[i]
-      }
-    }
-    if (typeof inputValue !== 'undefined') {
-      this.inputValue = inputValue
-    }
-    // Clear import so it is not re-applied
-    globalState.clearCalculatorImport()
-    this.$forceUpdate()
-  },
-
-  exportToGlobal() {
-    const payload = {
-      distributionType: this.selectedDistribution,
-      paramValues: this.parameters.map(p => p.value),
-      inputValue: this.inputValue
-    }
-    globalState.setCalculatorExport(payload)
-  },
-
-  computed: {
-    distributions() {
-      return this.currentCategory === 'discrete' 
-        ? this.discreteDistributions 
-        : this.continuousDistributions
-    }
-  }
 }
 </script>
 
@@ -387,229 +249,5 @@ export default {
 .delIcon {
   width: 30px;
   height: 22px;
-}
-
-/* Legacy styles for statistical calculator features */
-.section {
-  margin-bottom: 25px;
-}
-
-.section-title {
-  font-size: 18px;
-  color: #ffffff;
-  font-weight: bold;
-  margin-bottom: 15px;
-}
-
-.category-tabs {
-  flex-direction: row;
-  justify-content: center;
-  margin-bottom: 15px;
-}
-
-.category-tab {
-  height: 40px;
-  background-color: #222222;
-  border: 1px solid #444444;
-  border-radius: 20px;
-  padding: 0 20px;
-  margin: 0 10px;
-  justify-content: center;
-  align-items: center;
-}
-
-.category-tab.active {
-  background-color: #0066cc;
-  border-color: #0088ff;
-}
-
-.tab-text {
-  font-size: 14px;
-  color: #ffffff;
-}
-
-.distribution-grid {
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: space-between;
-}
-
-.distribution-cell {
-  width: 48%;
-  height: 70px;
-  background-color: #222222;
-  border: 1px solid #444444;
-  border-radius: 10px;
-  margin-bottom: 10px;
-  padding: 10px;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-
-.distribution-cell.selected {
-  background-color: #0066cc;
-  border-color: #0088ff;
-}
-
-.dist-name {
-  font-size: 14px;
-  color: #ffffff;
-  font-weight: bold;
-}
-
-.dist-formula {
-  font-size: 12px;
-  color: #cccccc;
-  margin-top: 2px;
-}
-
-.parameters-card {
-  background-color: #222222;
-  border: 1px solid #444444;
-  border-radius: 10px;
-  padding: 15px;
-}
-
-.param-row {
-  height: 40px;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-  margin-bottom: 10px;
-}
-
-.param-name {
-  font-size: 14px;
-  color: #ffffff;
-  width: 80px;
-}
-
-.param-value {
-  font-size: 14px;
-  color: #00ff00;
-  text-align: center;
-}
-
-.param-display {
-  width: 120px;
-  height: 35px;
-  background-color: #333333;
-  border: 1px solid #555555;
-  border-radius: 6px;
-  justify-content: center;
-  align-items: center;
-}
-
-.calculation-panel {
-  background-color: #222222;
-  border: 1px solid #444444;
-  border-radius: 10px;
-  padding: 20px;
-}
-
-.input-group {
-  height: 50px;
-  flex-direction: row;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.input-label {
-  font-size: 16px;
-  color: #ffffff;
-  margin-right: 15px;
-}
-
-.input-controls {
-  flex: 1;
-  flex-direction: row;
-  align-items: center;
-}
-
-.input-box {
-  width: 100px;
-  height: 35px;
-  background-color: #333333;
-  border: 1px solid #555555;
-  border-radius: 5px;
-  justify-content: center;
-  align-items: center;
-}
-
-.input-buttons {
-  flex-direction: row;
-  margin-left: 10px;
-}
-
-.input-btn {
-  width: 30px;
-  height: 30px;
-  background-color: #444444;
-  border: 1px solid #666666;
-  border-radius: 5px;
-  margin: 0 2px;
-  justify-content: center;
-  align-items: center;
-}
-
-.input-btn-text {
-  font-size: 18px;
-  color: #ffffff;
-  font-weight: bold;
-}
-
-.results-display {
-  flex-direction: column;
-}
-
-.result-box {
-  height: 45px;
-  background-color: #333333;
-  border: 1px solid #555555;
-  border-radius: 8px;
-  padding: 0 15px;
-  margin-bottom: 10px;
-  flex-direction: row;
-  align-items: center;
-  justify-content: space-between;
-}
-
-.result-label {
-  font-size: 14px;
-  color: #ffffff;
-}
-
-.result-value {
-  font-size: 16px;
-  font-weight: bold;
-}
-
-.result-value.pmf {
-  color: #00ff00;
-}
-
-.result-value.pdf {
-  color: #00ff00;
-}
-
-.result-value.cdf {
-  color: #ffaa00;
-}
-
-.calculate-btn {
-  height: 50px;
-  background-color: #0066cc;
-  border: none;
-  border-radius: 10px;
-  margin-top: 20px;
-  justify-content: center;
-  align-items: center;
-}
-
-.btn-text {
-  font-size: 16px;
-  color: #ffffff;
-  font-weight: bold;
 }
 </style>

@@ -1,25 +1,25 @@
 <template>
   <div class="container" @swipe="handleSwipe">
     <div class="top-bar">
-      <text class="page-title">关于应用</text>
+      <text class="page-title">{{ i18n.pages.about.title }}</text>
     </div>
 
     <div class="main-content">
       <div class="content-block">
-        <text class="developer-label">Developer:</text>
+        <text class="developer-label">{{ i18n.pages.about.developer }}</text>
         <text class="developer-name">@goge</text>
       </div>
       <div class="content-block">
-        <text class="version-label">Version:</text>
+        <text class="version-label">{{ i18n.pages.about.version }}</text>
         <text class="version-number">1.0.2</text>
       </div>
       <div class="content-block">
-        <text class="date-label">Date:</text>
+        <text class="date-label">{{ i18n.pages.about.date }}</text>
         <text class="date-text">2025.09</text>
       </div>
 
       <div class="back-button-container">
-        <text class="back-button" @click="goBack">返回</text>
+        <text class="back-button" @click="goBack">{{ i18n.common.back }}</text>
       </div>
     </div>
   </div>
@@ -27,14 +27,25 @@
 
 <script>
 import router from "@system.router"
+import i18n from '../../common/i18n'
 
 export default {
   private: {
-    
+    i18n: i18n.getLocaleStrings()
   },
 
   onInit() {
-    this.$page.setTitleBar({ text: '关于应用' })
+    this.refreshI18n()
+  },
+
+  onShow() {
+    this.refreshI18n()
+  },
+
+  refreshI18n() {
+    this.i18n = i18n.getLocaleStrings()
+    this.$page.setTitleBar({ text: i18n.t('pages.about.title') })
+    this.$forceUpdate()
   },
 
   handleSwipe(event) {

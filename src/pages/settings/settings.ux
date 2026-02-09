@@ -1,27 +1,21 @@
 <template>
   <div class="container" @swipe="handleSwipe">
     <div class="top-bar">
-      <text class="page-title">{{ i18n.pages.guide.title }}</text>
+      <text class="page-title">{{ i18n.pages.settings.title }}</text>
     </div>
 
     <div class="main-menu">
       <scroll class="scroll-container" scroll-y="true">
         <div class="menu-content">
-          <div class="menu-list-item menu-entry" onclick="routeToDistributionGuide()">
+          <div class="menu-list-item menu-entry" onclick="changeLanguage('zh-CN')">
             <div class="menu-item">
-              <text class="menu-title">{{ i18n.pages.guide.distribution }}</text>
+              <text class="{{currentLang === 'zh-CN' ? 'menu-title-active' : 'menu-title'}}">{{ i18n.pages.settings.languages.zh }}</text>
             </div>
           </div>
-          
-          <div class="menu-list-item menu-entry" onclick="routeToTipsGuide()">
+
+          <div class="menu-list-item menu-entry" onclick="changeLanguage('en')">
             <div class="menu-item">
-              <text class="menu-title">{{ i18n.pages.guide.tips }}</text>
-            </div>
-          </div>
-          
-          <div class="menu-list-item menu-entry" onclick="routeToFunctionGuide()">
-            <div class="menu-item">
-              <text class="menu-title">{{ i18n.pages.guide.function }}</text>
+              <text class="{{currentLang === 'en' ? 'menu-title-active' : 'menu-title'}}">{{ i18n.pages.settings.languages.en }}</text>
             </div>
           </div>
 
@@ -38,10 +32,13 @@
 
 <script>
 import router from "@system.router"
+import configuration from '@system.configuration'
+import storage from '@system.storage'
 import i18n from '../../common/i18n'
 
 export default {
   private: {
+    currentLang: 'zh-CN',
     i18n: i18n.getLocaleStrings()
   },
 
@@ -54,31 +51,41 @@ export default {
   },
 
   refreshI18n() {
-    this.i18n = i18n.getLocaleStrings()
-    this.$page.setTitleBar({ text: i18n.t('pages.guide.title') })
+    this.currentLang = i18n.getCurrentLang()
+    this.i18n = i18n.getLocaleStrings(this.currentLang)
+    this.updateTitle()
     this.$forceUpdate()
   },
 
-  goBack() {
-    router.back()
+  updateTitle() {
+    this.$page.setTitleBar({ text: i18n.t('pages.settings.title', this.currentLang) })
+  },
+
+  changeLanguage(lang) {
+    if (this.currentLang === lang) return
+    
+    this.currentLang = lang
+    configuration.setLocale({
+      language: lang === 'zh-CN' ? 'zh' : 'en',
+      countryOrRegion: lang === 'zh-CN' ? 'CN' : 'US'
+    })
+    
+    storage.set({
+      key: 'app_language',
+      value: lang
+    })
+
+    this.refreshI18n()
   },
 
   handleSwipe(event) {
     if (event.direction === 'right') {
-      this.goBack()
+      this.goBack();
     }
   },
 
-  routeToDistributionGuide() {
-    router.push({ uri: 'pages/guide/distribution' })
-  },
-
-  routeToTipsGuide() {
-    router.push({ uri: 'pages/guide/tips' })
-  },
-
-  routeToFunctionGuide() {
-    router.push({ uri: 'pages/guide/function' })
+  goBack() {
+    router.back()
   }
 }
 </script>
@@ -94,10 +101,9 @@ export default {
 .top-bar {
   display: flex;
   height: 75px;
-  flex-direction: row;
-  align-items: center;
-  justify-content: center;
   padding: 15px 20px;
+  justify-content: center;
+  align-items: center;
 }
 
 .page-title {
@@ -124,16 +130,14 @@ export default {
   flex-direction: column;
 }
 
-/* Added style for the new list-item wrapper */
 .menu-list-item {
-  margin-bottom: 10px; /* Reduced spacing to fit better */
+  margin-bottom: 10px;
 }
 
 .menu-entry {
   cursor: pointer;
 }
 
-/* Enhanced menu items */
 .menu-item {
   display: flex;
   height: 75px;
@@ -147,9 +151,16 @@ export default {
 }
 
 .menu-title {
-  font-size: 24px; /* Adjusted title size for new button height */
+  font-size: 24px;
   color: #ffffff;
   font-weight: bold;
-  text-align: center; /* Center the text */
+  text-align: center;
+}
+
+.menu-title-active {
+  font-size: 24px;
+  color: #00ff88;
+  font-weight: bold;
+  text-align: center;
 }
 </style>

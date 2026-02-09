@@ -1,54 +1,54 @@
 <template>
   <div class="container" @swipe="handleSwipe">
     <div class="top-bar">
-      <text class="page-title">函数说明</text>
+      <text class="page-title">{{ i18n.pages.guide.function }}</text>
     </div>
 
     <div class="main-menu">
       <scroll class="scroll-container" scroll-y="true">
         <div class="menu-content">
           <div class="content-block">
-            <text class="block-title">概率密度函数 (PDF)</text>
+            <text class="block-title">{{ i18n.pages.guide.function_content.pdf_title }}</text>
             <div class="block-content">
-              <text class="content-line">概率密度函数描述连续随机变量在各个可能取值上的概率密度</text>
-              <text class="content-line">定义:</text>
-              <text class="content-line">f(x) = dF(x)/dx,</text>
-              <text class="content-line">其中F(x)是累积分布函数</text>
-              <text class="content-line">性质:f(x) ≥ 0, ∫f(x)dx = 1</text>
-              <text class="content-line">应用:计算区间概率, 描述数据分布形状</text>
-              <text class="content-line">使用示例:</text>
-              <text class="content-line">- 正态分布PDF:计算某个值附近的概率密度</text>
-              <text class="content-line">- 指数分布PDF:分析设备故障率</text>
+              <text class="content-line">{{ i18n.pages.guide.function_content.pdf_line_1 }}</text>
+              <text class="content-line">{{ i18n.pages.guide.function_content.pdf_line_2 }}</text>
+              <text class="content-line">{{ i18n.pages.guide.function_content.pdf_line_3 }}</text>
+              <text class="content-line">{{ i18n.pages.guide.function_content.pdf_line_4 }}</text>
+              <text class="content-line">{{ i18n.pages.guide.function_content.pdf_line_5 }}</text>
+              <text class="content-line">{{ i18n.pages.guide.function_content.pdf_line_6 }}</text>
+              <text class="content-line">{{ i18n.pages.guide.function_content.pdf_line_7 }}</text>
+              <text class="content-line">{{ i18n.pages.guide.function_content.pdf_line_8 }}</text>
+              <text class="content-line">{{ i18n.pages.guide.function_content.pdf_line_9 }}</text>
             </div>
           </div>
           
           <div class="content-block">
-            <text class="block-title">概率质量函数 (PMF)</text>
+            <text class="block-title">{{ i18n.pages.guide.function_content.pmf_title }}</text>
             <div class="block-content">
-              <text class="content-line">概率质量函数描述离散随机变量取各个可能值的概率</text>
-              <text class="content-line">定义:</text>
-              <text class="content-line">Pr(X = x) = p(x)</text>
-              <text class="content-line">性质:</text>
-              <text class="content-line">Pr(X = x) ≥ 0, ΣPr(X = x) = 1</text>
-              <text class="content-line">应用:计算离散事件的精确概率</text>
-              <text class="content-line">使用示例:</text>
-              <text class="content-line">- 二项分布PMF:计算恰好成功k次的概率</text>
-              <text class="content-line">- 泊松分布PMF:计算单位时间内事件发生次数概率</text>
+              <text class="content-line">{{ i18n.pages.guide.function_content.pmf_line_1 }}</text>
+              <text class="content-line">{{ i18n.pages.guide.function_content.pmf_line_2 }}</text>
+              <text class="content-line">{{ i18n.pages.guide.function_content.pmf_line_3 }}</text>
+              <text class="content-line">{{ i18n.pages.guide.function_content.pmf_line_4 }}</text>
+              <text class="content-line">{{ i18n.pages.guide.function_content.pmf_line_5 }}</text>
+              <text class="content-line">{{ i18n.pages.guide.function_content.pmf_line_6 }}</text>
+              <text class="content-line">{{ i18n.pages.guide.function_content.pmf_line_7 }}</text>
+              <text class="content-line">{{ i18n.pages.guide.function_content.pmf_line_8 }}</text>
+              <text class="content-line">{{ i18n.pages.guide.function_content.pmf_line_9 }}</text>
             </div>
           </div>
           
           <div class="content-block">
-            <text class="block-title">累积分布函数 (CDF)</text>
+            <text class="block-title">{{ i18n.pages.guide.function_content.cdf_title }}</text>
             <div class="block-content">
-              <text class="content-line">累积分布函数描述随机变量小于等于某个值的概率</text>
-              <text class="content-line">定义:</text>
-              <text class="content-line">F(x) = Pr(X ≤ x)</text>
-              <text class="content-line">性质:</text>
-              <text class="content-line">F(-∞) = 0, F(+∞) = 1</text>
-              <text class="content-line">应用:计算区间概率, 分位数计算</text>
-              <text class="content-line">使用示例:</text>
-              <text class="content-line">- 正态分布CDF:计算标准化考试成绩排名</text>
-              <text class="content-line">- 指数分布CDF:计算设备在时间t前故障的概率</text>
+              <text class="content-line">{{ i18n.pages.guide.function_content.cdf_line_1 }}</text>
+              <text class="content-line">{{ i18n.pages.guide.function_content.cdf_line_2 }}</text>
+              <text class="content-line">{{ i18n.pages.guide.function_content.cdf_line_3 }}</text>
+              <text class="content-line">{{ i18n.pages.guide.function_content.cdf_line_4 }}</text>
+              <text class="content-line">{{ i18n.pages.guide.function_content.cdf_line_5 }}</text>
+              <text class="content-line">{{ i18n.pages.guide.function_content.cdf_line_6 }}</text>
+              <text class="content-line">{{ i18n.pages.guide.function_content.cdf_line_7 }}</text>
+              <text class="content-line">{{ i18n.pages.guide.function_content.cdf_line_8 }}</text>
+              <text class="content-line">{{ i18n.pages.guide.function_content.cdf_line_9 }}</text>
             </div>
           </div>
 <!--           
@@ -116,7 +116,7 @@
           </div> -->
 
           <div class="back-button-container">
-            <text class="back-button" @click="goBack">返回</text>
+            <text class="back-button" @click="goBack">{{ i18n.common.back }}</text>
           </div>
         </div>
       </scroll>
@@ -126,14 +126,25 @@
 
 <script>
 import router from "@system.router"
+import i18n from '../../../common/i18n'
 
 export default {
   private: {
-    
+    i18n: i18n.getLocaleStrings()
   },
 
   onInit() {
-    this.$page.setTitleBar({ text: '概率函数' })
+    this.refreshI18n()
+  },
+
+  onShow() {
+    this.refreshI18n()
+  },
+
+  refreshI18n() {
+    this.i18n = i18n.getLocaleStrings()
+    this.$page.setTitleBar({ text: i18n.t('pages.guide.function') })
+    this.$forceUpdate()
   },
 
   goBack() {
@@ -241,7 +252,6 @@ export default {
   font-size: 20px;
   color: #ffffff;
   background-color: #333333;
-  border: 1px solid #555555;
   border-radius: 12px;
   padding: 12px 24px;
   text-align: center;

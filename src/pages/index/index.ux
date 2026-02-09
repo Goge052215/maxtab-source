@@ -1,49 +1,71 @@
 <template>
   <div class="container" @swipe="handleSwipe">
     <div class="top-bar">
-      <text class="app-title">MaxTab</text>
+      <text class="app-title">{{ i18n.index.title }}</text>
     </div>
 
     <div class="main-menu">
-      <div class="menu-list-item menu-entry" onclick="routeToDiscrete()">
-        <div class="menu-item">
-          <text class="menu-title">离散分布</text>
-        </div>
-      </div>
-      
-      <div class="menu-list-item menu-entry" onclick="routeToContinuous()">
-        <div class="menu-item">
-          <text class="menu-title">连续分布</text>
-        </div>
-      </div>
+      <scroll class="scroll-container" scroll-y="true">
+        <div class="menu-content">
+          <div class="menu-list-item menu-entry" onclick="routeToDiscrete()">
+            <div class="menu-item">
+              <text class="menu-title">{{ i18n.index.menu.discrete }}</text>
+            </div>
+          </div>
+          
+          <div class="menu-list-item menu-entry" onclick="routeToContinuous()">
+            <div class="menu-item">
+              <text class="menu-title">{{ i18n.index.menu.continuous }}</text>
+            </div>
+          </div>
 
-      <div class="menu-list-item menu-entry" onclick="routeToGuide()">
-        <div class="menu-item">
-          <text class="menu-title">使用指南</text>
-        </div>
-      </div>
+          <div class="menu-list-item menu-entry" onclick="">
+            <div class="menu-item">
+              <text class="menu-title">{{ i18n.index.menu.hypothesis }}</text>
+            </div>
+          </div>
 
-      <div class="menu-list-item menu-entry" onclick="routeToSimple()">
-        <div class="menu-item">
-          <text class="menu-title">计算器</text>
+          <div class="menu-list-item menu-entry" onclick="">
+            <div class="menu-item">
+              <text class="menu-title">{{ i18n.index.menu.simulation }}</text>
+            </div>
+          </div>
+
+          <div class="menu-list-item menu-entry" onclick="routeToGuide()">
+            <div class="menu-item">
+              <text class="menu-title">{{ i18n.index.menu.guide }}</text>
+            </div>
+          </div>
+
+          <div class="menu-list-item menu-entry" onclick="routeToSimple()">
+            <div class="menu-item">
+              <text class="menu-title">{{ i18n.index.menu.calculator }}</text>
+            </div>
+          </div>
+          
+          <!-- <div class="menu-list-item menu-entry" onclick="routeToHistory()">
+            <div class="menu-item">
+              <text class="menu-title">计算历史</text> 后续更新会加
+            </div>
+          </div> -->
+          
+          <div class="menu-list-item menu-entry" onclick="routeToSettings()">
+            <div class="menu-item">
+              <text class="menu-title">{{ i18n.index.menu.settings }}</text>
+            </div>
+          </div>
+          
+          <div class="menu-list-item menu-entry" onclick="routeToAbout()">
+            <div class="menu-item">
+              <text class="menu-title">{{ i18n.index.menu.about }}</text>
+            </div>
+          </div>
         </div>
-      </div>
-      
-      <!-- <div class="menu-list-item menu-entry" onclick="routeToHistory()">
-        <div class="menu-item">
-          <text class="menu-title">计算历史</text> 后续更新会加
-        </div>
-      </div> -->
-      
-      <div class="menu-list-item menu-entry" onclick="routeToAbout()">
-        <div class="menu-item">
-          <text class="menu-title">关于</text>
-        </div>
-      </div>
+      </scroll>
     </div>
 
     <div class="footer">
-      <text class="footer-text">v1.0.2</text>
+      <text class="footer-text">{{ i18n.index.footer_version }}</text>
     </div>
   </div>
 </template>
@@ -51,14 +73,25 @@
 <script>
 import router from "@system.router"
 import app from '@system.app'
+import i18n from '../../common/i18n'
 
 export default {
   private: {
-    title: "统计分布计算器"
+    i18n: i18n.getLocaleStrings()
   },
 
   onInit() {
-    this.$page.setTitleBar({ text: '统计分布计算器' })
+    this.refreshI18n()
+  },
+
+  onShow() {
+    this.refreshI18n()
+  },
+
+  refreshI18n() {
+    this.i18n = i18n.getLocaleStrings()
+    this.$page.setTitleBar({ text: i18n.t('index.title') })
+    this.$forceUpdate()
   },
 
   routeToDiscrete() {
@@ -75,6 +108,10 @@ export default {
 
   routeToHistory() {
     router.push({ uri: 'pages/history' })
+  },
+
+  routeToSettings() {
+    router.push({ uri: 'pages/settings' })
   },
 
   routeToAbout() {
@@ -107,16 +144,14 @@ export default {
 
 .top-bar {
   display: flex;
-  height: 80px;
-  background-color: #111111;
+  height: 75px;
   padding: 15px 20px;
   justify-content: center;
   align-items: center;
-  border-bottom: 1px solid #333333;
 }
 
 .app-title {
-  font-size: 22px;
+  font-size: 24px;
   color: #ffffff;
   font-weight: bold;
 }
@@ -124,7 +159,18 @@ export default {
 .main-menu {
   display: flex;
   flex: 1;
-  padding: 20px;
+  flex-direction: column;
+  height: 0;
+}
+
+.scroll-container {
+  flex: 1;
+  width: 100%;
+  flex-direction: column;
+}
+
+.menu-content {
+  padding: 20px 20px 40px 20px;
   flex-direction: column;
 }
 
@@ -141,19 +187,18 @@ export default {
 /* Enhanced menu items */
 .menu-item {
   display: flex;
-  height: 60px; /* Reduced height since no description */
-  width: 100%; /* Ensure consistent width */
+  height: 75px;
+  width: 100%;
   background-color: #222222;
-  border: 1px solid #444444;
-  border-radius: 12px; /* Slightly reduced border radius */
-  padding: 15px 20px; /* Adjusted padding for centered text */
+  border-radius: 12px;
+  padding: 15px 20px;
   flex-direction: column;
   justify-content: center;
-  align-items: center; /* Center text horizontally */
+  align-items: center;
 }
 
 .menu-title {
-  font-size: 20px; /* Adjusted title size for new button height */
+  font-size: 24px; /* Adjusted title size for new button height */
   color: #ffffff;
   font-weight: bold;
   text-align: center; /* Center the text */
@@ -161,15 +206,13 @@ export default {
 
 .footer {
   display: flex;
-  height: 40px;
-  background-color: #111111;
-  border-top: 1px solid #333333;
+  height: 50px;
   justify-content: center;
   align-items: center;
 }
 
 .footer-text {
-  font-size: 14px;
+  font-size: 20px;
   color: #666666;
 }
 </style>

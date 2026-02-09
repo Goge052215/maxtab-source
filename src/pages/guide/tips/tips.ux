@@ -1,52 +1,52 @@
 <template>
   <div class="container" @swipe="handleSwipe">
     <div class="top-bar">
-      <text class="page-title">使用技巧</text>
+      <text class="page-title">{{ i18n.pages.guide.tips }}</text>
     </div>
 
     <div class="main-menu">
       <scroll class="scroll-container" scroll-y="true">
         <div class="menu-content">
           <div class="content-block">
-            <text class="block-title">输入技巧</text>
+            <text class="block-title">{{ i18n.pages.guide.tips_content.input_title }}</text>
             <div class="block-content">
-              <text class="content-line">参数输入规范</text>
-              <text class="content-line">• 数值参数:支持小数和整数,如μ=0,σ=1.5</text>
-              <text class="content-line">• 范围限制:注意参数的有效范围,如概率p∈[0,1]</text>
-              <text class="content-line">• 特殊值:支持科学计数法,如1e-6</text>
-              <text class="content-line">• 负数输入:使用负号,如μ=-2.5</text>
-              <text class="content-line"></text>
-              <text class="content-line">常见输入错误</text>
-              <text class="content-line">• 概率参数超出[0,1]范围</text>
-              <text class="content-line">• 方差或标准差为负值</text>
-              <text class="content-line">• 整数参数输入小数(如试验次数n=10.5)</text>
-              <text class="content-line">• 遗漏必需参数</text>
-              <text class="content-line"></text>
-              <text class="content-line">快速输入方法</text>
-              <text class="content-line">• 使用预设值:点击常用参数组合</text>
-              <text class="content-line">• 滑块调节:拖动滑块快速调整参数</text>
-              <text class="content-line">• 键盘快捷键:Tab键切换参数输入框</text>
-              <text class="content-line">• 历史记录:选择之前使用过的参数组合</text>
+              <text class="content-line">{{ i18n.pages.guide.tips_content.input_line_1 }}</text>
+              <text class="content-line">{{ i18n.pages.guide.tips_content.input_line_2 }}</text>
+              <text class="content-line">{{ i18n.pages.guide.tips_content.input_line_3 }}</text>
+              <text class="content-line">{{ i18n.pages.guide.tips_content.input_line_4 }}</text>
+              <text class="content-line">{{ i18n.pages.guide.tips_content.input_line_5 }}</text>
+              <text class="content-line">{{ i18n.pages.guide.tips_content.input_line_6 }}</text>
+              <text class="content-line">{{ i18n.pages.guide.tips_content.input_line_7 }}</text>
+              <text class="content-line">{{ i18n.pages.guide.tips_content.input_line_8 }}</text>
+              <text class="content-line">{{ i18n.pages.guide.tips_content.input_line_9 }}</text>
+              <text class="content-line">{{ i18n.pages.guide.tips_content.input_line_10 }}</text>
+              <text class="content-line">{{ i18n.pages.guide.tips_content.input_line_11 }}</text>
+              <text class="content-line">{{ i18n.pages.guide.tips_content.input_line_12 }}</text>
+              <text class="content-line">{{ i18n.pages.guide.tips_content.input_line_13 }}</text>
+              <text class="content-line">{{ i18n.pages.guide.tips_content.input_line_14 }}</text>
+              <text class="content-line">{{ i18n.pages.guide.tips_content.input_line_15 }}</text>
+              <text class="content-line">{{ i18n.pages.guide.tips_content.input_line_16 }}</text>
+              <text class="content-line">{{ i18n.pages.guide.tips_content.input_line_17 }}</text>
             </div>
           </div>
           
           <div class="content-block">
-            <text class="block-title">结果解读</text>
+            <text class="block-title">{{ i18n.pages.guide.tips_content.result_title }}</text>
             <div class="block-content">
-              <text class="content-line">概率值理解</text>
-              <text class="content-line">• 概率范围:所有概率值都在[0,1]之间</text>
-              <text class="content-line">• 累积概率:CDF值表示"不超过某值"的概率</text>
-              <text class="content-line">• 密度vs概率:PDF值可能大于1, 但不是概率</text>
-              <text class="content-line"></text>
-              <text class="content-line">数值精度</text>
-              <text class="content-line">• 显示精度:默认保留4位小数</text>
-              <text class="content-line">• 科学计数法:极小值自动转换格式</text>
-              <text class="content-line">• 舍入误差:注意计算精度限制</text>
-              <text class="content-line">• 数值稳定性:极端参数可能导致计算不稳定</text>
+              <text class="content-line">{{ i18n.pages.guide.tips_content.result_line_1 }}</text>
+              <text class="content-line">{{ i18n.pages.guide.tips_content.result_line_2 }}</text>
+              <text class="content-line">{{ i18n.pages.guide.tips_content.result_line_3 }}</text>
+              <text class="content-line">{{ i18n.pages.guide.tips_content.result_line_4 }}</text>
+              <text class="content-line">{{ i18n.pages.guide.tips_content.result_line_5 }}</text>
+              <text class="content-line">{{ i18n.pages.guide.tips_content.result_line_6 }}</text>
+              <text class="content-line">{{ i18n.pages.guide.tips_content.result_line_7 }}</text>
+              <text class="content-line">{{ i18n.pages.guide.tips_content.result_line_8 }}</text>
+              <text class="content-line">{{ i18n.pages.guide.tips_content.result_line_9 }}</text>
+              <text class="content-line">{{ i18n.pages.guide.tips_content.result_line_10 }}</text>
             </div>
           </div>
           <div class="back-button-container">
-            <text class="back-button" @click="goBack">返回</text>
+            <text class="back-button" @click="goBack">{{ i18n.common.back }}</text>
           </div>
         </div>
       </scroll>
@@ -56,14 +56,25 @@
 
 <script>
 import router from "@system.router"
+import i18n from '../../../common/i18n'
 
 export default {
   private: {
-    
+    i18n: i18n.getLocaleStrings()
   },
 
   onInit() {
-    this.$page.setTitleBar({ text: '使用技巧' })
+    this.refreshI18n()
+  },
+
+  onShow() {
+    this.refreshI18n()
+  },
+
+  refreshI18n() {
+    this.i18n = i18n.getLocaleStrings()
+    this.$page.setTitleBar({ text: i18n.t('pages.guide.tips') })
+    this.$forceUpdate()
   },
 
   goBack() {
@@ -172,7 +183,6 @@ export default {
   font-size: 20px;
   color: #ffffff;
   background-color: #333333;
-  border: 1px solid #555555;
   border-radius: 12px;
   padding: 12px 24px;
   text-align: center;

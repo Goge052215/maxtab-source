@@ -1,13 +1,13 @@
 <template>
   <div class="container" @swipe="handleSwipe">
     <div class="top-bar">
-      <text class="page-title">计算历史</text>
+      <text class="page-title">{{ i18n.pages.history.title }}</text>
     </div>
 
     <div class="main-menu">
       <div class="empty-state" if="history.length === 0">
-        <text class="empty-title">暂无计算历史</text>
-        <text class="empty-desc">开始计算后，历史记录将显示在这里</text>
+        <text class="empty-title">{{ i18n.pages.history.empty_title }}</text>
+        <text class="empty-desc">{{ i18n.pages.history.empty_desc }}</text>
       </div>
 
       <div class="content-scroll" if="history.length > 0">
@@ -15,19 +15,19 @@
           <div class="menu-list-item" for="{{ item in history }}">
             <div class="menu-item">
               <text class="menu-title">{{ item.distributionName }}</text>
-              <text class="menu-subtitle">{{ item.time }} • 输入值: {{ item.inputValue }}</text>
-              <text class="menu-result">{{ item.densityLabel }}: {{ item.densityValue }} | CDF: {{ item.cdfValue }}</text>
+              <text class="menu-subtitle">{{ item.time }} • {{ i18n.pages.history.input_value }}: {{ item.inputValue }}</text>
+              <text class="menu-result">{{ item.densityLabel }}: {{ item.densityValue }} | {{ i18n.labels.cdf }}: {{ item.cdfValue }}</text>
             </div>
           </div>
         </div>
       </div>
 
       <div class="button-container" if="history.length > 0">
-        <text class="action-button clear-button" onclick="clearHistory">清空历史</text>
+        <text class="action-button clear-button" onclick="clearHistory">{{ i18n.pages.history.clear }}</text>
       </div>
 
       <div class="back-button-container">
-        <text class="back-button" @click="goBack">返回</text>
+        <text class="back-button" @click="goBack">{{ i18n.common.back }}</text>
       </div>
     </div>
   </div>
@@ -35,75 +35,87 @@
 
 <script>
 import router from "@system.router"
+import i18n from "../../common/i18n"
 
 export default {
   private: {
-    history: []
+    history: [],
+    currentLang: 'zh-CN',
+    i18n: i18n.getLocaleStrings()
   },
 
   onInit() {
-    this.$page.setTitleBar({ text: '计算历史' })
+    this.refreshI18n()
     this.loadHistory()
   },
 
   onShow() {
+    this.refreshI18n()
     this.loadHistory()
   },
 
+  refreshI18n() {
+    this.currentLang = i18n.getCurrentLang()
+    this.i18n = i18n.getLocaleStrings(this.currentLang)
+    this.$page.setTitleBar({ text: i18n.t('pages.history.title', this.currentLang) })
+    this.$forceUpdate()
+  },
+
   loadHistory() {
-    // 模拟加载历史数据
+    const todayLabel = i18n.t('pages.history.today', this.currentLang)
+    const yesterdayLabel = i18n.t('pages.history.yesterday', this.currentLang)
     this.history = [
       {
-        distributionName: '正态分布',
+        distributionName: i18n.t('distributions.normal.title', this.currentLang),
         distributionType: 'normal',
         category: 'continuous',
-        time: '今天 14:30',
+        time: `${todayLabel} 14:30`,
         parameters: [
           { name: 'μ', value: 0 },
           { name: 'σ', value: 1 }
         ],
         inputValue: 1.96,
-        densityLabel: '概率密度',
+        densityLabel: i18n.t('labels.pdf', this.currentLang),
         densityValue: '0.0584',
         cdfValue: '0.9750'
       },
       {
-        distributionName: '二项分布',
+        distributionName: i18n.t('distributions.binomial.title', this.currentLang),
         distributionType: 'binomial',
         category: 'discrete',
-        time: '今天 10:15',
+        time: `${todayLabel} 10:15`,
         parameters: [
           { name: 'n', value: 20 },
           { name: 'p', value: 0.3 }
         ],
         inputValue: 5,
-        densityLabel: '概率质量',
+        densityLabel: i18n.t('labels.pmf', this.currentLang),
         densityValue: '0.1789',
         cdfValue: '0.4164'
       },
       {
-        distributionName: '泊松分布',
+        distributionName: i18n.t('distributions.poisson.title', this.currentLang),
         distributionType: 'poisson',
         category: 'discrete',
-        time: '昨天 16:45',
+        time: `${yesterdayLabel} 16:45`,
         parameters: [
           { name: 'λ', value: 2.5 }
         ],
         inputValue: 3,
-        densityLabel: '概率质量',
+        densityLabel: i18n.t('labels.pmf', this.currentLang),
         densityValue: '0.2138',
         cdfValue: '0.7576'
       },
       {
-        distributionName: '指数分布',
+        distributionName: i18n.t('distributions.exponential.title', this.currentLang),
         distributionType: 'exponential',
         category: 'continuous',
-        time: '昨天 09:20',
+        time: `${yesterdayLabel} 09:20`,
         parameters: [
           { name: 'λ', value: 1.5 }
         ],
         inputValue: 2,
-        densityLabel: '概率密度',
+        densityLabel: i18n.t('labels.pdf', this.currentLang),
         densityValue: '0.3347',
         cdfValue: '0.9502'
       }
@@ -140,7 +152,7 @@ export default {
 
   getTodayCalculations() {
     // 简化的今日计算统计
-    return this.history.filter(item => item.time.includes('今天')).length
+    return this.history.filter(item => item.time.includes(i18n.t('pages.history.today', this.currentLang))).length
   }
 }
 </script>
@@ -220,15 +232,14 @@ export default {
 /* Enhanced menu items for history */
 .menu-item {
   display: flex;
-  height: 90px;
+  height: 70px;
   width: 100%;
   background-color: #222222;
-  border: 1px solid #444444;
   border-radius: 12px;
   padding: 15px 20px;
   flex-direction: column;
   justify-content: center;
-  align-items: flex-start;
+  align-items: center;
 }
 
 .menu-title {
@@ -259,19 +270,17 @@ export default {
 }
 
 .action-button {
-  width: 70%;
-  height: 60px;
+  width: 100%;
+  height: 70px;
   font-size: 18px;
   color: #ffffff;
-  border: 1px solid #555555;
-  border-radius: 8px;
-  padding: 15px 24px;
+  border-radius: 12px;
+  padding: 15px 20px;
   text-align: center;
 }
 
 .clear-button {
   background-color: #ff4444;
-  border-color: #ff6666;
 }
 
 .back-button-container {
@@ -287,7 +296,6 @@ export default {
   font-size: 20px;
   color: #ffffff;
   background-color: #333333;
-  border: 1px solid #555555;
   border-radius: 8px;
   padding: 15px 24px;
   text-align: center;

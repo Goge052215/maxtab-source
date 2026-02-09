@@ -1,57 +1,74 @@
 <template>
   <div class="container" @swipe="handleSwipe">
     <div class="top-bar">
-      <text class="page-title">离散分布</text>
+      <text class="page-title">{{ i18n.pages.discrete.title }}</text>
     </div>
 
     <div class="main-menu">
-      <div class="menu-list-item menu-entry" onclick="routeToBin()">
-        <div class="menu-item">
-          <text class="menu-title">二项分布</text>
-        </div>
-      </div>
-      
-      <div class="menu-list-item menu-entry" onclick="routeToPoisson()">
-        <div class="menu-item">
-          <text class="menu-title">泊松分布</text>
-        </div>
-      </div>
-      
-      <div class="menu-list-item menu-entry" onclick="routeToGeometric()">
-        <div class="menu-item">
-          <text class="menu-title">几何分布</text>
-        </div>
-      </div>
-      
-      <div class="menu-list-item menu-entry" onclick="routeToNegativeBinomial()">
-        <div class="menu-item">
-          <text class="menu-title">负二项分布</text>
-        </div>
-      </div>
-      
-      <div class="menu-list-item menu-entry" onclick="routeToHypergeometric()">
-        <div class="menu-item">
-          <text class="menu-title">超几何分布</text>
-        </div>
-      </div>
+      <scroll class="scroll-container" scroll-y="true">
+        <div class="menu-content">
+          <div class="menu-list-item menu-entry" onclick="routeToBin()">
+            <div class="menu-item">
+              <text class="menu-title">{{ i18n.pages.discrete.binomial }}</text>
+            </div>
+          </div>
+          
+          <div class="menu-list-item menu-entry" onclick="routeToPoisson()">
+            <div class="menu-item">
+              <text class="menu-title">{{ i18n.pages.discrete.poisson }}</text>
+            </div>
+          </div>
+          
+          <div class="menu-list-item menu-entry" onclick="routeToGeometric()">
+            <div class="menu-item">
+              <text class="menu-title">{{ i18n.pages.discrete.geometric }}</text>
+            </div>
+          </div>
+          
+          <div class="menu-list-item menu-entry" onclick="routeToNegativeBinomial()">
+            <div class="menu-item">
+              <text class="menu-title">{{ i18n.pages.discrete.negative_binomial }}</text>
+            </div>
+          </div>
+          
+          <div class="menu-list-item menu-entry" onclick="routeToHypergeometric()">
+            <div class="menu-item">
+              <text class="menu-title">{{ i18n.pages.discrete.hypergeometric }}</text>
+            </div>
+          </div>
 
-      <div class="back-button-container">
-        <text class="back-button" @click="goBack">返回</text>
-      </div>
+          <div class="menu-list-item menu-entry" onclick="goBack">
+            <div class="menu-item">
+              <text class="menu-title">{{ i18n.common.back }}</text>
+            </div>
+          </div>
+        </div>
+      </scroll>
     </div>
   </div>
 </template>
 
 <script>
 import router from "@system.router"
+import i18n from '../../common/i18n'
 
 export default {
   private: {
-    
+    i18n: i18n.getLocaleStrings()
   },
 
   onInit() {
-    this.$page.setTitleBar({ text: '离散分布' })
+    this.refreshI18n()
+  },
+
+  onShow() {
+    this.refreshI18n()
+  },
+
+  refreshI18n() {
+    this.i18n = i18n.getLocaleStrings()
+    this.$page.setTitleBar({ text: i18n.t('pages.discrete.title') })
+    this.$forceUpdate()
   },
 
   goBack() {
@@ -88,51 +105,42 @@ export default {
 
 <style>
 .container {
+  display: flex;
   flex-direction: column;
   background-color: #000000;
   height: 100%;
 }
 
 .top-bar {
-  height: 60px;
-  background-color: #111111;
+  display: flex;
+  height: 75px;
   flex-direction: row;
   align-items: center;
   justify-content: center;
-  padding: 0 15px;
-  border-bottom: 1px solid #333333;
+  padding: 15px 20px;
 }
 
 .page-title {
-  font-size: 20px;
+  font-size: 24px;
   color: #ffffff;
   font-weight: bold;
-}
-
-.back-button-container {
-  margin-top: 20px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.back-button {
-  width: 60%;
-  height: 50px;
-  font-size: 20px;
-  color: #ffffff;
-  background-color: #333333;
-  border: 1px solid #555555;
-  border-radius: 12px;
-  padding: 12px 24px;
-  text-align: center;
-  cursor: pointer;
 }
 
 .main-menu {
   display: flex;
   flex: 1;
-  padding: 20px;
+  flex-direction: column;
+  height: 0;
+}
+
+.scroll-container {
+  flex: 1;
+  width: 100%;
+  flex-direction: column;
+}
+
+.menu-content {
+  padding: 20px 20px 40px 20px;
   flex-direction: column;
 }
 
@@ -148,19 +156,18 @@ export default {
 /* Enhanced menu items */
 .menu-item {
   display: flex;
-  height: 60px; /* Reduced height since no description */
-  width: 100%; /* Ensure consistent width */
+  height: 75px;
+  width: 100%;
   background-color: #222222;
-  border: 1px solid #444444;
-  border-radius: 12px; /* Slightly reduced border radius */
-  padding: 15px 20px; /* Adjusted padding for centered text */
+  border-radius: 12px;
+  padding: 15px 20px;
   flex-direction: column;
   justify-content: center;
-  align-items: center; /* Center text horizontally */
+  align-items: center;
 }
 
 .menu-title {
-  font-size: 20px; /* Adjusted title size for new button height */
+  font-size: 24px; /* Adjusted title size for new button height */
   color: #ffffff;
   font-weight: bold;
   text-align: center; /* Center the text */
