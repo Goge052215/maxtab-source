@@ -84,7 +84,7 @@
 
 <script>
 import router from "@system.router"
-import { NativeBridge } from "../../../common/native_bridge"
+import { NativeBridge } from "../../../common/distribution_engine"
 import { globalState } from "../../../common/global_state.js"
 import i18n from "../../../common/i18n"
 

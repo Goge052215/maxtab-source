@@ -45,12 +45,12 @@
       "uniform": "均匀分布",
       "gamma": "伽马分布",
       "beta": "β分布",
-      "weibull": "Weibull分布",
+      "weibull": "Weibull",
       "chisquare": "卡方分布",
       "student": "t分布",
       "f": "F分布",
-      "pareto": "Pareto分布",
-      "rayleigh": "Rayleigh分布",
+      "pareto": "Pareto",
+      "rayleigh": "Rayleigh",
       "back": "返回"
     },
     "guide": {

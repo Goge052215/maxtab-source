@@ -4,9 +4,6 @@ import {
   ABRAMOWITZ_STEGUN_COEFF, 
   ABRAMOWITZ_STEGUN_CONST } from './constants.js';
 
-// Directly use the JS calculation to prevent error output in console and cause delay
-console.log('Native module initialization: JavaScript implementation mode (fallback)');
-
 const DISTRIBUTION_TYPES = {
   DIST_NORMAL: 0,
   DIST_EXPONENTIAL: 1,

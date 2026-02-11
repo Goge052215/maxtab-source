@@ -161,28 +161,28 @@ export default {
 
 <style>
 .container {
+  display: flex;
   flex-direction: column;
   background-color: #000000;
   height: 100%;
 }
 
 .top-bar {
-  height: 60px;
-  background-color: #111111;
-  flex-direction: row;
-  align-items: center;
+  display: flex;
+  height: 75px;
+  padding: 15px 20px;
   justify-content: center;
-  padding: 0 15px;
-  border-bottom: 1px solid #333333;
+  align-items: center;
 }
 
 .page-title {
-  font-size: 20px;
+  font-size: 24px;
   color: #ffffff;
   font-weight: bold;
 }
 
 .main-menu {
+  display: flex;
   flex: 1;
   flex-direction: column;
   height: 0;
@@ -195,36 +195,30 @@ export default {
 }
 
 .menu-content {
-  padding: 10px 5px;
+  padding: 20px 20px 40px 20px;
   flex-direction: column;
   width: 100%;
 }
 
 .content-block {
-    margin-bottom: 40px;
-    background-color: #222222;
-    border: 1px solid #444444;
-    border-radius: 16px;
-    padding: 40px 20px;
-    flex-direction: column;
-    min-height: 420px;
-    width: 100%;
-    align-self: center;
-  }
+  margin-bottom: 10px;
+  background-color: #222222;
+  border-radius: 12px;
+  padding: 15px 20px;
+  flex-direction: column;
+  width: 100%;
+}
   
   .block-title {
-    font-size: 22px;
-    color: #ffffff;
-    font-weight: bold;
-    margin-bottom: 15px;
-    padding: 0 0px;
-    text-align: left;
-  }
+  font-size: 24px;
+  color: #ffffff;
+  font-weight: bold;
+  margin-bottom: 10px;
+  text-align: center;
+}
 
 .block-content {
-  color: #cccccc;
   width: 100%;
-  padding: 10px 0;
   flex-direction: column;
 }
 
@@ -236,26 +230,27 @@ export default {
 
 .content-line {
   font-size: 20px;
+  color: #e0e0e0;
   margin-bottom: 10px;
 }
 
 .back-button-container {
-  margin-top: 20px;
+  margin-top: 10px;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
 .back-button {
-  width: 60%;
-  height: 50px;
-  font-size: 20px;
+  width: 100%;
+  height: 75px;
+  font-size: 24px;
   color: #ffffff;
-  background-color: #333333;
-  border-radius: 12px;
-  padding: 12px 24px;
+  background-color: #222222;
+  border-radius: 10px;
+  padding: 15px 20px;
   text-align: center;
   cursor: pointer;
-  margin-bottom: 20px;
+  margin-bottom: 10px;
 }
 </style>
