@@ -71,7 +71,7 @@
 
 <script>
 import router from "@system.router"
-import { NativeBridge } from "../../../common/distribution_engine"
+import { DistributionCalculator } from "../../../common/distribution_engine"
 import { globalState } from "../../../common/global_state.js"
 import i18n from "../../../common/i18n"
 
@@ -273,8 +273,8 @@ export default {
       return
     }
 
-    // Use optimized C calculation
-    const result = NativeBridge.exponentialDistribution(this.lambda, this.x)
+    // Use optimized JS calculation
+    const result = DistributionCalculator.exponentialDistribution(this.lambda, this.x)
     
     if (result.success) {
       router.push({

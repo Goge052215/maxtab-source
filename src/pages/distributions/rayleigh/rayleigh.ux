@@ -71,7 +71,7 @@
 
 <script>
 import router from "@system.router"
-import { NativeBridge } from "../../../common/distribution_engine"
+import { DistributionCalculator } from "../../../common/distribution_engine"
 import { globalState } from "../../../common/global_state.js"
 import i18n from "../../../common/i18n"
 
@@ -214,7 +214,8 @@ export default {
       return
     }
 
-    const result = NativeBridge.rayleighDistribution(this.sigma, this.x)
+    // Use optimized JS calculation
+    const result = DistributionCalculator.rayleighDistribution(this.sigma, this.x)
     
     if (result.success) {
       router.push({

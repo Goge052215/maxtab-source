@@ -77,7 +77,7 @@
 
 <script>
 import router from "@system.router"
-import { NativeBridge } from "../../../common/distribution_engine"
+import { DistributionCalculator } from "../../../common/distribution_engine"
 import { globalState } from "../../../common/global_state.js"
 import i18n from "../../../common/i18n"
 
@@ -291,8 +291,8 @@ export default {
       return
     }
 
-    // Use optimized C calculation
-    const result = NativeBridge.uniformDistribution(this.a, this.b, this.x)
+    // Use optimized JS calculation
+    const result = DistributionCalculator.uniformDistribution(this.a, this.b, this.x)
     
     if (result.success) {
       router.push({

@@ -39,9 +39,10 @@
 ## 安装说明
 
 1. 访问米坛社区 Mi Band 10 专区
-2. 搜索 “MaxTab” 或 “统计计算器”
+2. 搜索 “MaxTab”
 3. 下载 `com.application.watch.demo.release.V1.0.3.rpk`
-4. 通过 Zepp Life 安装至手环
+
+您也可以通过Astrobox进行下载安装，本项目也在Astrobox上进行了发布。
 
 ## 精度与性能
 
@@ -68,6 +69,10 @@
 - 米坛社区私信：@[George Huang]
 - GitHub Issues：https://github.com/Goge052215/probcalc-miband/issues
 
-## 关于作者
+## 关于
 
 George Huang（SAAS, HKU；香港大学统计与精算学系）
+
+**本项目由米坛社区开源项目支持计划提供支持**
+
+<img src="badge.png" width="200" height="auto" onclick="window.open('https://www.bandbbs.cn/threads/20954/#post-1009164')">

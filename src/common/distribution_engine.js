@@ -101,7 +101,7 @@ setInterval(() => {
   }
 }, 30000) // Every 30 seconds
 
-class NativeBridge {
+class DistributionCalculator {
 
   static createResult(success = false, pdfResult = 0, cdfResult = 0, errorMessage = null) {
     const result = resultPool.get()
@@ -452,4 +452,4 @@ class NativeBridge {
   }
 }
 
-export { NativeBridge, CalculationResult, DISTRIBUTION_TYPES }
+export { DistributionCalculator, CalculationResult, DISTRIBUTION_TYPES }
