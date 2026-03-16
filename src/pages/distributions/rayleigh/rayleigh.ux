@@ -174,9 +174,26 @@ export default {
   },
 
   onComplete(evt) {
+    if (evt.detail && evt.detail.isCompleteButton) {
+      this.onFinish()
+      return
+    }
+
     const char = evt.detail.content
     
     if (char === '.' && this.inputBuffer.indexOf('.') !== -1) {
+      return
+    }
+
+    const allowNegative = false
+    if (char === '-' && this.inputBuffer.length === 0 && allowNegative) {
+      this.inputBuffer = char
+      this.updateParameterFromBuffer()
+      this.$forceUpdate()
+      return
+    }
+
+    if (char === '-' && (this.inputBuffer.length > 0 || !allowNegative)) {
       return
     }
     
@@ -193,7 +210,7 @@ export default {
   },
 
   updateParameterFromBuffer() {
-    if (!this.inputBuffer || this.inputBuffer === '') return
+    if (!this.inputBuffer || this.inputBuffer === '' || this.inputBuffer === '-') return
     
     const value = parseFloat(this.inputBuffer)
     if (isNaN(value)) return

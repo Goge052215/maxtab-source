@@ -72,10 +72,15 @@ export default {
     
     storage.set({
       key: 'app_language',
-      value: lang
+      value: lang,
+      success: () => {
+        this.refreshI18n()
+      },
+      fail: () => {
+        this.currentLang = i18n.getCurrentLang()
+        this.refreshI18n()
+      }
     })
-
-    this.refreshI18n()
   },
 
   handleSwipe(event) {

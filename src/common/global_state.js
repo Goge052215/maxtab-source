@@ -68,13 +68,10 @@ class GlobalState {
     if (result && typeof result === 'object') {
       this._activeReferences.add(result)
     }
-    
-    console.log('GlobalState: Set keyboard result:', result)
   }
 
   getKeyboardResult() {
     const result = this.keyboardResult
-    console.log('GlobalState: Get keyboard result:', result)
     
     // Immediate clearing for memory efficiency
     // ref https://www.makeuseof.com/improve-performance-free-up-ram-on-linux/
@@ -96,6 +93,18 @@ class GlobalState {
     }
     this.keyboardResult = null
     this.resultTimestamp = null
+  }
+
+  _clearCalculatorResultInternal() {
+    if (this.calculatorImport && typeof this.calculatorImport === 'object') {
+      this._activeReferences.delete(this.calculatorImport)
+    }
+    if (this.calculatorExport && typeof this.calculatorExport === 'object') {
+      this._activeReferences.delete(this.calculatorExport)
+    }
+    this.calculatorImport = null
+    this.calculatorExport = null
+    this.calculatorTimestamp = null
   }
 
   // Peek at result without clearing it
@@ -121,8 +130,6 @@ class GlobalState {
     if (importPayload && typeof importPayload === 'object') {
       this._activeReferences.add(importPayload)
     }
-    
-    console.log('GlobalState: Set calculator import:', importPayload)
   }
 
   getCalculatorImport() {
@@ -148,8 +155,6 @@ class GlobalState {
     if (exportPayload && typeof exportPayload === 'object') {
       this._activeReferences.add(exportPayload)
     }
-    
-    console.log('GlobalState: Set calculator export:', exportPayload)
   }
 
   getCalculatorExport() {
@@ -205,16 +210,14 @@ class GlobalState {
     try {
       // Register cleanup callbacks with memory monitor
       memoryMonitor.onMemoryCleanup(() => {
-        console.log('Memory monitor triggered global state cleanup')
         this.forceCleanup()
       })
       
       memoryMonitor.onMemoryCritical(() => {
-        console.log('Critical memory - performing aggressive global state cleanup')
         this._performAggressiveCleanup()
       })
     } catch (error) {
-      console.warn('Memory monitoring setup failed:', error)
+      // Memory monitoring setup failed
     }
   }
 
@@ -228,17 +231,10 @@ class GlobalState {
       // Clear all active references
       this._activeReferences.clear()
       
-      // Reset all state
-      this._keyboardResult = null
-      this._calculatorResult = null
-      this._calculatorExport = null
-      
       // Force immediate cleanup
       this._performMemoryCleanup()
-      
-      console.log('Aggressive global state cleanup completed')
     } catch (error) {
-      console.error('Aggressive cleanup error:', error)
+      // Aggressive cleanup error
     }
   }
 

@@ -19,13 +19,13 @@
             </div>
           </div>
 
-          <div class="menu-list-item menu-entry" onclick="">
+          <div class="menu-list-item menu-entry" onclick="routeToHypothesis()">
             <div class="menu-item">
               <text class="menu-title">{{ i18n.index.menu.hypothesis }}</text>
             </div>
           </div>
 
-          <div class="menu-list-item menu-entry" onclick="">
+          <div class="menu-list-item menu-entry" onclick="routeToSimulation()">
             <div class="menu-item">
               <text class="menu-title">{{ i18n.index.menu.simulation }}</text>
             </div>
@@ -100,6 +100,14 @@ export default {
 
   routeToContinuous() {
     router.push({ uri: 'pages/continuous' })
+  },
+
+  routeToHypothesis() {
+    router.push({ uri: 'pages/hypothesis' })
+  },
+
+  routeToSimulation() {
+    router.push({ uri: 'pages/simulation/index' })
   },
 
   routeToSimple() {

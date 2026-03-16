@@ -110,6 +110,54 @@
       "pages/distributions/rayleigh": {
         "component": "rayleigh"
       },
+      "pages/hypothesis": {
+        "component": "index"
+      },
+      "pages/hypothesis/one_sample": {
+        "component": "one_sample"
+      },
+      "pages/hypothesis/one_sample_input": {
+        "component": "one_sample_input"
+      },
+      "pages/hypothesis/two_sample": {
+        "component": "two_sample"
+      },
+      "pages/hypothesis/two_sample_input": {
+        "component": "two_sample_input"
+      },
+      "pages/hypothesis/one_sample_mode": {
+        "component": "one_sample_mode"
+      },
+      "pages/hypothesis/two_sample_mode": {
+        "component": "two_sample_mode"
+      },
+      "pages/hypothesis/tail_type_select": {
+        "component": "tail_type_select"
+      },
+      "pages/hypothesis/z_test": {
+        "component": "z_test"
+      },
+      "pages/hypothesis/t_test": {
+        "component": "t_test"
+      },
+      "pages/hypothesis/f_test": {
+        "component": "f_test"
+      },
+      "pages/hypothesis/chi_square": {
+        "component": "chi_square"
+      },
+      "pages/hypothesis/linear_regression": {
+        "component": "linear_regression"
+      },
+      "pages/simulation/index": {
+        "component": "index"
+      },
+      "pages/simulation/coin": {
+        "component": "coin"
+      },
+      "pages/simulation/poker": {
+        "component": "poker"
+      },
       "pages/guide": {
         "component": "guide"
       },

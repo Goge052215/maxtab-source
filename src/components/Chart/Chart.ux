@@ -49,13 +49,11 @@
         
         const canvas = this.$element('chart-canvas');
         if (!canvas) {
-          console.warn('Chart canvas not found');
           return;
         }
         
         const ctx = canvas.getContext('2d');
         if (!ctx) {
-          console.warn('Chart context not available');
           return;
         }
         
@@ -93,7 +91,6 @@
           },
         });
       } catch (error) {
-        console.error('Chart rendering error:', error);
         this.cleanup();
       }
     },
@@ -121,10 +118,8 @@
             ctx.clearRect(0, 0, canvas.width, canvas.height);
           }
         }
-        
-        console.log('Chart component cleaned up');
       } catch (error) {
-        console.error('Chart cleanup error:', error);
+        // Chart cleanup error
       }
     }
   };

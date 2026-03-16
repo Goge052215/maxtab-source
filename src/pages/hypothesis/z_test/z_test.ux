@@ -1,0 +1,390 @@
+<template>
+  <div class="container" @swipe="handleSwipe">
+    <div class="top-bar">
+      <text class="title">{{ i18n.pages.hypothesis.z_test }}</text>
+    </div>
+
+    <scroll class="scroll-container" scroll-y="true">
+      <div class="scroll-content">
+        <div class="content">
+          
+          <!-- Summary Display (Read Only) -->
+          <div class="section-group">
+            <text class="section-title">{{ i18n.pages.hypothesis.summary_stats }}</text>
+            
+            <div class="menu-list-item">
+              <div class="menu-item">
+                <text class="menu-label">{{ i18n.params.mean }} 1</text>
+                <text class="menu-value">{{ mean }}</text>
+              </div>
+            </div>
+            <div class="menu-list-item">
+              <div class="menu-item">
+                <text class="menu-label">{{ i18n.params.n }} 1</text>
+                <text class="menu-value">{{ n }}</text>
+              </div>
+            </div>
+            <div class="menu-list-item">
+              <div class="menu-item">
+                <text class="menu-label">{{ i18n.params.sigma }} 1</text>
+                <text class="menu-value">{{ sigma }}</text>
+              </div>
+            </div>
+            
+            <div class="menu-list-item" if="{{ isTwoSample }}">
+              <div class="menu-item">
+                <text class="menu-label">{{ i18n.params.mean }} 2</text>
+                <text class="menu-value">{{ mean2 }}</text>
+              </div>
+            </div>
+            <div class="menu-list-item" if="{{ isTwoSample }}">
+              <div class="menu-item">
+                <text class="menu-label">{{ i18n.params.n }} 2</text>
+                <text class="menu-value">{{ n2 }}</text>
+              </div>
+            </div>
+            <div class="menu-list-item" if="{{ isTwoSample }}">
+              <div class="menu-item">
+                <text class="menu-label">{{ i18n.params.sigma }} 2</text>
+                <text class="menu-value">{{ sigma2 }}</text>
+              </div>
+            </div>
+            
+            <div class="menu-list-item" if="{{ !isTwoSample }}">
+              <div class="menu-item">
+                <text class="menu-label">{{ i18n.pages.hypothesis.hypothesized_mean }} (μ₀)</text>
+                <text class="menu-value">{{ mu0 }}</text>
+              </div>
+            </div>
+          </div>
+
+          <!-- Results Section -->
+          <div class="result-section" if="{{ hasResult }}">
+            <text class="result-title">{{ i18n.common.calculation_result }}</text>
+            
+            <div class="menu-list-item">
+              <div class="menu-item">
+                <text class="menu-label">Z {{ i18n.pages.hypothesis.test_statistic }}</text>
+                <text class="menu-value result-number">{{ resultZ }}</text>
+              </div>
+            </div>
+
+            <div class="menu-list-item">
+              <div class="menu-item">
+                <text class="menu-label">{{ i18n.pages.hypothesis.two_tail }} P</text>
+                <text class="menu-value result-number">{{ pValueTwoTail }}</text>
+              </div>
+            </div>
+
+            <div class="menu-list-item">
+              <div class="menu-item">
+                <text class="menu-label">{{ i18n.pages.hypothesis.left_tail }} P</text>
+                <text class="menu-value result-number">{{ pValueLeft }}</text>
+              </div>
+            </div>
+
+            <div class="menu-list-item">
+              <div class="menu-item">
+                <text class="menu-label">{{ i18n.pages.hypothesis.right_tail }} P</text>
+                <text class="menu-value result-number">{{ pValueRight }}</text>
+              </div>
+            </div>
+
+            <div class="menu-list-item" if="{{ lowerCI !== null }}">
+              <div class="menu-item">
+                <text class="menu-label">95% CI</text>
+                <text class="menu-value small-text result-number">[{{ lowerCI }}, {{ upperCI }}]</text>
+              </div>
+            </div>
+
+            <div class="menu-list-item highlight">
+              <div class="menu-item">
+                <text class="menu-label">{{ i18n.pages.hypothesis.conclusion }} (α=0.05)</text>
+                <text class="menu-value small-text result-number">{{ conclusion }}</text>
+              </div>
+            </div>
+          </div>
+
+          <!-- Error Message -->
+          <div class="error-message" if="{{ errorMessage }}">
+            <text class="error-text">{{ errorMessage }}</text>
+          </div>
+
+          <!-- Back Button -->
+          <div class="bottom-section">
+            <div class="back-btn" onclick="goBack">
+              <text class="back-text">{{ i18n.common.back }}</text>
+            </div>
+          </div>
+        </div>
+      </div>
+    </scroll>
+  </div>
+</template>
+
+<script>
+import router from "@system.router"
+import HypothesisEngine from "../../../common/hypothesis_engine"
+import i18n from "../../../common/i18n"
+
+export default {
+  protected: {
+    mean: 0,
+    n: 30,
+    sigma: 1,
+    mu0: 0,
+    // Two Sample Params
+    isTwoSample: false,
+    mean2: 0,
+    n2: 30,
+    sigma2: 1,
+    diff: 0,
+    alpha: 0.05
+  },
+  private: {
+    resultZ: "-",
+    pValueTwoTail: "-",
+    pValueLeft: "-",
+    pValueRight: "-",
+    lowerCI: null,
+    upperCI: null,
+    conclusion: "",
+    hasResult: false,
+    errorMessage: "",
+    i18n: i18n.getLocaleStrings()
+  },
+
+  onInit() {
+    this.refreshI18n()
+    // Auto calculate on load
+    this.calculate()
+  },
+
+  onShow() {
+    this.refreshI18n()
+  },
+
+  refreshI18n() {
+    this.i18n = i18n.getLocaleStrings()
+    this.$page.setTitleBar({ text: i18n.t('pages.hypothesis.z_test') })
+    this.$forceUpdate()
+  },
+
+  goBack() {
+    router.back()
+  },
+
+  handleSwipe(event) {
+    if (event.direction === 'right') {
+      this.goBack()
+    }
+  },
+
+  calculate() {
+    try {
+      this.errorMessage = ""
+      this.hasResult = false
+
+      let result;
+      
+      if (this.isTwoSample) {
+          result = HypothesisEngine.zTestTwoSample({
+              mean1: parseFloat(this.mean),
+              n1: parseInt(this.n),
+              sigma1: parseFloat(this.sigma),
+              mean2: parseFloat(this.mean2),
+              n2: parseInt(this.n2),
+              sigma2: parseFloat(this.sigma2),
+              diff: parseFloat(this.diff || 0)
+          })
+      } else {
+          result = HypothesisEngine.zTestOneSample({
+              mean: parseFloat(this.mean),
+              n: parseInt(this.n),
+              sigma: parseFloat(this.sigma),
+              mu0: parseFloat(this.mu0)
+          })
+      }
+
+      if (result.error) {
+        this.errorMessage = i18n.t(`errors.${result.error}`) || result.error
+        return
+      }
+
+      this.resultZ = result.z.toFixed(4)
+      this.pValueTwoTail = result.pValueTwoTail.toFixed(4)
+      this.pValueLeft = result.pValueLeft.toFixed(4)
+      this.pValueRight = result.pValueRight.toFixed(4)
+      
+      if (result.lowerCI !== null && result.upperCI !== null) {
+        this.lowerCI = result.lowerCI.toFixed(4)
+        this.upperCI = result.upperCI.toFixed(4)
+      } else {
+        this.lowerCI = null
+        this.upperCI = null
+      }
+      
+      // Determine conclusion based on two-tail p-value and alpha=0.05
+      if (result.pValueTwoTail < this.alpha) {
+          this.conclusion = this.i18n.pages.hypothesis.reject
+      } else {
+          this.conclusion = this.i18n.pages.hypothesis.fail_to_reject
+      }
+
+      this.hasResult = true
+    } catch (e) {
+      this.errorMessage = "Calculation Error: " + (e.message || e)
+      this.hasResult = false
+    }
+  }
+}
+</script>
+
+<style>
+.container {
+  display: flex;
+  flex-direction: column;
+  background-color: #000000;
+  height: 100%;
+}
+
+.top-bar {
+  height: 80px;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  padding: 15px 20px;
+}
+
+.title {
+  font-size: 24px;
+  color: #ffffff;
+  font-weight: bold;
+}
+
+.scroll-container {
+  flex: 1;
+  width: 100%;
+  flex-direction: column;
+}
+
+.scroll-content {
+  flex-direction: column;
+  width: 100%;
+}
+
+.content {
+  flex-direction: column;
+  padding: 16px 12px;
+}
+
+.section-group {
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
+.section-title {
+  font-size: 24px;
+  color: #aaaaaa;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.menu-list-item {
+  margin-bottom: 20px;
+}
+
+.menu-item {
+  display: flex;
+  min-height: 95px;
+  width: 100%;
+  background-color: #222222;
+  border-radius: 12px;
+  padding: 15px 20px;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid #333333;
+}
+
+.menu-label {
+  font-size: 24px;
+  color: #ffffff;
+}
+
+.menu-value {
+  font-size: 24px;
+  color: #ffffff;
+  font-weight: bold;
+  text-align: center;
+}
+
+.menu-value.result-number {
+  font-size: 30px;
+}
+
+.menu-value.small-text {
+  font-size: 20px;
+}
+
+.menu-value.small-text.result-number {
+  font-size: 24px;
+}
+.result-section {
+  flex-direction: column;
+  margin-bottom: 20px;
+  background-color: #1a1a1a;
+  border-radius: 12px;
+  padding: 15px;
+  border: 1px solid #333333;
+}
+
+.result-title {
+  font-size: 24px;
+  color: #00ff88;
+  margin-bottom: 15px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.menu-list-item.highlight .menu-item {
+  border-color: #444444;
+}
+
+.error-message {
+  padding: 20px;
+  background-color: #331111;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+
+.error-text {
+  color: #ff4444;
+  font-size: 22px;
+  text-align: center;
+}
+
+.bottom-section {
+  margin-top: 6px;
+  margin-bottom: 50px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.back-btn {
+  width: 80%;
+  height: 70px;
+  background-color: #333333;
+  border-radius: 12px;
+  padding: 15px 20px;
+  justify-content: center;
+  align-items: center;
+}
+
+.back-text {
+  font-size: 24px;
+  color: #ffffff;
+  font-weight: bold;
+}
+</style>

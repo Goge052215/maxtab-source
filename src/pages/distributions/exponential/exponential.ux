@@ -127,7 +127,6 @@ export default {
         this.x = inputValue || 0
       }
       
-      console.log('Imported from calculator:', { lambda: this.lambda, x: this.x })
       this.$forceUpdate()
     }
   },
@@ -159,7 +158,6 @@ export default {
   },
 
   onVisibilityChange(evt) {
-    console.log("键盘显示状态变更:", JSON.stringify(evt))
     if (!evt.detail.visible) {
       this.showKeyboard = false
       this.inputBuffer = ''
@@ -170,7 +168,6 @@ export default {
   },
 
   onKeyDown(evt) {
-    console.log("按下按键:", JSON.stringify(evt))
     // Key down events are handled by the component
   },
 
@@ -187,18 +184,33 @@ export default {
     }
     
     this.$forceUpdate()
-    console.log("删除字符, 当前值:", this.inputBuffer, "参数值:", this[this.currentParam])
   },
 
   onComplete(evt) {
+    if (evt.detail && evt.detail.isCompleteButton) {
+      this.onFinish()
+      return
+    }
+
     const char = evt.detail.content
-    console.log("输入字符:", JSON.stringify(evt))
     
     // Handle decimal point validation
     if (char === '.' && this.inputBuffer.indexOf('.') !== -1) {
       return // Don't allow multiple decimal points
     }
     
+    const allowNegative = false
+    if (char === '-' && this.inputBuffer.length === 0 && allowNegative) {
+      this.inputBuffer = char
+      this.updateParameterFromBuffer()
+      this.$forceUpdate()
+      return
+    }
+
+    if (char === '-' && (this.inputBuffer.length > 0 || !allowNegative)) {
+      return
+    }
+
     // Handle input - allow decimal point after 0
     if (this.inputBuffer === '0' && char !== '.') {
       this.inputBuffer = char
@@ -222,7 +234,6 @@ export default {
   },
 
   onFinish() {
-    console.log("完成输入");
     // Check if this was a cancel action (no input buffer means cancel)
     if (this.inputBuffer === '' && this.originalValue !== undefined) {
       // Restore original value on cancel
@@ -232,7 +243,7 @@ export default {
   },
 
   updateParameterFromBuffer() {
-    if (!this.inputBuffer || this.inputBuffer === '') return
+    if (!this.inputBuffer || this.inputBuffer === '' || this.inputBuffer === '-') return
     
     const value = parseFloat(this.inputBuffer)
     if (isNaN(value)) return

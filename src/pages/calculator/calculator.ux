@@ -80,16 +80,13 @@ export default {
   },
 
   onReady() {
-    console.log('Calculator onReady called')
   },
 
   onResume() {
-    console.log('Calculator onResume called')
   },
 
   // Calculator functions
   numberClick(num) {
-    console.log('Number clicked:', num)
     if (this.waitingForOperand) {
       this.resultShow = String(num)
       this.waitingForOperand = false
@@ -102,7 +99,6 @@ export default {
   },
 
   operatorClick(nextOperator) {
-    console.log('Operator clicked:', nextOperator)
     const inputValue = parseFloat(this.currentInput || this.resultShow)
 
     if (this.previousInput === '') {

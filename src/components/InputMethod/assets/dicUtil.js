@@ -9,28 +9,28 @@ let SimpleInputMethod = {
 }
 
 SimpleInputMethod.initDict = function() {
-    this.dict.py2hz = dict;
-    this.dict.py2hz2 = {};
-    this.dict.py2hz2['i'] = 'i'; // i比较特殊，没有符合的汉字，所以特殊处理
+    SimpleInputMethod.dict.py2hz = dict;
+    SimpleInputMethod.dict.py2hz2 = {};
+    SimpleInputMethod.dict.py2hz2['i'] = 'i'; // i比较特殊，没有符合的汉字，所以特殊处理
 
     // Build cache more efficiently
-    for (let key in this.dict.py2hz) {
+    for (let key in SimpleInputMethod.dict.py2hz) {
         let ch = key[0];
-        if (!this.dict.py2hz2[ch]) {
-            this.dict.py2hz2[ch] = this.dict.py2hz[key];
-            this._cacheSize++;
+        if (!SimpleInputMethod.dict.py2hz2[ch]) {
+            SimpleInputMethod.dict.py2hz2[ch] = SimpleInputMethod.dict.py2hz[key];
+            SimpleInputMethod._cacheSize++;
         }
     }
     
     // Setup periodic cleanup
-    this._setupCleanup();
+    SimpleInputMethod._setupCleanup();
 };
 
 // Setup cleanup mechanism
 SimpleInputMethod._setupCleanup = function() {
     // Every 5 minutes
     setInterval(() => {
-        this._performCleanup();
+        SimpleInputMethod._performCleanup();
     }, 300000);
 };
 
@@ -39,52 +39,51 @@ SimpleInputMethod._performCleanup = function() {
     const now = Date.now();
     
     // Only cleanup if cache is too large or enough time has passed
-    if (this._cacheSize > this._maxCacheSize || (now - this._lastCleanup) > 600000) {
+    if (SimpleInputMethod._cacheSize > SimpleInputMethod._maxCacheSize || (now - SimpleInputMethod._lastCleanup) > 600000) {
         // Clear less frequently used cache entries
         const keysToDelete = [];
         let count = 0;
         
-        for (let key in this.dict.py2hz2) {
-            if (key !== 'i' && count < Math.floor(this._cacheSize * 0.3)) {
+        for (let key in SimpleInputMethod.dict.py2hz2) {
+            if (key !== 'i' && count < Math.floor(SimpleInputMethod._cacheSize * 0.3)) {
                 keysToDelete.push(key);
                 count++;
             }
         }
         
         keysToDelete.forEach(key => {
-            delete this.dict.py2hz2[key];
-            this._cacheSize--;
+            delete SimpleInputMethod.dict.py2hz2[key];
+            SimpleInputMethod._cacheSize--;
         });
         
-        this._lastCleanup = now;
-        console.log(`InputMethod cache cleaned: ${keysToDelete.length} entries removed`);
+        SimpleInputMethod._lastCleanup = now;
     }
 };
 
 SimpleInputMethod.getSingleHanzi = function(pinyin){
     // Check cache first, then fallback to main dict
-    let result = this.dict.py2hz2[pinyin];
+    let result = SimpleInputMethod.dict.py2hz2[pinyin];
     if (result) return result;
     
-    result = this.dict.py2hz[pinyin];
-    if (result && this._cacheSize < this._maxCacheSize) {
+    result = SimpleInputMethod.dict.py2hz[pinyin];
+    if (result && SimpleInputMethod._cacheSize < SimpleInputMethod._maxCacheSize) {
         // Cache frequently accessed items
-        this.dict.py2hz2[pinyin] = result;
-        this._cacheSize++;
+        SimpleInputMethod.dict.py2hz2[pinyin] = result;
+        SimpleInputMethod._cacheSize++;
     }
     
     return result || '';
 }
 
 SimpleInputMethod.getHanzi = function(pinyin) {
-    let result = this.getSingleHanzi(pinyin);
+    let result = SimpleInputMethod.getSingleHanzi(pinyin);
     if (result) return [result.split(''), pinyin];
 
     let start = Math.min(pinyin.length, 6);
 
     for (let i = start; i >= 1; i--) {
         let str = pinyin.substr(0, i);
-        let rs = this.getSingleHanzi(str);
+        let rs = SimpleInputMethod.getSingleHanzi(str);
         if (rs) return [rs.split(''), str];
     }
 
@@ -95,16 +94,14 @@ SimpleInputMethod.getHanzi = function(pinyin) {
 SimpleInputMethod.cleanup = function() {
     try {
         // Clear all caches
-        this.dict.py2hz2 = {};
-        this._cacheSize = 0;
+        SimpleInputMethod.dict.py2hz2 = {};
+        SimpleInputMethod._cacheSize = 0;
         
         // Keep only essential entry
-        this.dict.py2hz2['i'] = 'i';
-        this._cacheSize = 1;
-        
-        console.log('InputMethod cache cleared');
+        SimpleInputMethod.dict.py2hz2['i'] = 'i';
+        SimpleInputMethod._cacheSize = 1;
     } catch (error) {
-        console.error('InputMethod cleanup error:', error);
+        // InputMethod cleanup error
     }
 };
 

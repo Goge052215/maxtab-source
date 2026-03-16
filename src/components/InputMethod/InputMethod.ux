@@ -45,20 +45,7 @@
 import vibrator from "@system.vibrator";
 import device from '@system.device'
 import { SimpleInputMethod } from "./assets/dicUtil.js";
-function doSearchDic(word, cb) {
-  let hanzi = SimpleInputMethod.getHanzi(word);
-  if (hanzi && hanzi[0]) {
-    cb(hanzi[0]);
-  } else {
-    cb([]);
-  }
-}
-function deleteLast(t) {
-  if (t) {
-    return t.substr(0, t.length - 1);
-  }
-  return "";
-}
+
 export default {
   props: {
     hide: {
@@ -130,94 +117,107 @@ export default {
 
   onBtnClick(sign) {
     this.onVibrate();
+    if (this.handleSpecialButton(sign)) {
+      return;
+    }
+    this.handleInputSign(sign);
+  },
+  handleSpecialButton(sign) {
     switch (sign) {
       case "AC":
         this.clearWaiting();
-        break;
+        return true;
       case "lang":
-        if (this.lang === "cn") {
-          this.lang = "en";
-        } else {
-          this.lang = "cn";
-        }
+        this.toggleLang();
         this.clearWaiting();
-        break;
+        return true;
       case "D":
-        if (this.waitingIndex >= 0) {
-          this.clearWaiting();
-        } else {
-          this.$emit("delete", {});
-        }
-        break;
+        this.handleDeleteAction();
+        return true;
       case "E":
         this.hide = true;
-        break;
+        return true;
       case "space":
         this.addAllTxt(" ");
-        break;
-
+        return true;
       case "select":
-        if (this.lastWaitingStr != sign && this.lastWaitingStr) {
-          if (this.lang === "cn") {
-            this.addAllTxt(this.waitingList[this.waitingIndex]);
-          } else {
-            if (this.upperFlag) {
-              this.addAllTxt(this.waitingList[this.waitingIndex].toUpperCase());
-            } else {
-              this.addAllTxt(this.waitingList[this.waitingIndex].toLowerCase());
-            }
-          }
-          this.clearWaiting();
-        }
-        break;
+        this.handleSelectAction(sign);
+        return true;
       case "switchNum":
         this.numFlag = true;
         this.clearWaiting();
-        break;
+        return true;
       case "switchCn":
         this.numFlag = false;
-        break;
+        return true;
       case "switchUpper":
         this.upperFlag = true;
-        break;
+        return true;
       case "switchLow":
         this.upperFlag = false;
-        break;
-              default:
-        if (sign.length === 1) {
-          this.addAllTxt(sign);
+        return true;
+      default:
+        return false;
+    }
+  },
+  toggleLang() {
+    this.lang = this.lang === "cn" ? "en" : "cn";
+  },
+  handleDeleteAction() {
+    if (this.waitingIndex >= 0) {
+      this.clearWaiting();
+    } else {
+      this.$emit("delete", {});
+    }
+  },
+  handleSelectAction(sign) {
+    if (this.lastWaitingStr != sign && this.lastWaitingStr) {
+      if (this.lang === "cn") {
+        this.addAllTxt(this.waitingList[this.waitingIndex]);
+      } else {
+        if (this.upperFlag) {
+          this.addAllTxt(this.waitingList[this.waitingIndex].toUpperCase());
         } else {
-          if (this.waitingIndex >= 0) {
-            if (this.lastWaitingStr === sign) {
-              this.waitingIndex++;
-              if (this.waitingIndex >= this.lastWaitingStr.length) {
-                this.waitingIndex = 0;
-              }
-            } else {
-              if (this.lang === "cn") {
-                this.addAllTxt(this.waitingList[this.waitingIndex]);
-              } else {
-                if (this.upperFlag) {
-                  this.addAllTxt(
-                    this.waitingList[this.waitingIndex].toUpperCase(),
-                  );
-                } else {
-                  this.addAllTxt(
-                    this.waitingList[this.waitingIndex].toLowerCase(),
-                  );
-                }
-              }
-              this.lastWaitingStr = sign;
-              this.waitingIndex = 0;
-              this.waitingList = sign.split("");
-            }
+          this.addAllTxt(this.waitingList[this.waitingIndex].toLowerCase());
+        }
+      }
+      this.clearWaiting();
+    }
+  },
+  handleInputSign(sign) {
+    if (sign.length === 1) {
+      this.addAllTxt(sign);
+      return;
+    }
+
+    if (this.waitingIndex >= 0) {
+      if (this.lastWaitingStr === sign) {
+        this.waitingIndex++;
+        if (this.waitingIndex >= this.lastWaitingStr.length) {
+          this.waitingIndex = 0;
+        }
+      } else {
+        if (this.lang === "cn") {
+          this.addAllTxt(this.waitingList[this.waitingIndex]);
+        } else {
+          if (this.upperFlag) {
+            this.addAllTxt(
+              this.waitingList[this.waitingIndex].toUpperCase(),
+            );
           } else {
-            this.lastWaitingStr = sign;
-            this.waitingIndex = 0;
-            this.waitingList = sign.split("");
+            this.addAllTxt(
+              this.waitingList[this.waitingIndex].toLowerCase(),
+            );
           }
         }
-        break;
+        this.lastWaitingStr = sign;
+        this.waitingIndex = 0;
+        this.waitingList = sign.split("");
+      }
+    } else {
+      this.lastWaitingStr = sign;
+      this.waitingIndex = 0;
+      this.waitingList = sign.split("");
     }
   },
   clearWaiting() {
@@ -267,10 +267,10 @@ export default {
     }
     this.clearWaiting();
   },
-  watchHidePropsChange(newV, oldV) {
+  watchHidePropsChange(newV) {
     this.$emit("visibilityChange", { visible: newV });
   },
-  watchMaxLengthPropsChange(newV, oldV) {
+  watchMaxLengthPropsChange() {
     // maxlength property change handler - kept for compatibility
   },
   onVibrate() {

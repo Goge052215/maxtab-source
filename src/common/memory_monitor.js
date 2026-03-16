@@ -14,9 +14,9 @@ class MemoryMonitor {
             timestamp: Date.now()
         };
         this.thresholds = {
-            warning: 50 * 1024 * 1024, // 50MB
-            critical: 100 * 1024 * 1024, // 100MB
-            cleanup: 80 * 1024 * 1024 // 80MB
+            warning: 50 * 1024 * 1024,    // 50MB
+            critical: 100 * 1024 * 1024,  // 100MB
+            cleanup: 80 * 1024 * 1024     // 80MB
         };
         this.callbacks = {
             warning: [],
@@ -28,12 +28,12 @@ class MemoryMonitor {
     }
     
     init() {
-        // Start monitoring if memory API is available
+        // Start monitoring
         if (this.isMemoryAPIAvailable()) {
             this.startMonitoring();
         }
         
-        // Setup cleanup triggers
+        // Cleanup triggers
         this.setupCleanupTriggers();
     }
     
@@ -50,7 +50,7 @@ class MemoryMonitor {
     getCurrentMemoryUsage() {
         try {
             if (typeof performance !== 'undefined' && performance.memory) {
-                // Browser environment
+                // Browser
                 return {
                     heapUsed: performance.memory.usedJSHeapSize,
                     heapTotal: performance.memory.totalJSHeapSize,
@@ -58,7 +58,7 @@ class MemoryMonitor {
                     timestamp: Date.now()
                 };
             } else if (typeof process !== 'undefined' && process.memoryUsage) {
-                // Node.js environment
+                // Node.js
                 const usage = process.memoryUsage();
                 return {
                     heapUsed: usage.heapUsed,
@@ -68,7 +68,7 @@ class MemoryMonitor {
                 };
             }
         } catch (error) {
-            console.warn('Memory usage unavailable:', error);
+            // Memory usage unavailable
         }
         
         return null;
@@ -82,15 +82,12 @@ class MemoryMonitor {
         this.monitoringInterval = setInterval(() => {
             this.checkMemoryUsage();
         }, interval);
-        
-        console.log('Memory monitoring started');
     }
     
     stopMonitoring() {
         if (this.monitoringInterval) {
             clearInterval(this.monitoringInterval);
             this.monitoringInterval = null;
-            console.log('Memory monitoring stopped');
         }
     }
     
@@ -116,7 +113,7 @@ class MemoryMonitor {
             try {
                 callback(usage);
             } catch (error) {
-                console.error(`Memory callback error (${type}):`, error);
+                // Memory callback error
             }
         });
     }
@@ -135,13 +132,11 @@ class MemoryMonitor {
     
     setupCleanupTriggers() {
         // Automatic cleanup on memory pressure
-        this.onMemoryCleanup((usage) => {
-            console.log('Memory cleanup triggered:', this.formatBytes(usage.heapUsed));
+        this.onMemoryCleanup(() => {
             this.performAutomaticCleanup();
         });
         
-        this.onMemoryCritical((usage) => {
-            console.warn('Critical memory usage:', this.formatBytes(usage.heapUsed));
+        this.onMemoryCritical(() => {
             this.performAggressiveCleanup();
         });
     }
@@ -158,10 +153,8 @@ class MemoryMonitor {
             
             // Force garbage collection if available
             this.forceGarbageCollection();
-            
-            console.log('Automatic memory cleanup completed');
         } catch (error) {
-            console.error('Automatic cleanup error:', error);
+            // Automatic cleanup error
         }
     }
     
@@ -177,10 +170,8 @@ class MemoryMonitor {
             for (let i = 0; i < 3; i++) {
                 setTimeout(() => this.forceGarbageCollection(), i * 100);
             }
-            
-            console.log('Aggressive memory cleanup completed');
         } catch (error) {
-            console.error('Aggressive cleanup error:', error);
+            // Aggressive cleanup error
         }
     }
     
@@ -193,8 +184,13 @@ class MemoryMonitor {
             });
             
             // Clear any temporary DOM references
-            if (window._tempDOMRefs) {
-                window._tempDOMRefs.clear();
+            const tempRefs = window._tempDOMRefs;
+            if (tempRefs) {
+                if (typeof tempRefs === 'object' && 'clear' in tempRefs && typeof tempRefs.clear === 'function') {
+                    tempRefs.clear();
+                } else if (Array.isArray(tempRefs)) {
+                    tempRefs.length = 0;
+                }
             }
         }
     }
@@ -257,7 +253,6 @@ class MemoryMonitor {
     destroy() {
         this.stopMonitoring();
         this.callbacks = { warning: [], critical: [], cleanup: [] };
-        console.log('Memory monitor destroyed');
     }
 }
 

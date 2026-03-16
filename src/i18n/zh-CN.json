@@ -29,6 +29,62 @@
     "footer_version": "v1.1.1"
   },
   "pages": {
+    "hypothesis": {
+      "title": "假设检验",
+      "z_test": "Z检验",
+      "t_test": "t检验",
+      "f_test": "F检验",
+      "chi_square": "卡方检验",
+      "linear_regression": "线性回归",
+      "one_sample": "单样本",
+      "two_sample": "双样本",
+      "paired": "配对",
+      "pooled": "合并方差",
+      "welch": "Welch",
+      "input_mode": "输入方式",
+      "summary_stats": "统计量输入",
+      "procedure": "检验流程",
+      "data_array": "数组输入",
+      "sample_1": "样本1",
+      "sample_2": "样本2",
+      "mean_diff": "均值差",
+      "test_type": "检验类型",
+      "tail_type": "尾部类型",
+      "null_hypothesis": "H0",
+      "alternative_hypothesis": "H1",
+      "hypothesized_mean": "假设均值",
+      "hypothesized_diff": "假设差值",
+      "significance_level": "显著性水平",
+      "test_statistic": "检验统计量",
+      "p_value": "P值",
+      "conclusion": "结论",
+      "reject": "拒绝H0",
+      "fail_to_reject": "无法拒绝H0",
+      "left_tail": "左尾",
+      "right_tail": "右尾",
+      "two_tail": "双尾",
+      "observed": "观测值",
+      "expected": "期望值",
+      "slope": "斜率",
+      "intercept": "截距",
+      "correlation": "相关系数 (r)",
+      "r_squared": "R平方",
+      "std_err": "标准误"
+    },
+    "simulation": {
+      "title": "概率模拟",
+      "coin": "抛硬币",
+      "poker": "扑克牌",
+      "flip": "抛掷",
+      "reset": "重置",
+      "heads": "正面",
+      "tails": "反面",
+      "total": "总计",
+      "draw": "抽取",
+      "shuffle": "洗牌",
+      "replacement": "放回",
+      "no_replacement": "不放回"
+    },
     "discrete": {
       "title": "离散分布",
       "binomial": "二项分布",
@@ -250,7 +306,7 @@
       "title": "β分布"
     },
     "weibull": {
-      "title": "Weibull分布"
+      "title": "Weibull"
     },
     "chisquare": {
       "title": "卡方分布"
@@ -262,10 +318,10 @@
       "title": "F分布"
     },
     "pareto": {
-      "title": "Pareto分布"
+      "title": "Pareto"
     },
     "rayleigh": {
-      "title": "Rayleigh分布"
+      "title": "Rayleigh"
     }
   },
   "params": {

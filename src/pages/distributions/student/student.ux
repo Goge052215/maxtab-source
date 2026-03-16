@@ -173,20 +173,26 @@ export default {
   },
 
   onComplete(evt) {
+    if (evt.detail && evt.detail.isCompleteButton) {
+      this.onFinish()
+      return
+    }
+
     const char = evt.detail.content
     
     if (char === '.' && this.inputBuffer.indexOf('.') !== -1) {
       return
     }
     
-    if (char === '-' && this.inputBuffer.length === 0 && this.currentParam === 'x') {
+    const allowNegative = this.currentParam === 'x'
+    if (char === '-' && this.inputBuffer.length === 0 && allowNegative) {
       this.inputBuffer = char
       this.updateParameterFromBuffer()
       this.$forceUpdate()
       return
     }
     
-    if (char === '-' && (this.inputBuffer.length > 0 || this.currentParam === 'df')) {
+    if (char === '-' && (this.inputBuffer.length > 0 || !allowNegative)) {
       return
     }
     

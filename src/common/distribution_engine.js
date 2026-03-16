@@ -46,15 +46,14 @@ class CalculationResult {
 import LRUCache from './lru_cache.js'
 
 const memoCache = {
-  logFactorial: new LRUCache(500), // Reduced from 1000 for memory efficiency
-  logGamma: new LRUCache(500),     // Reduced from 1000 for memory efficiency  
-  logCombination: new LRUCache(500) // Reduced from 1000 for memory efficiency
+  logFactorial: new LRUCache(500),
+  logGamma: new LRUCache(500),
+  logCombination: new LRUCache(500)
 }
 
 const resultPool = {
   pool: [],
-  maxSize: 25, // Reduced from 50 for memory efficiency 
-  // "https://www.makeuseof.com/improve-performance-free-up-ram-on-linux/"
+  maxSize: 25,
   
   get() {
     if (this.pool.length > 0) {
@@ -71,7 +70,7 @@ const resultPool = {
       result.pmfResult = 0
       result.cdfResult = 0
       result.errorMessage = null
-      result.chartData = null // Clear chart data to free memory
+      result.chartData = null
       this.pool.push(result)
     }
   },
@@ -82,9 +81,9 @@ const resultPool = {
   }
 }
 
-// Add periodic cleanup for caches
+// Periodic cleanup
 setInterval(() => {
-  // Clear caches if they get too large
+  // Clear caches
   if (memoCache.logFactorial.size > 300) {
     memoCache.logFactorial.clear()
   }
@@ -95,21 +94,21 @@ setInterval(() => {
     memoCache.logCombination.clear()
   }
   
-  // Cleanup result pool periodically
+  // Cleanup result pool
   if (resultPool.pool.length > 15) {
     resultPool.cleanup()
   }
-}, 30000) // Every 30 seconds
+}, 30000)
 
 class DistributionCalculator {
-
-  static createResult(success = false, pdfResult = 0, cdfResult = 0, errorMessage = null) {
+  static createResult(success = false, pdfResult = 0, cdfResult = 0, errorMessage = null, chartData = null) {
     const result = resultPool.get()
     result.success = success
     result.pdfResult = pdfResult
     result.pmfResult = pdfResult
     result.cdfResult = cdfResult
     result.errorMessage = errorMessage
+    result.chartData = chartData
     return result
   }
 

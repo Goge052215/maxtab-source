@@ -1,0 +1,681 @@
+<import name="input-method" src="../../../components/InputMethod/InputMethod.ux"></import>
+
+<template>
+  <div class="container" @swipe="handleSwipe">
+    <div class="top-bar">
+      <div class="title-container">
+        <text class="title">{{ i18n.pages.hypothesis.two_sample }}</text>
+        <text class="subtitle">{{ i18n.pages.hypothesis.input_mode }}</text>
+      </div>
+    </div>
+
+    <scroll class="scroll-container" scroll-y="true">
+      <div class="scroll-content">
+        <div class="content">
+          <!-- Input Mode Selection -->
+          <!-- Removed Mode Selection Toggle -->
+
+          <!-- Sample 1 Input Fields -->
+          <div class="param-section" if="{{ !showKeyboard && inputMode === 'summary' }}">
+            <text class="section-title">{{ i18n.pages.hypothesis.sample_1 }}</text>
+            
+            <div class="param-item" @click="selectInput('mean1')">
+              <text class="param-label">{{ i18n.params.mean }} (x̄₁)</text>
+              <div class="param-display">
+                <text class="param-value">{{ mean1 }}</text>
+              </div>
+            </div>
+            
+            <div class="param-item" @click="selectInput('n1')">
+              <text class="param-label">{{ i18n.params.n }} (n₁)</text>
+              <div class="param-display">
+                <text class="param-value">{{ n1 }}</text>
+              </div>
+            </div>
+            
+            <div class="param-item" @click="selectInput('s1')">
+              <text class="param-label">{{ i18n.params.stddev }} (s₁)</text>
+              <div class="param-display">
+                <text class="param-value">{{ s1 }}</text>
+              </div>
+            </div>
+
+            <div class="param-item" @click="selectInput('sigma1')">
+              <text class="param-label">{{ 'σ₁ (Optional)' }}</text>
+              <div class="param-display">
+                <text class="param-value">{{ sigma1 === null ? '' : sigma1 }}</text>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sample 2 Input Fields -->
+          <div class="param-section" if="{{ !showKeyboard && inputMode === 'summary' }}">
+            <text class="section-title">{{ i18n.pages.hypothesis.sample_2 }}</text>
+            
+            <div class="param-item" @click="selectInput('mean2')">
+              <text class="param-label">{{ i18n.params.mean }} (x̄₂)</text>
+              <div class="param-display">
+                <text class="param-value">{{ mean2 }}</text>
+              </div>
+            </div>
+            
+            <div class="param-item" @click="selectInput('n2')">
+              <text class="param-label">{{ i18n.params.n }} (n₂)</text>
+              <div class="param-display">
+                <text class="param-value">{{ n2 }}</text>
+              </div>
+            </div>
+            
+            <div class="param-item" @click="selectInput('s2')">
+              <text class="param-label">{{ i18n.params.stddev }} (s₂)</text>
+              <div class="param-display">
+                <text class="param-value">{{ s2 }}</text>
+              </div>
+            </div>
+
+            <div class="param-item" @click="selectInput('sigma2')">
+              <text class="param-label">{{ 'σ₂ (Optional)' }}</text>
+              <div class="param-display">
+                <text class="param-value">{{ sigma2 === null ? '' : sigma2 }}</text>
+              </div>
+            </div>
+
+            <div class="param-item" @click="selectInput('diff')">
+               <text class="param-label">{{ i18n.pages.hypothesis.hypothesized_diff || 'Δ₀' }}</text>
+               <div class="param-display">
+                 <text class="param-value">{{ diff }}</text>
+               </div>
+            </div>
+          </div>
+
+          <!-- Array Input Fields (Tabbed) -->
+          <div class="param-section" if="{{ !showKeyboard && inputMode === 'array' }}">
+            <div class="tabs">
+              <div class="tab {{ currentTab === 0 ? 'active' : '' }}" onclick="switchTab(0)">
+                <text class="tab-text">{{ i18n.pages.hypothesis.sample_1 }}</text>
+              </div>
+              <div class="tab {{ currentTab === 1 ? 'active' : '' }}" onclick="switchTab(1)">
+                <text class="tab-text">{{ i18n.pages.hypothesis.sample_2 }}</text>
+              </div>
+            </div>
+
+            <div class="table-header">
+              <text class="table-cell-id">#</text>
+              <text class="table-cell-value">X</text>
+            </div>
+            
+            <div class="table-row" for="{{ (index, value) in currentDataArray }}">
+              <text class="table-cell-id">{{ index + 1 }}</text>
+              <div class="table-cell-input" @click="selectArrayInput(index)">
+                <text class="param-value">{{ value === null ? '' : value }}</text>
+              </div>
+            </div>
+            
+            <div class="table-actions">
+              <div class="action-btn" onclick="addRow">
+                <text class="action-text">+</text>
+              </div>
+              <div class="action-btn" onclick="removeRow">
+                <text class="action-text">-</text>
+              </div>
+            </div>
+
+            <div class="param-item" @click="selectInput('diff')">
+               <text class="param-label">{{ i18n.pages.hypothesis.hypothesized_diff || 'Δ₀' }}</text>
+               <div class="param-display">
+                 <text class="param-value">{{ diff }}</text>
+               </div>
+            </div>
+            
+             <div class="param-item" @click="selectInput(currentTab === 0 ? 'sigma1' : 'sigma2')">
+               <text class="param-label">{{ (currentTab === 0 ? 'σ₁' : 'σ₂') + ' (Optional)' }}</text>
+               <div class="param-display">
+                 <text class="param-value">{{ (currentTab === 0 ? sigma1 : sigma2) === null ? '' : (currentTab === 0 ? sigma1 : sigma2) }}</text>
+               </div>
+            </div>
+          </div>
+
+          <!-- Keyboard Input Display -->
+          <div class="param-section" if="{{ showKeyboard }}">
+            <div class="param-item">
+              <text class="param-label">{{ currentParamName }}</text>
+              <div class="param-display">
+                <text class="param-value">{{ inputBuffer }}</text>
+              </div>
+            </div>
+          </div>
+
+          <!-- Next Button -->
+          <div class="calc-section" if="{{ !showKeyboard }}">
+            <div class="calc-btn" onclick="goToTestSelection">
+              <text class="calc-text">{{ i18n.common.ok }}</text>
+            </div>
+          </div>
+
+          <!-- Back Button -->
+          <div class="bottom-section" if="{{ !showKeyboard }}">
+            <div class="back-btn" onclick="goBack">
+              <text class="back-text">{{ i18n.common.back }}</text>
+            </div>
+          </div>
+          
+          <input-method
+            if="{{ showKeyboard }}"
+            hide="{{!showKeyboard}}"
+            keyboardtype="NUMERIC"
+            maxlength="10"
+            vibratemode="{{vibratemode}}"
+            screentype="{{screentype}}"
+            @visibility-change="onVisibilityChange"
+            @key-down="onKeyDown"
+            @delete="onDelete"
+            @complete="onComplete"
+          ></input-method>
+        </div>
+      </div>
+    </scroll>
+  </div>
+</template>
+
+<script>
+import router from "@system.router"
+import i18n from "../../../common/i18n"
+import HypothesisEngine from "../../../common/hypothesis_engine"
+
+export default {
+  protected: {
+    inputMode: 'summary'
+  },
+  private: {
+    mean1: 0,
+    n1: 30,
+    s1: 1,
+    sigma1: null,
+    mean2: 0,
+    n2: 30,
+    s2: 1,
+    sigma2: null,
+    diff: 0,
+    currentTab: 0, // 0 for Sample 1, 1 for Sample 2
+    dataArray1: [null, null, null, null],
+    dataArray2: [null, null, null, null],
+    showKeyboard: false,
+    currentParam: '',
+    currentParamName: '',
+    currentArrayIndex: -1,
+    currentArrayField: '', // 'x' or 'y'
+    inputBuffer: '',
+    i18n: i18n.getLocaleStrings(),
+    vibratemode: "short",
+    screentype: "pill-shaped"
+  },
+
+  computed: {
+    currentDataArray() {
+      return this.currentTab === 0 ? this.dataArray1 : this.dataArray2
+    }
+  },
+
+  onInit() {
+    this.refreshI18n()
+  },
+
+  onShow() {
+    this.refreshI18n()
+  },
+
+  refreshI18n() {
+    this.i18n = i18n.getLocaleStrings()
+    this.$page.setTitleBar({ text: i18n.t('pages.hypothesis.two_sample') })
+    this.$forceUpdate()
+  },
+
+  goBack() {
+    router.back()
+  },
+
+  handleSwipe(event) {
+    if (event.direction === 'right') {
+      this.goBack()
+    }
+  },
+
+  switchTab(index) {
+    this.currentTab = index
+  },
+
+  addRow() {
+    if (this.currentTab === 0) {
+      this.dataArray1.push(null)
+    } else {
+      this.dataArray2.push(null)
+    }
+  },
+
+  removeRow() {
+    if (this.currentTab === 0 && this.dataArray1.length > 1) {
+      this.dataArray1.pop()
+    } else if (this.currentTab === 1 && this.dataArray2.length > 1) {
+      this.dataArray2.pop()
+    }
+  },
+
+  selectInput(param) {
+    this.currentParam = param
+    this.currentArrayIndex = -1
+    // Store original value for cancel functionality
+    this.originalValue = this[param]
+    this.inputBuffer = ''
+    this.showKeyboard = true
+    
+    switch(param) {
+      case 'mean1': this.currentParamName = this.i18n.params.mean + " 1"; break;
+      case 'n1': this.currentParamName = this.i18n.params.n + " 1"; break;
+      case 's1': this.currentParamName = this.i18n.params.stddev + " 1"; break;
+      case 'mean2': this.currentParamName = this.i18n.params.mean + " 2"; break;
+      case 'n2': this.currentParamName = this.i18n.params.n + " 2"; break;
+      case 's2': this.currentParamName = this.i18n.params.stddev + " 2"; break;
+    }
+  },
+
+  selectArrayInput(index) {
+    this.currentArrayIndex = index
+    this.currentParam = 'array'
+    // Store original value
+    const arr = this.currentTab === 0 ? this.dataArray1 : this.dataArray2
+    this.originalValue = arr[index]
+    this.inputBuffer = ''
+    this.showKeyboard = true
+    this.currentParamName = `${this.currentTab === 0 ? 'X' : 'Y'}[${index + 1}]`
+  },
+
+  onVisibilityChange(e) {
+    if (!e.detail.visible) {
+      this.showKeyboard = false
+      this.inputBuffer = ''
+      this.currentParam = ''
+      this.currentParamName = ''
+      this.$forceUpdate()
+    }
+  },
+
+  onKeyDown(e) {
+    // Key down events are handled by the component or just logged
+  },
+
+  onDelete() {
+    if (this.inputBuffer.length > 0) {
+      this.inputBuffer = this.inputBuffer.slice(0, -1)
+      this.updateParameterFromBuffer()
+    } else {
+      // If buffer is empty, reset to default/original values
+      if (this.currentParam === 'array') {
+        if (this.currentArrayIndex >= 0) {
+          const item = this.dataArray[this.currentArrayIndex]
+          item[this.currentArrayField] = null
+          this.dataArray.splice(this.currentArrayIndex, 1, item)
+        }
+      } else {
+        if (this.currentParam.startsWith('mean')) this[this.currentParam] = 0
+        else if (this.currentParam.startsWith('n')) this[this.currentParam] = 30
+        else if (this.currentParam.startsWith('s')) this[this.currentParam] = 1
+      }
+    }
+    this.$forceUpdate()
+  },
+
+  onComplete(e) {
+    // If it's the complete button (checkmark), finish input
+    if (e.detail && e.detail.isCompleteButton) {
+      this.onFinish()
+      return
+    }
+
+    const char = e.detail.content
+    
+    // Handle decimal point validation
+    if (char === '.' && this.inputBuffer.indexOf('.') !== -1) {
+      return // Don't allow multiple decimal points
+    }
+    
+    // Handle negative sign
+    // Allow negative for mean, array values, diff
+    const allowNegative = ['mean1', 'mean2', 'array', 'diff'].indexOf(this.currentParam) !== -1
+    
+    if (char === '-' && this.inputBuffer.length === 0 && allowNegative) {
+      this.inputBuffer = char
+      this.updateParameterFromBuffer()
+      this.$forceUpdate()
+      return
+    }
+    
+    // Don't allow negative sign in middle or for positive-only params
+    if (char === '-' && (this.inputBuffer.length > 0 || !allowNegative)) {
+      return
+    }
+    
+    // Handle input - allow decimal point after 0
+    if (this.inputBuffer === '0' && char !== '.') {
+      this.inputBuffer = char
+    } else if (this.inputBuffer === '0' && char === '.') {
+      this.inputBuffer = '0.'
+    } else {
+      this.inputBuffer += char
+    }
+    
+    // Update parameter directly as user types
+    this.updateParameterFromBuffer()
+    this.$forceUpdate()
+  },
+
+  updateParameterFromBuffer() {
+    if (!this.inputBuffer || this.inputBuffer === '' || this.inputBuffer === '-') return
+    
+    const value = parseFloat(this.inputBuffer)
+    if (isNaN(value)) return
+    
+    if (this.currentParam === 'array') {
+      if (this.currentArrayIndex >= 0) {
+        const item = this.dataArray[this.currentArrayIndex]
+        item[this.currentArrayField] = value
+        this.dataArray.splice(this.currentArrayIndex, 1, item)
+      }
+    } else {
+      this[this.currentParam] = value
+      
+      // Validate bounds
+      if ((this.currentParam.startsWith('n') || this.currentParam.startsWith('s')) && value < 0) {
+        this[this.currentParam] = Math.abs(value)
+      }
+    }
+  },
+
+  onFinish() {
+    // Check if this was a cancel action (no input buffer means cancel/restore)
+    if (this.inputBuffer === '' && this.originalValue !== undefined) {
+      if (this.currentParam === 'array') {
+        const item = this.dataArray[this.currentArrayIndex]
+        item[this.currentArrayField] = this.originalValue
+        this.dataArray.splice(this.currentArrayIndex, 1, item)
+      } else {
+        this[this.currentParam] = this.originalValue
+      }
+    }
+    
+    this.showKeyboard = false
+    this.inputBuffer = ''
+    this.currentParam = ''
+    this.currentParamName = ''
+    this.$forceUpdate()
+  },
+
+  calculateStats() {
+    // Filter out null/empty values for X
+    const validDataX = this.dataArray
+      .map(item => item.x)
+      .filter(v => v !== null && !isNaN(v))
+      
+    // Filter out null/empty values for Y
+    const validDataY = this.dataArray
+      .map(item => item.y)
+      .filter(v => v !== null && !isNaN(v))
+
+    if (validDataX.length > 0) {
+      const statsX = HypothesisEngine.getStats(validDataX)
+      this.mean1 = parseFloat(statsX.mean.toFixed(4))
+      this.n1 = statsX.n
+      this.s1 = parseFloat(statsX.s.toFixed(4))
+    }
+
+    if (validDataY.length > 0) {
+      const statsY = HypothesisEngine.getStats(validDataY)
+      this.mean2 = parseFloat(statsY.mean.toFixed(4))
+      this.n2 = statsY.n
+      this.s2 = parseFloat(statsY.s.toFixed(4))
+    }
+  },
+
+  goToTestSelection() {
+    if (this.inputMode === 'array') {
+      this.calculateStats()
+    }
+
+    router.push({
+      uri: 'pages/hypothesis/two_sample',
+      params: {
+        mean1: this.mean1,
+        n1: this.n1,
+        s1: this.s1,
+        mean2: this.mean2,
+        n2: this.n2,
+        s2: this.s2
+      }
+    })
+  }
+}
+</script>
+
+<style>
+/* Reusing shared styles */
+.container {
+  display: flex;
+  flex-direction: column;
+  background-color: #000000;
+  height: 100%;
+}
+
+.top-bar {
+  height: 80px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 15px 20px;
+}
+
+.title-container {
+  flex-direction: column;
+  align-items: center;
+}
+
+.title {
+  font-size: 24px;
+  color: #ffffff;
+  font-weight: bold;
+}
+
+.subtitle {
+  font-size: 20px;
+  color: #aaaaaa;
+  margin-top: 5px;
+}
+
+.scroll-container {
+  flex: 1;
+  width: 100%;
+  flex-direction: column;
+}
+
+.scroll-content {
+  flex-direction: column;
+  width: 100%;
+}
+
+.content {
+  flex-direction: column;
+  padding: 20px;
+}
+
+.mode-selector {
+  flex-direction: row;
+  justify-content: space-around;
+  margin-bottom: 20px;
+  background-color: #222222;
+  border-radius: 8px;
+  padding: 5px;
+}
+
+.mode-btn {
+  padding: 10px 20px;
+  border-radius: 6px;
+}
+
+.mode-btn.active {
+  background-color: #444444;
+}
+
+.mode-text {
+  color: #ffffff;
+  font-size: 24px;
+}
+
+.section-title {
+  font-size: 24px;
+  color: #ffffff;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.param-section {
+  flex-direction: column;
+  margin-bottom: 20px;
+}
+
+.param-item {
+  background-color: #1a1a1a;
+  border-radius: 8px;
+  padding: 12px 15px;
+  margin-bottom: 10px;
+  flex-direction: column;
+  align-items: flex-start;
+  border: 1px solid #333333;
+}
+
+.param-label {
+  font-size: 24px;
+  color: #ffffff;
+  font-weight: 500;
+}
+
+.param-display {
+  width: 100%;
+  height: 60px;
+  background-color: #333333;
+  border: 1px solid #555555;
+  border-radius: 6px;
+  justify-content: center;
+  align-items: center;
+  margin-top: 8px;
+}
+
+.param-value {
+  font-size: 30px;
+  color: #00ff88;
+  font-weight: bold;
+}
+
+.calc-section {
+  margin-bottom: 6px;
+}
+
+.calc-btn {
+  height: 70px;
+  width: 100%;
+  background-color: #0066cc;
+  border-radius: 12px;
+  padding: 15px 20px;
+  justify-content: center;
+  align-items: center;
+}
+
+.calc-text {
+  font-size: 24px;
+  color: #ffffff;
+  font-weight: bold;
+}
+
+.bottom-section {
+  margin-top: 6px;
+  margin-bottom: 50px;
+  justify-content: center;
+  align-items: center;
+}
+
+.back-btn {
+  width: 100%;
+  height: 70px;
+  background-color: #333333;
+  border-radius: 12px;
+  justify-content: center;
+  align-items: center;
+}
+
+.back-text {
+  font-size: 24px;
+  color: #ffffff;
+  font-weight: bold;
+}
+
+/* Table Styles */
+.table-header {
+  flex-direction: row;
+  justify-content: space-between;
+  padding-bottom: 5px;
+  margin-bottom: 5px;
+}
+
+.table-row {
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 5px;
+  height: 70px;
+}
+
+.table-cell-id {
+  width: 10%;
+  color: #aaaaaa;
+  font-size: 24px;
+  text-align: center;
+}
+
+.table-cell-value {
+  width: 42%;
+  color: #ffffff;
+  font-size: 24px;
+  text-align: center;
+}
+
+.table-cell-input {
+  width: 42%;
+  height: 60px;
+  background-color: #333333;
+  border: 1px solid #555555;
+  border-radius: 6px;
+  justify-content: center;
+  align-items: center;
+  margin-left: 2px;
+  margin-right: 2px;
+}
+
+.table-actions {
+  flex-direction: row;
+  justify-content: space-around;
+  margin-top: 10px;
+  margin-bottom: 20px;
+}
+
+.action-btn {
+  width: 60px;
+  height: 60px;
+  background-color: #444444;
+  border-radius: 30px;
+  justify-content: center;
+  align-items: center;
+}
+
+.action-text {
+  color: #ffffff;
+  font-size: 30px;
+  font-weight: bold;
+}
+</style>
