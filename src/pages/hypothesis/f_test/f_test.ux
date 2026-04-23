@@ -4,7 +4,7 @@
       <text class="title">{{ i18n.pages.hypothesis.f_test }}</text>
     </div>
 
-    <scroll class="scroll-container" scroll-y="true">
+    <scroll class="scroll-container" scroll-y="{{ true }}">
       <div class="scroll-content">
         <div class="content">
           
@@ -87,7 +87,7 @@
           </div>
 
           <!-- Error Message -->
-          <div class="error-message" if="{{ errorMessage }}">
+          <div class="error-message" if="{{ !!errorMessage }}">
             <text class="error-text">{{ errorMessage }}</text>
           </div>
 
@@ -106,7 +106,7 @@
 <script>
 import router from "@system.router"
 import HypothesisEngine from "../../../common/hypothesis_engine"
-import i18n from "../../../common/i18n"
+import i18nService from "../../../common/i18n"
 
 export default {
   protected: {
@@ -126,7 +126,7 @@ export default {
     conclusion: "",
     hasResult: false,
     errorMessage: "",
-    i18n: i18n.getLocaleStrings()
+    i18n: i18nService.getLocaleStrings()
   },
 
   onInit() {
@@ -140,8 +140,10 @@ export default {
   },
 
   refreshI18n() {
-    this.i18n = i18n.getLocaleStrings()
-    this.$page.setTitleBar({ text: i18n.t('pages.hypothesis.f_test') })
+    this.i18n = i18nService.getLocaleStrings()
+    // @ts-ignore QuickApp runtime API
+    this.$page.setTitleBar({ text: i18nService.t('pages.hypothesis.f_test') })
+    // @ts-ignore QuickApp runtime API
     this.$forceUpdate()
   },
 
@@ -149,7 +151,8 @@ export default {
     router.back()
   },
 
-  handleSwipe(event) {
+  handleSwipe() {
+    const event = arguments[0] || {}
     if (event.direction === 'right') {
       this.goBack()
     }
@@ -160,15 +163,15 @@ export default {
       this.errorMessage = ""
       this.hasResult = false
 
-      const result = HypothesisEngine.fTestTwoSample({
-        n1: parseInt(this.n1),
-        s1: parseFloat(this.s1),
-        n2: parseInt(this.n2),
-        s2: parseFloat(this.s2)
-      })
+      const result = /** @type {any} */ (HypothesisEngine.fTestTwoSample({
+        n1: Number(this.n1),
+        s1: Number(this.s1),
+        n2: Number(this.n2),
+        s2: Number(this.s2)
+      }))
 
       if (result.error) {
-        this.errorMessage = i18n.t(`errors.${result.error}`) || result.error
+        this.errorMessage = i18nService.t(`errors.${result.error}`) || result.error
         return
       }
 
@@ -188,7 +191,8 @@ export default {
 
       this.hasResult = true
     } catch (e) {
-      this.errorMessage = "Calculation Error: " + (e.message || e)
+      const err = e instanceof Error ? e.message : String(e)
+      this.errorMessage = "Calculation Error: " + err
       this.hasResult = false
     }
   }

@@ -5,7 +5,7 @@
     </div>
 
     <div class="main-menu">
-      <scroll class="scroll-container" scroll-y="true">
+      <scroll class="scroll-container" scroll-y="{{ true }}">
         <div class="menu-content">
           <div class="menu-list-item menu-entry" onclick="routeToCoin">
             <div class="menu-item">
@@ -32,11 +32,11 @@
 
 <script>
 import router from '@system.router'
-import i18n from '../../../common/i18n'
+import i18nService from '../../../common/i18n'
 
 export default {
   private: {
-    i18n: i18n.getLocaleStrings()
+    i18n: i18nService.getLocaleStrings()
   },
   onInit() {
     this.refreshI18n()
@@ -45,7 +45,8 @@ export default {
     this.refreshI18n()
   },
   refreshI18n() {
-    this.i18n = i18n.getLocaleStrings()
+    this.i18n = i18nService.getLocaleStrings()
+    // @ts-ignore
     this.$page.setTitleBar({ text: this.i18n.pages.simulation.title })
   },
   routeToCoin() {
@@ -61,6 +62,7 @@ export default {
   goBack() {
     router.back()
   },
+  /** @param {any} event */
   handleSwipe(event) {
     if (event.direction === 'right') {
       this.goBack()

@@ -9,7 +9,7 @@
       </div>
     </div>
 
-    <scroll class="scroll-container" scroll-y="true">
+    <scroll class="scroll-container" scroll-y="{{ true }}">
       <div class="scroll-content">
         <div class="content">
           <!-- Input Mode Selection -->
@@ -152,6 +152,10 @@
             </div>
           </div>
 
+          <div class="error-message" if="{{ errorMessage }}">
+            <text class="error-text">{{ errorMessage }}</text>
+          </div>
+
           <!-- Back Button -->
           <div class="bottom-section" if="{{ !showKeyboard }}">
             <div class="back-btn" onclick="goBack">
@@ -179,7 +183,7 @@
 
 <script>
 import router from "@system.router"
-import i18n from "../../../common/i18n"
+import i18nService from "../../../common/i18n"
 import HypothesisEngine from "../../../common/hypothesis_engine"
 
 export default {
@@ -203,9 +207,9 @@ export default {
     currentParam: '',
     currentParamName: '',
     currentArrayIndex: -1,
-    currentArrayField: '', // 'x' or 'y'
     inputBuffer: '',
-    i18n: i18n.getLocaleStrings(),
+    errorMessage: '',
+    i18n: i18nService.getLocaleStrings(),
     vibratemode: "short",
     screentype: "pill-shaped"
   },
@@ -225,8 +229,8 @@ export default {
   },
 
   refreshI18n() {
-    this.i18n = i18n.getLocaleStrings()
-    this.$page.setTitleBar({ text: i18n.t('pages.hypothesis.two_sample') })
+    this.i18n = i18nService.getLocaleStrings()
+    this.$page.setTitleBar({ text: i18nService.t('pages.hypothesis.two_sample') })
     this.$forceUpdate()
   },
 
@@ -272,9 +276,12 @@ export default {
       case 'mean1': this.currentParamName = this.i18n.params.mean + " 1"; break;
       case 'n1': this.currentParamName = this.i18n.params.n + " 1"; break;
       case 's1': this.currentParamName = this.i18n.params.stddev + " 1"; break;
+      case 'sigma1': this.currentParamName = this.i18n.params.sigma + " 1"; break;
       case 'mean2': this.currentParamName = this.i18n.params.mean + " 2"; break;
       case 'n2': this.currentParamName = this.i18n.params.n + " 2"; break;
       case 's2': this.currentParamName = this.i18n.params.stddev + " 2"; break;
+      case 'sigma2': this.currentParamName = this.i18n.params.sigma + " 2"; break;
+      case 'diff': this.currentParamName = this.i18n.pages.hypothesis.hypothesized_diff || "Δ0"; break;
     }
   },
 
@@ -311,14 +318,15 @@ export default {
       // If buffer is empty, reset to default/original values
       if (this.currentParam === 'array') {
         if (this.currentArrayIndex >= 0) {
-          const item = this.dataArray[this.currentArrayIndex]
-          item[this.currentArrayField] = null
-          this.dataArray.splice(this.currentArrayIndex, 1, item)
+          const arr = this.currentTab === 0 ? this.dataArray1 : this.dataArray2
+          arr.splice(this.currentArrayIndex, 1, null)
         }
       } else {
         if (this.currentParam.startsWith('mean')) this[this.currentParam] = 0
         else if (this.currentParam.startsWith('n')) this[this.currentParam] = 30
+        else if (this.currentParam.startsWith('sigma')) this[this.currentParam] = null
         else if (this.currentParam.startsWith('s')) this[this.currentParam] = 1
+        else if (this.currentParam === 'diff') this[this.currentParam] = 0
       }
     }
     this.$forceUpdate()
@@ -376,9 +384,8 @@ export default {
     
     if (this.currentParam === 'array') {
       if (this.currentArrayIndex >= 0) {
-        const item = this.dataArray[this.currentArrayIndex]
-        item[this.currentArrayField] = value
-        this.dataArray.splice(this.currentArrayIndex, 1, item)
+        const arr = this.currentTab === 0 ? this.dataArray1 : this.dataArray2
+        arr.splice(this.currentArrayIndex, 1, value)
       }
     } else {
       this[this.currentParam] = value
@@ -388,15 +395,15 @@ export default {
         this[this.currentParam] = Math.abs(value)
       }
     }
+    this.errorMessage = ''
   },
 
   onFinish() {
     // Check if this was a cancel action (no input buffer means cancel/restore)
     if (this.inputBuffer === '' && this.originalValue !== undefined) {
       if (this.currentParam === 'array') {
-        const item = this.dataArray[this.currentArrayIndex]
-        item[this.currentArrayField] = this.originalValue
-        this.dataArray.splice(this.currentArrayIndex, 1, item)
+        const arr = this.currentTab === 0 ? this.dataArray1 : this.dataArray2
+        arr.splice(this.currentArrayIndex, 1, this.originalValue)
       } else {
         this[this.currentParam] = this.originalValue
       }
@@ -410,15 +417,15 @@ export default {
   },
 
   calculateStats() {
-    // Filter out null/empty values for X
-    const validDataX = this.dataArray
-      .map(item => item.x)
-      .filter(v => v !== null && !isNaN(v))
-      
-    // Filter out null/empty values for Y
-    const validDataY = this.dataArray
-      .map(item => item.y)
-      .filter(v => v !== null && !isNaN(v))
+    const validDataX = this.dataArray1
+      .filter(v => v !== null && v !== '' && !isNaN(v))
+      .map(v => parseFloat(v))
+      .filter(v => Number.isFinite(v))
+
+    const validDataY = this.dataArray2
+      .filter(v => v !== null && v !== '' && !isNaN(v))
+      .map(v => parseFloat(v))
+      .filter(v => Number.isFinite(v))
 
     if (validDataX.length > 0) {
       const statsX = HypothesisEngine.getStats(validDataX)
@@ -435,9 +442,72 @@ export default {
     }
   },
 
+  getValidData(array) {
+    return array
+      .filter(v => v !== null && v !== '' && !isNaN(v))
+      .map(v => Number(v))
+      .filter(v => Number.isFinite(v))
+  },
+
+  validateBeforeRoute() {
+    const mean1 = Number(this.mean1)
+    const n1 = Number(this.n1)
+    const s1 = Number(this.s1)
+    const mean2 = Number(this.mean2)
+    const n2 = Number(this.n2)
+    const s2 = Number(this.s2)
+    const diff = Number(this.diff || 0)
+    const hasSigma1 = this.sigma1 !== null && this.sigma1 !== '' && typeof this.sigma1 !== 'undefined'
+    const hasSigma2 = this.sigma2 !== null && this.sigma2 !== '' && typeof this.sigma2 !== 'undefined'
+    const sigma1 = Number(this.sigma1)
+    const sigma2 = Number(this.sigma2)
+
+    if (!Number.isFinite(mean1) || !Number.isFinite(mean2)) {
+      this.errorMessage = 'Sample means must be valid numbers'
+      return false
+    }
+    if (!Number.isFinite(diff)) {
+      this.errorMessage = 'Hypothesized difference must be a valid number'
+      return false
+    }
+    if (!Number.isFinite(n1) || n1 <= 1 || !Number.isInteger(n1)) {
+      this.errorMessage = 'Sample size n1 must be an integer > 1'
+      return false
+    }
+    if (!Number.isFinite(n2) || n2 <= 1 || !Number.isInteger(n2)) {
+      this.errorMessage = 'Sample size n2 must be an integer > 1'
+      return false
+    }
+    if (!Number.isFinite(s1) || s1 < 0 || !Number.isFinite(s2) || s2 < 0) {
+      this.errorMessage = 'Sample standard deviations must be >= 0'
+      return false
+    }
+    if (hasSigma1 && (!Number.isFinite(sigma1) || sigma1 <= 0)) {
+      this.errorMessage = 'Population sigma1 must be > 0 when provided'
+      return false
+    }
+    if (hasSigma2 && (!Number.isFinite(sigma2) || sigma2 <= 0)) {
+      this.errorMessage = 'Population sigma2 must be > 0 when provided'
+      return false
+    }
+    if (this.inputMode === 'array') {
+      const x = this.getValidData(this.dataArray1)
+      const y = this.getValidData(this.dataArray2)
+      if (x.length < 2 || y.length < 2) {
+        this.errorMessage = 'Each sample needs at least 2 valid data points'
+        return false
+      }
+    }
+    this.errorMessage = ''
+    return true
+  },
+
   goToTestSelection() {
     if (this.inputMode === 'array') {
       this.calculateStats()
+    }
+    if (!this.validateBeforeRoute()) {
+      return
     }
 
     router.push({
@@ -446,9 +516,12 @@ export default {
         mean1: this.mean1,
         n1: this.n1,
         s1: this.s1,
+        sigma1: this.sigma1,
         mean2: this.mean2,
         n2: this.n2,
-        s2: this.s2
+        s2: this.s2,
+        sigma2: this.sigma2,
+        diff: this.diff
       }
     })
   }
@@ -591,6 +664,20 @@ export default {
   font-size: 24px;
   color: #ffffff;
   font-weight: bold;
+}
+
+.error-message {
+  margin-bottom: 15px;
+  padding: 10px;
+  background-color: #2d1f1f;
+  border: 1px solid #cc4444;
+  border-radius: 8px;
+}
+
+.error-text {
+  font-size: 18px;
+  color: #ff6666;
+  text-align: center;
 }
 
 .bottom-section {

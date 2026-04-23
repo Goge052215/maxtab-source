@@ -7,20 +7,20 @@
       </div>
     </div>
 
-    <scroll class="scroll-container" scroll-y="true">
+    <scroll class="scroll-container" scroll-y="{{ true }}">
       <div class="scroll-content">
         <div class="content">
           <!-- Test Selection -->
           <div class="test-selector">
             <text class="section-title">{{ i18n.pages.hypothesis.test_statistic }}</text>
             
-            <div class="menu-list-item menu-entry" if="{{ isSigmaValid }}" onclick="routeToZTest">
+            <div class="menu-list-item menu-entry" if="{{ isSigmaValid }}" onclick="routeToTailSelect('z_test')">
               <div class="menu-item">
                 <text class="menu-title">{{ i18n.pages.hypothesis.z_test }}</text>
               </div>
             </div>
 
-            <div class="menu-list-item menu-entry" onclick="routeToTTest">
+            <div class="menu-list-item menu-entry" onclick="routeToTailSelect('t_test')">
               <div class="menu-item">
                 <text class="menu-title">{{ i18n.pages.hypothesis.t_test }}</text>
               </div>
@@ -41,7 +41,7 @@
 
 <script>
 import router from "@system.router"
-import i18n from "../../../common/i18n"
+import i18nService from "../../../common/i18n"
 
 export default {
   protected: {
@@ -52,7 +52,7 @@ export default {
     mu0: 0
   },
   private: {
-    i18n: i18n.getLocaleStrings()
+    i18n: i18nService.getLocaleStrings()
   },
 
   computed: {
@@ -71,8 +71,10 @@ export default {
   },
 
   refreshI18n() {
-    this.i18n = i18n.getLocaleStrings()
-    this.$page.setTitleBar({ text: i18n.t('pages.hypothesis.one_sample') })
+    this.i18n = i18nService.getLocaleStrings()
+    // @ts-ignore QuickApp runtime API
+    this.$page.setTitleBar({ text: i18nService.t('pages.hypothesis.one_sample') })
+    // @ts-ignore QuickApp runtime API
     this.$forceUpdate()
   },
 
@@ -80,36 +82,25 @@ export default {
     router.back()
   },
 
-  handleSwipe(event) {
+  handleSwipe() {
+    const event = arguments[0] || {}
     if (event.direction === 'right') {
       this.goBack()
     }
   },
 
-  routeToZTest() {
-    router.push({
-      uri: 'pages/hypothesis/z_test',
-      params: {
-        mean: this.mean,
-        n: this.n,
-        // Pass entered sigma if available, otherwise use sample s (but Z-test assumes known population sigma)
-        // If sigma is null, we pass s, but ideally user should know Z-test uses sigma.
-        // Based on user requirement: Z-Test used when sigma is provided.
-        sigma: (this.sigma !== null && this.sigma !== undefined) ? this.sigma : this.s,
-        mu0: this.mu0
-      }
-    })
-  },
-
-  routeToTTest() {
+  routeToTailSelect() {
+    const selectedTest = arguments[0] || 't_test'
     router.push({
       uri: 'pages/hypothesis/tail_type_select',
       params: {
         mean: this.mean,
         n: this.n,
         s: this.s,
+        sigma: this.sigma,
         mu0: this.mu0,
-        isTwoSample: false
+        isTwoSample: false,
+        selectedTest
       }
     })
   }

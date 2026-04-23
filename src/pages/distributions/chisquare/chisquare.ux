@@ -6,7 +6,7 @@
       <text class="title">{{ i18n.distributions.chisquare.title }}</text>
     </div>
 
-    <scroll class="scroll-container" scroll-y="true">
+    <scroll class="scroll-container" scroll-y="{{ true }}">
       <div class="scroll-content">
         <div class="content">
           <div class="section-group" if="{{ !showKeyboard }}">
@@ -73,7 +73,7 @@
 import router from "@system.router"
 import { DistributionCalculator } from "../../../common/distribution_engine"
 import { globalState } from "../../../common/global_state.js"
-import i18n from "../../../common/i18n"
+import i18nService from "../../../common/i18n"
 
 export default {
   private: {
@@ -89,7 +89,7 @@ export default {
     vibratemode: "short",
     screentype: "pill-shaped",
     currentLang: 'zh-CN',
-    i18n: i18n.getLocaleStrings()
+    i18n: i18nService.getLocaleStrings()
   },
 
   onInit() {
@@ -103,9 +103,9 @@ export default {
   },
 
   refreshI18n() {
-    this.currentLang = i18n.getCurrentLang()
-    this.i18n = i18n.getLocaleStrings(this.currentLang)
-    this.$page.setTitleBar({ text: i18n.t('distributions.chisquare.title', this.currentLang) })
+    this.currentLang = i18nService.getCurrentLang()
+    this.i18n = i18nService.getLocaleStrings(this.currentLang)
+    this.$page.setTitleBar({ text: i18nService.t('distributions.chisquare.title', this.currentLang) })
     this.$forceUpdate()
   },
 
@@ -227,7 +227,7 @@ export default {
 
   calculate() {
     if (this.df <= 0) {
-      this.errorMessage = i18n.t('errors.df_must_be_positive', this.currentLang)
+      this.errorMessage = i18nService.t('errors.df_must_be_positive', this.currentLang)
       return
     }
 
@@ -238,19 +238,19 @@ export default {
       router.push({
         uri: 'pages/detail_continuous',
         params: {
-          distributionName: i18n.t('distributions.chisquare.title', this.currentLang),
+          distributionName: i18nService.t('distributions.chisquare.title', this.currentLang),
           pdfValue: result.pdfResult.toFixed(6),
           cdfValue: result.cdfResult.toFixed(6),
           inputParams: [
-            { key: i18n.t('params.df', this.currentLang), value: this.df },
-            { key: i18n.t('params.x', this.currentLang), value: this.x }
+            { key: i18nService.t('params.df', this.currentLang), value: this.df },
+            { key: i18nService.t('params.x', this.currentLang), value: this.x }
           ]
         }
       })
       this.hasResult = true
       this.errorMessage = ""
     } else {
-      this.errorMessage = result.errorMessage || i18n.t('common.error_failed', this.currentLang)
+      this.errorMessage = result.errorMessage || i18nService.t('common.error_failed', this.currentLang)
       this.hasResult = false
     }
   }

@@ -1,9 +1,22 @@
 <script>
 import { globalState } from './common/global_state.js'
 import { memoryMonitor } from './common/memory_monitor.js'
+import i18n from './common/i18n'
+import storage from '@system.storage'
 
 export default {
   onCreate() {
+    storage.get({
+      key: 'app_language',
+      success: (data) => {
+        const savedLang = data && (data.value || data.data || data)
+        if (typeof savedLang === 'string') {
+          i18n.setCurrentLang(savedLang)
+        }
+      },
+      fail: () => {
+      }
+    })
     // Setup memory management
     this.setupMemoryOptimization()
   },

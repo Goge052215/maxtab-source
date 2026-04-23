@@ -42,7 +42,7 @@
 import router from "@system.router"
 import app from '@system.app'
 import device from '@system.device'
-import i18n from "../../common/i18n"
+import i18nService from "../../common/i18n"
 
 const MinusIcon = '+/-';
 const DelIcon = ' ';
@@ -60,7 +60,7 @@ export default {
     clickColorList: [],
     signColorList: ['#FFFFFF', '#FFFFFF', '#FFFFFF', '#FFFFFF'],
     currentLang: 'zh-CN',
-    i18n: i18n.getLocaleStrings()
+    i18n: i18nService.getLocaleStrings()
   },
 
   onInit() {
@@ -74,8 +74,8 @@ export default {
 
   refreshI18n() {
     this.currentLang = i18n.getCurrentLang()
-    this.i18n = i18n.getLocaleStrings(this.currentLang)
-    this.$page.setTitleBar({ text: i18n.t('pages.calculator.title', this.currentLang) })
+    this.i18n = i18nService.getLocaleStrings(this.currentLang)
+    this.$page.setTitleBar({ text: i18nService.t('pages.calculator.title', this.currentLang) })
     this.$forceUpdate()
   },
 

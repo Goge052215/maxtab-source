@@ -1,0 +1,11 @@
+0 verbose cli /usr/local/bin/node /usr/local/lib/node_modules/npm/bin/npm-cli.js
+1 info using npm@10.9.2
+2 info using node@v22.15.1
+3 silly config load:file:/usr/local/lib/node_modules/npm/npmrc
+4 silly config load:file:/Users/goge/maxtab/.npmrc
+5 silly config load:file:/usr/local/etc/npmrc
+6 verbose title npm exec aiot initEmulatorEnv
+7 verbose argv "exec" "--" "aiot" "initEmulatorEnv"
+8 verbose logfile logs-max:10 dir:/Users/goge/maxtab/.npm/_logs/2026-03-26T07_12_58_965Z-
+9 verbose logfile /Users/goge/maxtab/.npm/_logs/2026-03-26T07_12_58_965Z-debug-0.log
+10 silly logfile done cleaning log files

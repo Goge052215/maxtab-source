@@ -9,7 +9,7 @@
       </div>
     </div>
 
-    <scroll class="scroll-container" scroll-y="true">
+    <scroll class="scroll-container" scroll-y="{{ true }}">
       <div class="scroll-content">
         <div class="content">
           
@@ -115,7 +115,7 @@
 
 <script>
 import router from "@system.router"
-import i18n from "../../../common/i18n"
+import i18nService from "../../../common/i18n"
 import HypothesisEngine from "../../../common/hypothesis_engine"
 
 export default {
@@ -141,7 +141,7 @@ export default {
     errorMessage: "",
     alpha: 0.05,
 
-    i18n: i18n.getLocaleStrings(),
+    i18n: i18nService.getLocaleStrings(),
     vibratemode: "short",
     screentype: "pill-shaped"
   },
@@ -155,8 +155,8 @@ export default {
   },
 
   refreshI18n() {
-    this.i18n = i18n.getLocaleStrings()
-    this.$page.setTitleBar({ text: i18n.t('pages.hypothesis.chi_square') })
+    this.i18n = i18nService.getLocaleStrings()
+    this.$page.setTitleBar({ text: i18nService.t('pages.hypothesis.chi_square') })
     this.$forceUpdate()
   },
 

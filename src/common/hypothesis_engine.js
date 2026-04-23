@@ -8,6 +8,7 @@ class HypothesisEngine {
    */
   static _validateParams(params) {
     if (params.n !== undefined && params.n <= 0) return { error: 'invalid_n', message: 'Sample size must be > 0' };
+    if (params.n !== undefined && !Number.isInteger(params.n)) return { error: 'invalid_n', message: 'Sample size must be an integer' };
     if (params.s !== undefined && params.s < 0) return { error: 'invalid_s', message: 'Standard deviation must be >= 0' };
     if (params.sigma !== undefined && params.sigma <= 0) return { error: 'invalid_sigma', message: 'Sigma must be > 0' };
     return null;
@@ -16,7 +17,7 @@ class HypothesisEngine {
   /**
    * Calculate summary statistics from an array of data.
    * @param {number[]} data - Array of numerical values.
-   * @returns {object} { n, mean, s, variance }
+   * @returns {{ n: number, mean: number, s: number, variance: number }}
    */
   static getStats(data) {
     if (!data || !Array.isArray(data) || data.length === 0) {
@@ -302,7 +303,19 @@ class HypothesisEngine {
    * @param {number[]} x - Independent variable
    * @param {number[]} y - Dependent variable
    * @param {number} [alpha=0.05] - Significance level
-   * @returns {object} { slope, intercept, r, rSquared, t, df, pValueTwoTail, lowerCISlope, upperCISlope }
+   * @returns {{
+   *   error?: string,
+   *   message?: string,
+   *   slope?: number,
+   *   intercept?: number,
+   *   r?: number,
+   *   rSquared?: number,
+   *   t?: number,
+   *   df?: number,
+   *   pValueTwoTail?: number,
+   *   lowerCISlope?: number | null,
+   *   upperCISlope?: number | null
+   * }}
    */
   static linearRegression(x, y, alpha = 0.05) {
     if (!x || !y || x.length !== y.length || x.length <= 2) {

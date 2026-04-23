@@ -7,7 +7,7 @@
       </div>
     </div>
 
-    <scroll class="scroll-container" scroll-y="true">
+    <scroll class="scroll-container" scroll-y="{{ true }}">
       <div class="scroll-content">
         <div class="content">
           <!-- Test Selection -->
@@ -48,7 +48,7 @@
 
 <script>
 import router from "@system.router"
-import i18n from "../../../common/i18n"
+import i18nService from "../../../common/i18n"
 
 export default {
   protected: {
@@ -63,7 +63,7 @@ export default {
     diff: 0
   },
   private: {
-    i18n: i18n.getLocaleStrings()
+    i18n: i18nService.getLocaleStrings()
   },
 
   computed: {
@@ -84,8 +84,10 @@ export default {
   },
 
   refreshI18n() {
-    this.i18n = i18n.getLocaleStrings()
-    this.$page.setTitleBar({ text: i18n.t('pages.hypothesis.two_sample') })
+    this.i18n = i18nService.getLocaleStrings()
+    // @ts-ignore QuickApp runtime API
+    this.$page.setTitleBar({ text: i18nService.t('pages.hypothesis.two_sample') })
+    // @ts-ignore QuickApp runtime API
     this.$forceUpdate()
   },
 
@@ -93,31 +95,28 @@ export default {
     router.back()
   },
 
-  handleSwipe(event) {
+  handleSwipe() {
+    const event = arguments[0] || {}
     if (event.direction === 'right') {
       this.goBack()
     }
   },
 
   routeToZTest() {
-    // Two-sample Z-test
-    // Only if sigmas are provided. If not, maybe we should warn or just pass s as sigma (approximation)
-    // Following user design: Z-Test used when sigma1, sigma2 provided.
-    
-    const s1Val = (this.sigma1 !== null && this.sigma1 !== undefined) ? this.sigma1 : this.s1
-    const s2Val = (this.sigma2 !== null && this.sigma2 !== undefined) ? this.sigma2 : this.s2
-    
     router.push({
-      uri: 'pages/hypothesis/z_test',
+      uri: 'pages/hypothesis/tail_type_select',
       params: {
         mean: this.mean1,
         n: this.n1,
-        sigma: s1Val, 
+        s: this.s1,
+        sigma: this.sigma1,
         mean2: this.mean2,
         n2: this.n2,
-        sigma2: s2Val,
+        s2: this.s2,
+        sigma2: this.sigma2,
         isTwoSample: true,
-        diff: this.diff || 0
+        diff: this.diff || 0,
+        selectedTest: 'z_test'
       }
     })
   },
@@ -129,11 +128,14 @@ export default {
         mean: this.mean1,
         n: this.n1,
         s: this.s1,
+        sigma: this.sigma1,
         mean2: this.mean2,
         n2: this.n2,
         s2: this.s2,
+        sigma2: this.sigma2,
         isTwoSample: true,
-        diff: this.diff || 0
+        diff: this.diff || 0,
+        selectedTest: 't_test'
       }
     })
   },

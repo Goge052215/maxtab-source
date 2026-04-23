@@ -5,7 +5,7 @@
     </div>
 
     <div class="main-menu">
-      <scroll class="scroll-container" scroll-y="true">
+      <scroll class="scroll-container" scroll-y="{{ true }}">
         <div class="menu-content">
           <div class="menu-header">
             <text class="menu-subtitle">{{ i18n.pages.hypothesis.tail_type }}</text>
@@ -20,8 +20,8 @@
 
           <div class="menu-list-item" if="{{ !isTwoSample }}">
             <div class="menu-item">
-              <text class="menu-title">{{ i18n.pages.hypothesis.hypothesized_mean }} (μ₀)</text>
-              <text class="menu-desc">{{ mu0 }}</text>
+              <text class="menu-title">{{ i18n.pages.hypothesis.hypothesized_mean }} (mu0)</text>
+              <text class="menu-desc">{{ muZero }}</text>
             </div>
           </div>
 
@@ -62,22 +62,26 @@
 
 <script>
 import router from "@system.router"
-import i18n from "../../../common/i18n"
+import i18nService from "../../../common/i18n"
 
 export default {
   protected: {
     mean: 0,
     n: 30,
     s: 1,
+    sigma: null,
     mu0: 0,
     isTwoSample: false,
     mean2: 0,
     n2: 30,
     s2: 1,
-    diff: 0
+    sigma2: null,
+    diff: 0,
+    muZero: 0,
+    selectedTest: 't_test'
   },
   private: {
-    i18n: i18n.getLocaleStrings(),
+    i18n: i18nService.getLocaleStrings(),
     twoTailNull: "",
     twoTailAlt: "",
     leftTailNull: "",
@@ -87,43 +91,62 @@ export default {
   },
 
   onInit() {
+    this.muZero = this.mu0
     this.refreshI18n()
     this.updateHypotheses()
   },
 
   onShow() {
+    this.muZero = this.mu0
     this.refreshI18n()
     this.updateHypotheses()
   },
 
   refreshI18n() {
-    this.i18n = i18n.getLocaleStrings()
-    this.$page.setTitleBar({ text: i18n.t('pages.hypothesis.tail_type') })
+    this.i18n = i18nService.getLocaleStrings()
+    // @ts-ignore QuickApp runtime API
+    this.$page.setTitleBar({ text: i18nService.t('pages.hypothesis.tail_type') })
+    // @ts-ignore QuickApp runtime API
     this.$forceUpdate()
   },
 
   updateHypotheses() {
-    this.twoTailNull = `μ₀ = μ₁`
-    this.twoTailAlt = `μ₀ ≠ μ₁`
-    this.leftTailNull = `μ₀ > μ₁`
-    this.leftTailAlt = `μ₀ < μ₁`
-    this.rightTailNull = `μ₀ < μ₁`
-    this.rightTailAlt = `μ₀ > μ₁`
+    if (this.isTwoSample) {
+      const delta = Number(this.diff || 0)
+      this.twoTailNull = `mu1 - mu2 = ${delta}`
+      this.twoTailAlt = `mu1 - mu2 != ${delta}`
+      this.leftTailNull = `mu1 - mu2 >= ${delta}`
+      this.leftTailAlt = `mu1 - mu2 < ${delta}`
+      this.rightTailNull = `mu1 - mu2 <= ${delta}`
+      this.rightTailAlt = `mu1 - mu2 > ${delta}`
+    } else {
+      this.twoTailNull = `mu = mu0`
+      this.twoTailAlt = `mu != mu0`
+      this.leftTailNull = `mu >= mu0`
+      this.leftTailAlt = `mu < mu0`
+      this.rightTailNull = `mu <= mu0`
+      this.rightTailAlt = `mu > mu0`
+    }
+    // @ts-ignore QuickApp runtime API
     this.$forceUpdate()
   },
 
-  routeToTTest(tailType) {
+  routeToTTest() {
+    const tailType = arguments[0] || 'two_tail'
+    const targetUri = this.selectedTest === 'z_test' ? 'pages/hypothesis/z_test' : 'pages/hypothesis/t_test'
     router.push({
-      uri: 'pages/hypothesis/t_test',
+      uri: targetUri,
       params: {
         mean: this.mean,
         n: this.n,
         s: this.s,
+        sigma: this.sigma,
         mu0: this.mu0,
         isTwoSample: this.isTwoSample,
         mean2: this.mean2,
         n2: this.n2,
         s2: this.s2,
+        sigma2: this.sigma2,
         diff: this.diff || 0,
         tailType: tailType
       }
@@ -134,7 +157,8 @@ export default {
     router.back()
   },
 
-  handleSwipe(event) {
+  handleSwipe() {
+    const event = arguments[0] || {}
     if (event.direction === 'right') {
       this.goBack()
     }
@@ -231,3 +255,4 @@ export default {
 .back-item {
   min-height: 75px;
 }
+</style>

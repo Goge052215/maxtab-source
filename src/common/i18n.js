@@ -7,7 +7,7 @@ const locales = {
   en
 }
 
-const getCurrentLang = () => {
+const getSystemLang = () => {
   const locale = configuration.getLocale()
   if (locale && locale.language && locale.language.indexOf('zh') > -1) {
     return 'zh-CN'
@@ -15,8 +15,19 @@ const getCurrentLang = () => {
   return 'en'
 }
 
+let currentLang = getSystemLang()
+const isSupportedLang = (lang) => Object.prototype.hasOwnProperty.call(locales, lang)
+
+const setCurrentLang = (lang) => {
+  if (isSupportedLang(lang)) {
+    currentLang = lang
+  }
+}
+
+const getCurrentLang = () => currentLang
+
 const getLocaleStrings = (lang) => {
-  const targetLang = lang || getCurrentLang()
+  const targetLang = lang || currentLang
   return locales[targetLang] || en
 }
 
@@ -35,6 +46,7 @@ const t = (path, lang) => {
 
 export default {
   getCurrentLang,
+  setCurrentLang,
   getLocaleStrings,
   t
 }

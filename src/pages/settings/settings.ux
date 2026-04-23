@@ -5,7 +5,7 @@
     </div>
 
     <div class="main-menu">
-      <scroll class="scroll-container" scroll-y="true">
+      <scroll class="scroll-container" scroll-y="{{true}}">
         <div class="menu-content">
           <div class="menu-list-item menu-entry" onclick="changeLanguage('zh-CN')">
             <div class="menu-item">
@@ -34,42 +34,77 @@
 import router from "@system.router"
 import configuration from '@system.configuration'
 import storage from '@system.storage'
-import i18n from '../../common/i18n'
+import i18nService from '../../common/i18n'
 
 export default {
   private: {
     currentLang: 'zh-CN',
-    i18n: i18n.getLocaleStrings()
+    i18n: i18nService.getLocaleStrings()
   },
 
   onInit() {
-    this.refreshI18n()
+    storage.get({
+      key: 'app_language',
+      success: (data) => {
+        const savedLang = data && (data.value || data.data || data)
+        if (typeof savedLang === 'string') {
+          i18n.setCurrentLang(savedLang)
+        }
+        this.refreshI18n()
+      },
+      fail: () => {
+        this.refreshI18n()
+      }
+    })
   },
 
   onShow() {
-    this.refreshI18n()
+    storage.get({
+      key: 'app_language',
+      success: (data) => {
+        const savedLang = data && (data.value || data.data || data)
+        if (typeof savedLang === 'string') {
+          i18n.setCurrentLang(savedLang)
+        }
+        this.refreshI18n()
+      },
+      fail: () => {
+        this.refreshI18n()
+      }
+    })
   },
 
   refreshI18n() {
     this.currentLang = i18n.getCurrentLang()
-    this.i18n = i18n.getLocaleStrings(this.currentLang)
+    this.i18n = i18nService.getLocaleStrings(this.currentLang)
     this.updateTitle()
-    this.$forceUpdate()
+    const forceUpdate = Reflect.get(this, '$forceUpdate')
+    if (typeof forceUpdate === 'function') {
+      forceUpdate.call(this)
+    }
   },
 
   updateTitle() {
-    this.$page.setTitleBar({ text: i18n.t('pages.settings.title', this.currentLang) })
+    const setTitleBar = this.$page ? Reflect.get(this.$page, 'setTitleBar') : null
+    if (typeof setTitleBar === 'function') {
+      setTitleBar.call(this.$page, { text: i18nService.t('pages.settings.title', this.currentLang) })
+    }
   },
 
-  changeLanguage(lang) {
+  changeLanguage(lang = 'zh-CN') {
     if (this.currentLang === lang) return
-    
-    this.currentLang = lang
-    configuration.setLocale({
-      language: lang === 'zh-CN' ? 'zh' : 'en',
-      countryOrRegion: lang === 'zh-CN' ? 'CN' : 'US'
-    })
-    
+
+    i18n.setCurrentLang(lang)
+    this.refreshI18n()
+
+    try {
+      configuration.setLocale({
+        language: lang === 'zh-CN' ? 'zh' : 'en',
+        countryOrRegion: lang === 'zh-CN' ? 'CN' : 'US'
+      })
+    } catch (e) {
+    }
+
     storage.set({
       key: 'app_language',
       value: lang,
@@ -77,13 +112,12 @@ export default {
         this.refreshI18n()
       },
       fail: () => {
-        this.currentLang = i18n.getCurrentLang()
         this.refreshI18n()
       }
     })
   },
 
-  handleSwipe(event) {
+  handleSwipe(event = { direction: '' }) {
     if (event.direction === 'right') {
       this.goBack();
     }

@@ -9,7 +9,7 @@
       </div>
     </div>
 
-    <scroll class="scroll-container" scroll-y="true">
+    <scroll class="scroll-container" scroll-y="{{ true }}">
       <div class="scroll-content">
         <div class="content">
           
@@ -108,7 +108,7 @@
             </div>
           </div>
 
-          <div class="error-message" if="{{ errorMessage }}">
+          <div class="error-message" if="{{ !!errorMessage }}">
             <text class="error-text">{{ errorMessage }}</text>
           </div>
 
@@ -122,7 +122,7 @@
             if="{{ showKeyboard }}"
             hide="{{!showKeyboard}}"
             keyboardtype="NUMERIC"
-            maxlength="10"
+            maxlength="{{10}}"
             vibratemode="{{vibratemode}}"
             screentype="{{screentype}}"
             @visibility-change="onVisibilityChange"
@@ -138,7 +138,7 @@
 
 <script>
 import router from "@system.router"
-import i18n from "../../../common/i18n"
+import i18nService from "../../../common/i18n"
 import HypothesisEngine from "../../../common/hypothesis_engine"
 
 export default {
@@ -169,7 +169,7 @@ export default {
     errorMessage: "",
     alpha: 0.05,
 
-    i18n: i18n.getLocaleStrings(),
+    i18n: i18nService.getLocaleStrings(),
     vibratemode: "short",
     screentype: "pill-shaped"
   },
@@ -183,15 +183,24 @@ export default {
   },
 
   refreshI18n() {
-    this.i18n = i18n.getLocaleStrings()
-    this.$page.setTitleBar({ text: i18n.t('pages.hypothesis.linear_regression') })
-    this.$forceUpdate()
+    this.i18n = i18nService.getLocaleStrings()
+    // @ts-ignore QuickApp runtime API
+    this.$page.setTitleBar({ text: i18nService.t('pages.hypothesis.linear_regression') })
+    this.forceUpdateSafe()
+  },
+
+  forceUpdateSafe() {
+    const vm = /** @type {any} */ (this)
+    if (typeof vm.$forceUpdate === 'function') {
+      vm.$forceUpdate()
+    }
   },
 
   goBack() {
     router.back()
   },
 
+  /** @param {any} event */
   handleSwipe(event) {
     if (event.direction === 'right') {
       this.goBack()
@@ -208,6 +217,7 @@ export default {
     }
   },
 
+  /** @param {number} index @param {'x'|'y'} field */
   selectArrayInput(index, field) {
     this.currentArrayIndex = index
     this.currentArrayField = field
@@ -218,11 +228,12 @@ export default {
     this.currentParamName = `${fieldName} [${index + 1}]`
   },
 
+  /** @param {any} e */
   onVisibilityChange(e) {
     if (!e.detail.visible) {
       this.showKeyboard = false
       this.inputBuffer = ''
-      this.$forceUpdate()
+      this.forceUpdateSafe()
     }
   },
 
@@ -237,13 +248,15 @@ export default {
     } else {
       if (this.currentArrayIndex >= 0) {
         const item = this.dataArray[this.currentArrayIndex]
-        item[this.currentArrayField] = null
+        const field = /** @type {'x'|'y'} */ (this.currentArrayField)
+        item[field] = null
         this.dataArray.splice(this.currentArrayIndex, 1, item)
       }
     }
-    this.$forceUpdate()
+    this.forceUpdateSafe()
   },
 
+  /** @param {any} e */
   onComplete(e) {
     if (e.detail && e.detail.isCompleteButton) {
       this.onFinish()
@@ -258,7 +271,7 @@ export default {
     if (char === '-' && this.inputBuffer.length === 0) {
       this.inputBuffer = char
       this.updateParameterFromBuffer()
-      this.$forceUpdate()
+      this.forceUpdateSafe()
       return
     }
     
@@ -273,7 +286,7 @@ export default {
     }
     
     this.updateParameterFromBuffer()
-    this.$forceUpdate()
+    this.forceUpdateSafe()
   },
 
   updateParameterFromBuffer() {
@@ -284,7 +297,8 @@ export default {
     
     if (this.currentArrayIndex >= 0) {
       const item = this.dataArray[this.currentArrayIndex]
-      item[this.currentArrayField] = value
+      const field = /** @type {'x'|'y'} */ (this.currentArrayField)
+      item[field] = value
       this.dataArray.splice(this.currentArrayIndex, 1, item)
     }
   },
@@ -292,13 +306,14 @@ export default {
   onFinish() {
     if (this.inputBuffer === '' && this.originalValue !== undefined) {
       const item = this.dataArray[this.currentArrayIndex]
-      item[this.currentArrayField] = this.originalValue
+      const field = /** @type {'x'|'y'} */ (this.currentArrayField)
+      item[field] = this.originalValue
       this.dataArray.splice(this.currentArrayIndex, 1, item)
     }
     
     this.showKeyboard = false
     this.inputBuffer = ''
-    this.$forceUpdate()
+    this.forceUpdateSafe()
   },
 
   calculate() {

@@ -21,7 +21,7 @@
 
 <script>
   import router from "@system.router";
-  import i18n from "../../common/i18n";
+  import i18nService from "../../common/i18n";
 
   export default {
     private: {
@@ -31,7 +31,7 @@
       inputParams: [],
       chartData: null,
       currentLang: 'zh-CN',
-      i18n: i18n.getLocaleStrings()
+      i18n: i18nService.getLocaleStrings()
     },
 
     onInit() {
@@ -44,15 +44,15 @@
 
     refreshI18n() {
       this.currentLang = i18n.getCurrentLang()
-      this.i18n = i18n.getLocaleStrings(this.currentLang)
+      this.i18n = i18nService.getLocaleStrings(this.currentLang)
       if (!this.distributionName) {
-        this.distributionName = i18n.t('pages.detail_discrete.title', this.currentLang)
+        this.distributionName = i18nService.t('pages.detail_discrete.title', this.currentLang)
       }
       this.$forceUpdate()
     },
 
     onReady() {
-      this.$page.setTitleBar({ text: this.distributionName || i18n.t('pages.detail_discrete.title', this.currentLang) });
+      this.$page.setTitleBar({ text: this.distributionName || i18nService.t('pages.detail_discrete.title', this.currentLang) });
     },
 
     goBack() {

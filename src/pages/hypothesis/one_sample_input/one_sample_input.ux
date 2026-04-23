@@ -9,7 +9,7 @@
       </div>
     </div>
 
-    <scroll class="scroll-container" scroll-y="true">
+    <scroll class="scroll-container" scroll-y="{{ true }}">
       <div class="scroll-content">
         <div class="content">
           <!-- Input Mode Selection -->
@@ -44,6 +44,7 @@
                 <text class="param-value">{{ sigma === null ? '' : sigma }}</text>
               </div>
             </div>
+            <text class="helper-text">Known population sigma enables Z-test</text>
 
             <div class="param-item" @click="selectInput('mu0')">
               <text class="param-label">{{ i18n.pages.hypothesis.hypothesized_mean }} (μ₀)</text>
@@ -82,6 +83,7 @@
                 <text class="param-value">{{ sigma === null ? '' : sigma }}</text>
               </div>
             </div>
+            <text class="helper-text">Known population sigma enables Z-test</text>
 
             <div class="param-item" @click="selectInput('mu0')">
               <text class="param-label">{{ i18n.pages.hypothesis.hypothesized_mean }} (μ₀)</text>
@@ -108,6 +110,10 @@
             </div>
           </div>
 
+          <div class="error-message" if="{{ errorMessage }}">
+            <text class="error-text">{{ errorMessage }}</text>
+          </div>
+
           <!-- Back Button -->
           <div class="bottom-section" if="{{ !showKeyboard }}">
             <div class="back-btn" onclick="goBack">
@@ -119,7 +125,7 @@
             if="{{ showKeyboard }}"
             hide="{{!showKeyboard}}"
             keyboardtype="NUMERIC"
-            maxlength="10"
+            maxlength="{{10}}"
             vibratemode="{{vibratemode}}"
             screentype="{{screentype}}"
             @visibility-change="onVisibilityChange"
@@ -135,7 +141,7 @@
 
 <script>
 import router from "@system.router"
-import i18n from "../../../common/i18n"
+import i18nService from "../../../common/i18n"
 import HypothesisEngine from "../../../common/hypothesis_engine"
 
 export default {
@@ -154,7 +160,9 @@ export default {
     currentParamName: '',
     currentArrayIndex: -1,
     inputBuffer: '',
-    i18n: i18n.getLocaleStrings(),
+    originalValue: null,
+    errorMessage: '',
+    i18n: i18nService.getLocaleStrings(),
     vibratemode: "short",
     screentype: "pill-shaped"
   },
@@ -168,8 +176,8 @@ export default {
   },
 
   refreshI18n() {
-    this.i18n = i18n.getLocaleStrings()
-    this.$page.setTitleBar({ text: i18n.t('pages.hypothesis.one_sample') })
+    this.i18n = i18nService.getLocaleStrings()
+    this.$page.setTitleBar({ text: i18nService.t('pages.hypothesis.one_sample') })
     this.$forceUpdate()
   },
 
@@ -247,6 +255,7 @@ export default {
       } else {
         if (this.currentParam === 'mean' || this.currentParam === 'mu0') this[this.currentParam] = 0
         else if (this.currentParam === 'n') this[this.currentParam] = 30
+        else if (this.currentParam === 'sigma') this[this.currentParam] = null
         else if (this.currentParam === 's') this[this.currentParam] = 1
       }
     }
@@ -315,6 +324,7 @@ export default {
         this[this.currentParam] = Math.abs(value)
       }
     }
+    this.errorMessage = ''
   },
 
   onFinish() {
@@ -348,17 +358,73 @@ export default {
     }
   },
 
+  getValidArrayData() {
+    return this.dataArray
+      .filter(v => v !== null && v !== '' && !isNaN(v))
+      .map(v => Number(v))
+      .filter(v => Number.isFinite(v))
+  },
+
+  validateBeforeRoute() {
+    const mean = Number(this.mean)
+    const n = Number(this.n)
+    const s = Number(this.s)
+    const mu0 = Number(this.mu0)
+    const sigmaRaw = this.sigma
+    const hasSigma = sigmaRaw !== null && sigmaRaw !== '' && typeof sigmaRaw !== 'undefined'
+    const sigma = Number(sigmaRaw)
+
+    if (!Number.isFinite(mean)) {
+      this.errorMessage = 'Mean must be a valid number'
+      return false
+    }
+    if (!Number.isFinite(mu0)) {
+      this.errorMessage = 'Hypothesized mean must be a valid number'
+      return false
+    }
+    if (!Number.isFinite(n) || n <= 1) {
+      this.errorMessage = 'Sample size n must be greater than 1'
+      return false
+    }
+    if (!Number.isInteger(n)) {
+      this.errorMessage = 'Sample size n must be an integer'
+      return false
+    }
+    if (!Number.isFinite(s) || s < 0) {
+      this.errorMessage = 'Sample standard deviation s must be >= 0'
+      return false
+    }
+    if (hasSigma && (!Number.isFinite(sigma) || sigma <= 0)) {
+      this.errorMessage = 'Population sigma must be > 0 when provided'
+      return false
+    }
+    if (this.inputMode === 'array') {
+      const validData = this.getValidArrayData()
+      if (validData.length < 2) {
+        this.errorMessage = 'At least 2 valid data points are required'
+        return false
+      }
+    }
+
+    this.errorMessage = ''
+    return true
+  },
+
   goToTestSelection() {
     if (this.inputMode === 'array') {
       this.calculateStats()
     }
+    if (!this.validateBeforeRoute()) {
+      return
+    }
 
     router.push({
-      uri: 'pages/hypothesis/tail_type_select',
+      uri: 'pages/hypothesis/one_sample',
       params: {
         mean: this.mean,
         n: this.n,
         s: this.s,
+        sigma: this.sigma,
         mu0: this.mu0,
         isTwoSample: false
       }
@@ -496,6 +562,28 @@ export default {
   font-size: 24px;
   color: #ffffff;
   font-weight: bold;
+}
+
+.helper-text {
+  color: #aaaaaa;
+  font-size: 18px;
+  margin-top: -4px;
+  margin-bottom: 10px;
+  text-align: center;
+}
+
+.error-message {
+  margin-bottom: 15px;
+  padding: 10px;
+  background-color: #2d1f1f;
+  border: 1px solid #cc4444;
+  border-radius: 8px;
+}
+
+.error-text {
+  font-size: 18px;
+  color: #ff6666;
+  text-align: center;
 }
 
 .bottom-section {

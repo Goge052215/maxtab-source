@@ -5,7 +5,7 @@
     </div>
 
     <div class="main-menu">
-      <scroll class="scroll-container" scroll-y="true">
+      <scroll class="scroll-container" scroll-y="{{ true }}">
         <div class="menu-content">
           <div class="content-block">
             <text class="block-title">{{ i18n.pages.guide.tips_content.input_title }}</text>
@@ -56,11 +56,11 @@
 
 <script>
 import router from "@system.router"
-import i18n from '../../../common/i18n'
+import i18nService from '../../../common/i18n'
 
 export default {
   private: {
-    i18n: i18n.getLocaleStrings()
+    i18n: i18nService.getLocaleStrings()
   },
 
   onInit() {
@@ -72,8 +72,8 @@ export default {
   },
 
   refreshI18n() {
-    this.i18n = i18n.getLocaleStrings()
-    this.$page.setTitleBar({ text: i18n.t('pages.guide.tips') })
+    this.i18n = i18nService.getLocaleStrings()
+    this.$page.setTitleBar({ text: i18nService.t('pages.guide.tips') })
     this.$forceUpdate()
   },
 

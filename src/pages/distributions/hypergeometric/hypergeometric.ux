@@ -6,7 +6,7 @@
       <text class="title">{{ i18n.distributions.hypergeometric.title }}</text>
     </div>
 
-    <scroll class="scroll-container" scroll-y="true">
+    <scroll class="scroll-container" scroll-y="{{ true }}">
       <div class="scroll-content">
         <div class="content">
           <div class="param-section" if="{{ !showKeyboard }}">
@@ -86,7 +86,7 @@
 import router from "@system.router"
 import { DistributionCalculator } from "../../../common/distribution_engine"
 import { globalState } from "../../../common/global_state.js"
-import i18n from "../../../common/i18n"
+import i18nService from "../../../common/i18n"
 
 export default {
   private: {
@@ -104,7 +104,7 @@ export default {
     inputBuffer: '',
     originalValue: undefined,
     currentLang: 'zh-CN',
-    i18n: i18n.getLocaleStrings(),
+    i18n: i18nService.getLocaleStrings(),
     // Template variables
     vibratemode: "short",
     screentype: "pill-shaped"
@@ -121,9 +121,9 @@ export default {
   },
 
   refreshI18n() {
-    this.currentLang = i18n.getCurrentLang()
-    this.i18n = i18n.getLocaleStrings(this.currentLang)
-    this.$page.setTitleBar({ text: i18n.t('distributions.hypergeometric.title', this.currentLang) })
+    this.currentLang = i18nService.getCurrentLang()
+    this.i18n = i18nService.getLocaleStrings(this.currentLang)
+    this.$page.setTitleBar({ text: i18nService.t('distributions.hypergeometric.title', this.currentLang) })
     this.$forceUpdate()
   },
 
@@ -292,17 +292,17 @@ export default {
   calculate() {
     // Validate input parameters
     if (this.N <= 0) {
-      this.errorMessage = i18n.t('errors.N_must_be_positive', this.currentLang)
+      this.errorMessage = i18nService.t('errors.N_must_be_positive', this.currentLang)
       return
     }
     
     if (this.K < 0 || this.K > this.N) {
-      this.errorMessage = i18n.t('errors.K_between_0_and_N', this.currentLang)
+      this.errorMessage = i18nService.t('errors.K_between_0_and_N', this.currentLang)
       return
     }
     
     if (this.n < 0 || this.n > this.N) {
-      this.errorMessage = i18n.t('errors.n_between_0_and_N', this.currentLang)
+      this.errorMessage = i18nService.t('errors.n_between_0_and_N', this.currentLang)
       return
     }
     
@@ -310,7 +310,7 @@ export default {
     const kMax = Math.min(this.n, this.K)
     
     if (this.k < kMin || this.k > kMax) {
-      this.errorMessage = i18n.t('errors.k_between_min_and_max', this.currentLang).replace('{min}', kMin).replace('{max}', kMax)
+      this.errorMessage = i18nService.t('errors.k_between_min_and_max', this.currentLang).replace('{min}', kMin).replace('{max}', kMax)
       return
     }
 
@@ -321,21 +321,21 @@ export default {
       router.push({
         uri: 'pages/detail_discrete',
         params: {
-          distributionName: i18n.t('distributions.hypergeometric.title', this.currentLang),
+          distributionName: i18nService.t('distributions.hypergeometric.title', this.currentLang),
           pmfValue: result.pdfResult.toFixed(6),
           cdfValue: result.cdfResult.toFixed(6),
           inputParams: [
-            { key: `${i18n.t('params.N', this.currentLang)} N`, value: this.N },
-            { key: `${i18n.t('params.K', this.currentLang)} K`, value: this.K },
-            { key: `${i18n.t('params.n', this.currentLang)} n`, value: this.n },
-            { key: `${i18n.t('params.k', this.currentLang)} k`, value: this.k }
+            { key: `${i18nService.t('params.N', this.currentLang)} N`, value: this.N },
+            { key: `${i18nService.t('params.K', this.currentLang)} K`, value: this.K },
+            { key: `${i18nService.t('params.n', this.currentLang)} n`, value: this.n },
+            { key: `${i18nService.t('params.k', this.currentLang)} k`, value: this.k }
           ]
         }
       })
       this.hasResult = true
       this.errorMessage = ""
     } else {
-      this.errorMessage = result.errorMessage || i18n.t('common.error_failed', this.currentLang)
+      this.errorMessage = result.errorMessage || i18nService.t('common.error_failed', this.currentLang)
       this.hasResult = false
     }
   }

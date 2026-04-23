@@ -87,12 +87,12 @@
 
 <script>
 import router from "@system.router"
-import i18n from '../../common/i18n'
+import i18nService from '../../common/i18n'
 
 export default {
   private: {
     scrollY: 0,
-    i18n: i18n.getLocaleStrings()
+    i18n: i18nService.getLocaleStrings()
   },
 
   onInit() {
@@ -104,8 +104,8 @@ export default {
   },
 
   refreshI18n() {
-    this.i18n = i18n.getLocaleStrings()
-    this.$page.setTitleBar({ text: i18n.t('pages.continuous.title') })
+    this.i18n = i18nService.getLocaleStrings()
+    this.$page.setTitleBar({ text: i18nService.t('pages.continuous.title') })
     this.$forceUpdate()
   },
 

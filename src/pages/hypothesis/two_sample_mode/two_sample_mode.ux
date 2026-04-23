@@ -5,7 +5,7 @@
     </div>
 
     <div class="main-menu">
-      <scroll class="scroll-container" scroll-y="true">
+      <scroll class="scroll-container" scroll-y="{{ true }}">
         <div class="menu-content">
           <div class="menu-header">
             <text class="menu-subtitle">{{ i18n.pages.hypothesis.input_mode }}</text>
@@ -39,11 +39,11 @@
 
 <script>
 import router from "@system.router"
-import i18n from '../../../common/i18n'
+import i18nService from '../../../common/i18n'
 
 export default {
   private: {
-    i18n: i18n.getLocaleStrings()
+    i18n: i18nService.getLocaleStrings()
   },
 
   onInit() {
@@ -55,8 +55,10 @@ export default {
   },
 
   refreshI18n() {
-    this.i18n = i18n.getLocaleStrings()
-    this.$page.setTitleBar({ text: i18n.t('pages.hypothesis.two_sample') })
+    this.i18n = i18nService.getLocaleStrings()
+    // @ts-ignore
+    this.$page.setTitleBar({ text: i18nService.t('pages.hypothesis.two_sample') })
+    // @ts-ignore
     this.$forceUpdate()
   },
 
@@ -64,12 +66,14 @@ export default {
     router.back()
   },
 
+  /** @param {any} event */
   handleSwipe(event) {
     if (event.direction === 'right') {
       this.goBack()
     }
   },
 
+  /** @param {string} mode */
   routeToInput(mode) {
     router.push({ 
       uri: 'pages/hypothesis/two_sample_input',

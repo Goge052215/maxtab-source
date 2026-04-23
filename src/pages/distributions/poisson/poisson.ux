@@ -6,7 +6,7 @@
       <text class="title">{{ i18n.distributions.poisson.title }}</text>
     </div>
 
-    <scroll class="scroll-container" scroll-y="true">
+    <scroll class="scroll-container" scroll-y="{{ true }}">
       <div class="scroll-content">
         <div class="content">
           <div class="param-section" if="{{ !showKeyboard }}">
@@ -72,7 +72,7 @@
 import router from "@system.router"
 import { DistributionCalculator } from "../../../common/distribution_engine"
 import { globalState } from "../../../common/global_state.js"
-import i18n from "../../../common/i18n"
+import i18nService from "../../../common/i18n"
 
 export default {
   private: {
@@ -88,7 +88,7 @@ export default {
     inputBuffer: '',
     originalValue: undefined,
     currentLang: 'zh-CN',
-    i18n: i18n.getLocaleStrings(),
+    i18n: i18nService.getLocaleStrings(),
     // Template variables
     vibratemode: "short",
     screentype: "pill-shaped"
@@ -105,9 +105,9 @@ export default {
   },
 
   refreshI18n() {
-    this.currentLang = i18n.getCurrentLang()
-    this.i18n = i18n.getLocaleStrings(this.currentLang)
-    this.$page.setTitleBar({ text: i18n.t('distributions.poisson.title', this.currentLang) })
+    this.currentLang = i18nService.getCurrentLang()
+    this.i18n = i18nService.getLocaleStrings(this.currentLang)
+    this.$page.setTitleBar({ text: i18nService.t('distributions.poisson.title', this.currentLang) })
     this.$forceUpdate()
   },
 
@@ -278,12 +278,12 @@ export default {
   calculate() {
     // Validate input parameters
     if (this.lambda <= 0) {
-      this.errorMessage = `${i18n.t('params.lambda', this.currentLang)} ${i18n.t('errors.must_be_positive', this.currentLang)}`
+      this.errorMessage = `${i18nService.t('params.lambda', this.currentLang)} ${i18nService.t('errors.must_be_positive', this.currentLang)}`
       return
     }
     
     if (this.k < 0) {
-      this.errorMessage = `${i18n.t('params.k', this.currentLang)} ${i18n.t('errors.must_be_nonnegative', this.currentLang)}`
+      this.errorMessage = `${i18nService.t('params.k', this.currentLang)} ${i18nService.t('errors.must_be_nonnegative', this.currentLang)}`
       return
     }
 
@@ -294,20 +294,20 @@ export default {
       router.push({
         uri: 'pages/detail_discrete',
         params: {
-          distributionName: i18n.t('distributions.poisson.title', this.currentLang),
+          distributionName: i18nService.t('distributions.poisson.title', this.currentLang),
           pmfValue: result.pdfResult.toFixed(6),
           cdfValue: result.cdfResult.toFixed(6),
           chartData: result.chartData,
           inputParams: [
-            { key: i18n.t('params.lambda', this.currentLang), value: this.lambda },
-            { key: i18n.t('params.k', this.currentLang), value: this.k }
+            { key: i18nService.t('params.lambda', this.currentLang), value: this.lambda },
+            { key: i18nService.t('params.k', this.currentLang), value: this.k }
           ]
         }
       })
       this.hasResult = true
       this.errorMessage = ""
     } else {
-      this.errorMessage = result.errorMessage || i18n.t('common.error_failed', this.currentLang)
+      this.errorMessage = result.errorMessage || i18nService.t('common.error_failed', this.currentLang)
       this.hasResult = false
     }
   }

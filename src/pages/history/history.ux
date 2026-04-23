@@ -35,13 +35,13 @@
 
 <script>
 import router from "@system.router"
-import i18n from "../../common/i18n"
+import i18nService from "../../common/i18n"
 
 export default {
   private: {
     history: [],
     currentLang: 'zh-CN',
-    i18n: i18n.getLocaleStrings()
+    i18n: i18nService.getLocaleStrings()
   },
 
   onInit() {
@@ -56,17 +56,17 @@ export default {
 
   refreshI18n() {
     this.currentLang = i18n.getCurrentLang()
-    this.i18n = i18n.getLocaleStrings(this.currentLang)
-    this.$page.setTitleBar({ text: i18n.t('pages.history.title', this.currentLang) })
+    this.i18n = i18nService.getLocaleStrings(this.currentLang)
+    this.$page.setTitleBar({ text: i18nService.t('pages.history.title', this.currentLang) })
     this.$forceUpdate()
   },
 
   loadHistory() {
-    const todayLabel = i18n.t('pages.history.today', this.currentLang)
-    const yesterdayLabel = i18n.t('pages.history.yesterday', this.currentLang)
+    const todayLabel = i18nService.t('pages.history.today', this.currentLang)
+    const yesterdayLabel = i18nService.t('pages.history.yesterday', this.currentLang)
     this.history = [
       {
-        distributionName: i18n.t('distributions.normal.title', this.currentLang),
+        distributionName: i18nService.t('distributions.normal.title', this.currentLang),
         distributionType: 'normal',
         category: 'continuous',
         time: `${todayLabel} 14:30`,
@@ -75,12 +75,12 @@ export default {
           { name: 'σ', value: 1 }
         ],
         inputValue: 1.96,
-        densityLabel: i18n.t('labels.pdf', this.currentLang),
+        densityLabel: i18nService.t('labels.pdf', this.currentLang),
         densityValue: '0.0584',
         cdfValue: '0.9750'
       },
       {
-        distributionName: i18n.t('distributions.binomial.title', this.currentLang),
+        distributionName: i18nService.t('distributions.binomial.title', this.currentLang),
         distributionType: 'binomial',
         category: 'discrete',
         time: `${todayLabel} 10:15`,
@@ -89,12 +89,12 @@ export default {
           { name: 'p', value: 0.3 }
         ],
         inputValue: 5,
-        densityLabel: i18n.t('labels.pmf', this.currentLang),
+        densityLabel: i18nService.t('labels.pmf', this.currentLang),
         densityValue: '0.1789',
         cdfValue: '0.4164'
       },
       {
-        distributionName: i18n.t('distributions.poisson.title', this.currentLang),
+        distributionName: i18nService.t('distributions.poisson.title', this.currentLang),
         distributionType: 'poisson',
         category: 'discrete',
         time: `${yesterdayLabel} 16:45`,
@@ -102,12 +102,12 @@ export default {
           { name: 'λ', value: 2.5 }
         ],
         inputValue: 3,
-        densityLabel: i18n.t('labels.pmf', this.currentLang),
+        densityLabel: i18nService.t('labels.pmf', this.currentLang),
         densityValue: '0.2138',
         cdfValue: '0.7576'
       },
       {
-        distributionName: i18n.t('distributions.exponential.title', this.currentLang),
+        distributionName: i18nService.t('distributions.exponential.title', this.currentLang),
         distributionType: 'exponential',
         category: 'continuous',
         time: `${yesterdayLabel} 09:20`,
@@ -115,7 +115,7 @@ export default {
           { name: 'λ', value: 1.5 }
         ],
         inputValue: 2,
-        densityLabel: i18n.t('labels.pdf', this.currentLang),
+        densityLabel: i18nService.t('labels.pdf', this.currentLang),
         densityValue: '0.3347',
         cdfValue: '0.9502'
       }
@@ -152,7 +152,7 @@ export default {
 
   getTodayCalculations() {
     // 简化的今日计算统计
-    return this.history.filter(item => item.time.includes(i18n.t('pages.history.today', this.currentLang))).length
+    return this.history.filter(item => item.time.includes(i18nService.t('pages.history.today', this.currentLang))).length
   }
 }
 </script>

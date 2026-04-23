@@ -4,7 +4,7 @@
       <text class="title">{{ i18n.pages.hypothesis.t_test }}</text>
     </div>
 
-    <scroll class="scroll-container" scroll-y="true">
+    <scroll class="scroll-container" scroll-y="{{ true }}">
       <div class="scroll-content">
         <div class="content">
           
@@ -59,8 +59,8 @@
             
             <div class="menu-list-item" if="{{ !isTwoSample }}">
               <div class="menu-item">
-                <text class="menu-label">{{ i18n.pages.hypothesis.hypothesized_mean }} (μ₀)</text>
-                <text class="menu-value">{{ mu0 }}</text>
+                <text class="menu-label">{{ i18n.pages.hypothesis.hypothesized_mean }} (mu0)</text>
+                <text class="menu-value">{{ muZero }}</text>
               </div>
             </div>
           </div>
@@ -173,7 +173,7 @@
           <!-- Back Button -->
           <div class="bottom-section">
             <div class="back-btn" onclick="goBack">
-              <text class="back-text">{{ i18n.common.back }}</text>
+              <text class="back-text">{{ backTextLabel }}</text>
             </div>
           </div>
         </div>
@@ -185,7 +185,7 @@
 <script>
 import router from "@system.router"
 import HypothesisEngine from "../../../common/hypothesis_engine"
-import i18n from "../../../common/i18n"
+import i18nService from "../../../common/i18n"
 
 export default {
   protected: {
@@ -193,6 +193,7 @@ export default {
     n: 30,
     s: 1,
     mu0: 0,
+    muZero: 0,
     // Two Sample Params
     isTwoSample: false,
     mean2: 0,
@@ -218,22 +219,28 @@ export default {
     conclusion: "",
     hasResult: false,
     errorMessage: "",
-    i18n: i18n.getLocaleStrings()
+    backTextLabel: "",
+    i18n: i18nService.getLocaleStrings()
   },
 
   onInit() {
+    this.muZero = this.mu0
     this.refreshI18n()
     // Auto calculate on load
     this.calculate()
   },
 
   onShow() {
+    this.muZero = this.mu0
     this.refreshI18n()
   },
 
   refreshI18n() {
-    this.i18n = i18n.getLocaleStrings()
-    this.$page.setTitleBar({ text: i18n.t('pages.hypothesis.t_test') })
+    this.i18n = i18nService.getLocaleStrings()
+    this.backTextLabel = this.i18n.common && this.i18n.common.back ? this.i18n.common.back : "Back"
+    // @ts-ignore QuickApp runtime API
+    this.$page.setTitleBar({ text: i18nService.t('pages.hypothesis.t_test') })
+    // @ts-ignore QuickApp runtime API
     this.$forceUpdate()
   },
 
@@ -241,7 +248,8 @@ export default {
     router.back()
   },
 
-  handleSwipe(event) {
+  handleSwipe() {
+    const event = arguments[0] || {}
     if (event.direction === 'right') {
       this.goBack()
     }
@@ -252,17 +260,17 @@ export default {
       this.errorMessage = ""
       this.hasResult = false
 
-      let result;
+      let result = null
 
-      const mean = parseFloat(this.mean)
-      const n = parseInt(this.n)
-      const s = parseFloat(this.s)
-      const mu0 = parseFloat(this.mu0)
-      const mean2 = parseFloat(this.mean2)
-      const n2 = parseInt(this.n2)
-      const s2 = parseFloat(this.s2)
-      const diff = parseFloat(this.diff || 0)
-      const tailType = this.tailType || "two_tail"
+      const mean = Number(this.mean)
+      const n = Number(this.n)
+      const s = Number(this.s)
+      const mu0 = Number(this.mu0)
+      const mean2 = Number(this.mean2)
+      const n2 = Number(this.n2)
+      const s2 = Number(this.s2)
+      const diff = Number(this.diff || 0)
+      const tailType = String(this.tailType || "two_tail")
 
       this.testTypeLabel = this.isTwoSample
         ? `${this.i18n.pages.hypothesis.two_sample} ${this.i18n.pages.hypothesis.welch}`
@@ -273,14 +281,29 @@ export default {
           ? this.i18n.pages.hypothesis.right_tail
           : this.i18n.pages.hypothesis.two_tail
       if (tailType === "left_tail") {
-        this.hypothesisNull = `μ₀ > μ₁`
-        this.hypothesisAlt = `μ₀ < μ₁`
+        if (this.isTwoSample) {
+          this.hypothesisNull = `mu1 - mu2 >= ${diff}`
+          this.hypothesisAlt = `mu1 - mu2 < ${diff}`
+        } else {
+          this.hypothesisNull = `mu >= mu0`
+          this.hypothesisAlt = `mu < mu0`
+        }
       } else if (tailType === "right_tail") {
-        this.hypothesisNull = `μ₀ < μ₁`
-        this.hypothesisAlt = `μ₀ > μ₁`
+        if (this.isTwoSample) {
+          this.hypothesisNull = `mu1 - mu2 <= ${diff}`
+          this.hypothesisAlt = `mu1 - mu2 > ${diff}`
+        } else {
+          this.hypothesisNull = `mu <= mu0`
+          this.hypothesisAlt = `mu > mu0`
+        }
       } else {
-        this.hypothesisNull = `μ₀ = μ₁`
-        this.hypothesisAlt = `μ₀ ≠ μ₁`
+        if (this.isTwoSample) {
+          this.hypothesisNull = `mu1 - mu2 = ${diff}`
+          this.hypothesisAlt = `mu1 - mu2 != ${diff}`
+        } else {
+          this.hypothesisNull = `mu = mu0`
+          this.hypothesisAlt = `mu != mu0`
+        }
       }
 
       if (this.isTwoSample) {
@@ -311,20 +334,21 @@ export default {
           })
       }
 
-      if (result.error) {
-        this.errorMessage = i18n.t(`errors.${result.error}`) || result.error
+      const r = /** @type {any} */ (result)
+      if (r.error) {
+        this.errorMessage = i18nService.t(`errors.${r.error}`) || r.error
         return
       }
 
-      this.resultT = result.t.toFixed(4)
-      this.resultDf = result.df.toFixed(4)
-      this.pValueTwoTail = result.pValueTwoTail.toFixed(4)
-      this.pValueLeft = result.pValueLeft.toFixed(4)
-      this.pValueRight = result.pValueRight.toFixed(4)
+      this.resultT = r.t.toFixed(4)
+      this.resultDf = r.df.toFixed(4)
+      this.pValueTwoTail = r.pValueTwoTail.toFixed(4)
+      this.pValueLeft = r.pValueLeft.toFixed(4)
+      this.pValueRight = r.pValueRight.toFixed(4)
       
-      if (result.lowerCI !== null && result.upperCI !== null) {
-        this.lowerCI = result.lowerCI.toFixed(4)
-        this.upperCI = result.upperCI.toFixed(4)
+      if (r.lowerCI !== null && r.upperCI !== null) {
+        this.lowerCI = r.lowerCI.toFixed(4)
+        this.upperCI = r.upperCI.toFixed(4)
       } else {
         this.lowerCI = null
         this.upperCI = null
@@ -332,10 +356,10 @@ export default {
       
       // Determine conclusion based on two-tail p-value and alpha=0.05
       const selectedPValue = tailType === "left_tail"
-        ? result.pValueLeft
+        ? r.pValueLeft
         : tailType === "right_tail"
-          ? result.pValueRight
-          : result.pValueTwoTail
+          ? r.pValueRight
+          : r.pValueTwoTail
 
       if (selectedPValue < this.alpha) {
           this.conclusion = this.i18n.pages.hypothesis.reject
@@ -345,7 +369,8 @@ export default {
 
       this.hasResult = true
     } catch (e) {
-      this.errorMessage = "Calculation Error: " + (e.message || e)
+      const err = e instanceof Error ? e.message : String(e)
+      this.errorMessage = "Calculation Error: " + err
       this.hasResult = false
     }
   }

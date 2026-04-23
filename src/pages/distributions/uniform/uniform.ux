@@ -6,7 +6,7 @@
       <text class="title">{{ i18n.distributions.uniform.title }}</text>
     </div>
 
-    <scroll class="scroll-container" scroll-y="true">
+    <scroll class="scroll-container" scroll-y="{{ true }}">
       <div class="scroll-content">
         <div class="content">
           <div class="param-section" if="{{ !showKeyboard }}">
@@ -79,7 +79,7 @@
 import router from "@system.router"
 import { DistributionCalculator } from "../../../common/distribution_engine"
 import { globalState } from "../../../common/global_state.js"
-import i18n from "../../../common/i18n"
+import i18nService from "../../../common/i18n"
 
 export default {
   private: {
@@ -96,7 +96,7 @@ export default {
     inputBuffer: '',
     originalValue: undefined,
     currentLang: 'zh-CN',
-    i18n: i18n.getLocaleStrings(),
+    i18n: i18nService.getLocaleStrings(),
     // Template variables
     vibratemode: "short",
     screentype: "pill-shaped"
@@ -113,9 +113,9 @@ export default {
   },
 
   refreshI18n() {
-    this.currentLang = i18n.getCurrentLang()
-    this.i18n = i18n.getLocaleStrings(this.currentLang)
-    this.$page.setTitleBar({ text: i18n.t('distributions.uniform.title', this.currentLang) })
+    this.currentLang = i18nService.getCurrentLang()
+    this.i18n = i18nService.getLocaleStrings(this.currentLang)
+    this.$page.setTitleBar({ text: i18nService.t('distributions.uniform.title', this.currentLang) })
     this.$forceUpdate()
   },
 
@@ -285,7 +285,7 @@ export default {
   calculate() {
     // Validate input parameters
     if (this.a >= this.b) {
-      this.errorMessage = i18n.t('errors.lower_less_than_upper', this.currentLang)
+      this.errorMessage = i18nService.t('errors.lower_less_than_upper', this.currentLang)
       return
     }
 
@@ -296,20 +296,20 @@ export default {
       router.push({
         uri: 'pages/detail_continuous',
         params: {
-          distributionName: i18n.t('distributions.uniform.title', this.currentLang),
+          distributionName: i18nService.t('distributions.uniform.title', this.currentLang),
           pdfValue: result.pdfResult.toFixed(6),
           cdfValue: result.cdfResult.toFixed(6),
           inputParams: [
-            { key: `${i18n.t('params.lower', this.currentLang)} a`, value: this.a },
-            { key: `${i18n.t('params.upper', this.currentLang)} b`, value: this.b },
-            { key: `${i18n.t('params.x', this.currentLang)} x`, value: this.x }
+            { key: `${i18nService.t('params.lower', this.currentLang)} a`, value: this.a },
+            { key: `${i18nService.t('params.upper', this.currentLang)} b`, value: this.b },
+            { key: `${i18nService.t('params.x', this.currentLang)} x`, value: this.x }
           ]
         }
       })
       this.hasResult = true
       this.errorMessage = ""
     } else {
-      this.errorMessage = result.errorMessage || i18n.t('common.error_failed', this.currentLang)
+      this.errorMessage = result.errorMessage || i18nService.t('common.error_failed', this.currentLang)
       this.hasResult = false
     }
   }

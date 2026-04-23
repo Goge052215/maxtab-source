@@ -6,7 +6,7 @@
       <text class="title">{{ i18n.distributions.binomial.title }}</text>
     </div>
 
-    <scroll class="scroll-container" scroll-y="true">
+    <scroll class="scroll-container" scroll-y="{{ true }}">
       <div class="scroll-content">
         <div class="content">
           <div class="param-section" if="{{ !showKeyboard }}">
@@ -46,7 +46,7 @@
             </div>
           </div>
 
-          <div class="error-message" if="{{ errorMessage }}">
+          <div class="error-message" if="{{ !!errorMessage }}">
             <text class="error-text">{{ errorMessage }}</text>
           </div>
 
@@ -60,7 +60,7 @@
             if="{{ showKeyboard }}"
             hide="{{!showKeyboard}}"
             keyboardtype="NUMERIC"
-            maxlength="10"
+            maxlength={{10}}
             vibratemode="{{vibratemode}}"
             screentype="{{screentype}}"
             @visibility-change="onVisibilityChange"
@@ -79,7 +79,7 @@
 import router from "@system.router"
 import { DistributionCalculator } from "../../../common/distribution_engine"
 import { globalState } from "../../../common/global_state.js"
-import i18n from "../../../common/i18n"
+import i18nService from "../../../common/i18n"
 
 export default {
   private: {
@@ -96,7 +96,7 @@ export default {
     inputBuffer: '',
     originalValue: undefined,
     currentLang: 'zh-CN',
-    i18n: i18n.getLocaleStrings(),
+    i18n: i18nService.getLocaleStrings(),
     // Template variables
     vibratemode: "short",
     screentype: "pill-shaped"
@@ -113,9 +113,9 @@ export default {
   },
 
   refreshI18n() {
-    this.currentLang = i18n.getCurrentLang()
-    this.i18n = i18n.getLocaleStrings(this.currentLang)
-    this.$page.setTitleBar({ text: i18n.t('distributions.binomial.title', this.currentLang) })
+    this.currentLang = i18nService.getCurrentLang()
+    this.i18n = i18nService.getLocaleStrings(this.currentLang)
+    this.$page.setTitleBar({ text: i18nService.t('distributions.binomial.title', this.currentLang) })
     this.$forceUpdate()
   },
 
@@ -298,17 +298,17 @@ export default {
   calculate() {
     // Validate input parameters
     if (this.n <= 0) {
-      this.errorMessage = `${i18n.t('params.n', this.currentLang)} ${i18n.t('errors.must_be_positive', this.currentLang)}`
+      this.errorMessage = `${i18nService.t('params.n', this.currentLang)} ${i18nService.t('errors.must_be_positive', this.currentLang)}`
       return
     }
     
     if (this.p < 0 || this.p > 1) {
-      this.errorMessage = `${i18n.t('params.p', this.currentLang)} ${i18n.t('errors.must_be_between_0_and_1', this.currentLang)}`
+      this.errorMessage = `${i18nService.t('params.p', this.currentLang)} ${i18nService.t('errors.must_be_between_0_and_1', this.currentLang)}`
       return
     }
     
     if (this.k < 0 || this.k > this.n) {
-      this.errorMessage = i18n.t('errors.k_between_0_and_n', this.currentLang)
+      this.errorMessage = i18nService.t('errors.k_between_0_and_n', this.currentLang)
       return
     }
 
@@ -319,21 +319,21 @@ export default {
       router.push({
         uri: 'pages/detail_discrete',
         params: {
-          distributionName: i18n.t('distributions.binomial.title', this.currentLang),
+          distributionName: i18nService.t('distributions.binomial.title', this.currentLang),
           pmfValue: result.pdfResult.toFixed(6),
           cdfValue: result.cdfResult.toFixed(6),
           chartData: result.chartData,
           inputParams: [
-            { key: `${i18n.t('params.n', this.currentLang)} n`, value: this.n },
-            { key: `${i18n.t('params.p', this.currentLang)} p`, value: this.p },
-            { key: `${i18n.t('params.k', this.currentLang)} k`, value: this.k }
+            { key: `${i18nService.t('params.n', this.currentLang)} n`, value: this.n },
+            { key: `${i18nService.t('params.p', this.currentLang)} p`, value: this.p },
+            { key: `${i18nService.t('params.k', this.currentLang)} k`, value: this.k }
           ]
         }
       })
       this.hasResult = true
       this.errorMessage = ""
     } else {
-      this.errorMessage = result.errorMessage || i18n.t('common.error_failed', this.currentLang)
+      this.errorMessage = result.errorMessage || i18nService.t('common.error_failed', this.currentLang)
       this.hasResult = false
     }
   }
