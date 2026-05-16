@@ -19,9 +19,15 @@
             </div>
           </div>
 
-          <div class="menu-list-item menu-entry" onclick="routeToHypothesis()">
+          <!-- <div class="menu-list-item menu-entry" onclick="routeToHypothesis()">
             <div class="menu-item">
               <text class="menu-title">{{ i18n.index.menu.hypothesis }}</text>
+            </div>
+          </div> -->
+
+          <div class="menu-list-item menu-entry" onclick="routeToLinearRegression()">
+            <div class="menu-item">
+              <text class="menu-title">{{ i18n.index.menu.linear_regression }}</text>
             </div>
           </div>
 
@@ -104,8 +110,13 @@ export default {
     router.push({ uri: 'pages/continuous' })
   },
 
-  routeToHypothesis() {
-    router.push({ uri: 'pages/hypothesis' })
+  // Hyp Testing Not finished yet
+  // routeToHypothesis() {
+  //   router.push({ uri: 'pages/hypothesis' })
+  // },
+
+  routeToLinearRegression() {
+    router.push({ uri: 'pages/hypothesis/linear_regression' })
   },
 
   routeToSimulation() {

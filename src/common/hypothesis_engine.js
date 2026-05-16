@@ -306,6 +306,8 @@ class HypothesisEngine {
    * @returns {{
    *   error?: string,
    *   message?: string,
+   *   a?: number,
+   *   b?: number,
    *   slope?: number,
    *   intercept?: number,
    *   r?: number,
@@ -322,17 +324,27 @@ class HypothesisEngine {
       return { error: 'invalid_data', message: 'Need at least 3 points for regression' };
     }
 
-    const n = x.length;
-    const meanX = jstat.mean(x);
-    const meanY = jstat.mean(y);
+    const pairs = [];
+    for (let i = 0; i < x.length; i++) {
+      const xValue = Number(x[i]);
+      const yValue = Number(y[i]);
+      if (!Number.isFinite(xValue) || !Number.isFinite(yValue)) {
+        return { error: 'invalid_data', message: 'All X and Y values must be valid numbers' };
+      }
+      pairs.push({ x: xValue, y: yValue });
+    }
+
+    const n = pairs.length;
+    const meanX = jstat.mean(pairs.map(item => item.x));
+    const meanY = jstat.mean(pairs.map(item => item.y));
     
     let sxx = 0;
     let sxy = 0;
     let syy = 0;
 
     for (let i = 0; i < n; i++) {
-      const dx = x[i] - meanX;
-      const dy = y[i] - meanY;
+      const dx = pairs[i].x - meanX;
+      const dy = pairs[i].y - meanY;
       sxx += dx * dx;
       sxy += dx * dy;
       syy += dy * dy;
@@ -342,48 +354,49 @@ class HypothesisEngine {
 
     const slope = sxy / sxx;
     const intercept = meanY - slope * meanX;
-    
-    // Correlation coefficient r
-    const r = sxy / Math.sqrt(sxx * syy);
+
+    // If Y is constant, the fitted line is still valid but correlation is reported as 0.
+    const r = syy === 0 ? 0 : sxy / Math.sqrt(sxx * syy);
     const rSquared = r * r;
 
     // Standard error of slope
-    const sse = syy - slope * sxy;
+    const sse = Math.max(0, syy - slope * sxy);
     const mse = sse / (n - 2);
-    
-    let t, pValueTwoTail, seSlope;
+
+    let t;
+    let pValueTwoTail;
+    let seSlope;
     if (mse <= 1e-10) {
-        // Perfect fit
+      if (Math.abs(slope) <= 1e-10) {
+        t = 0;
+        pValueTwoTail = 1;
+        seSlope = 0;
+      } else {
         t = Infinity;
         pValueTwoTail = 0;
         seSlope = 0;
+      }
     } else {
-        seSlope = Math.sqrt(mse / sxx);
-        t = slope / seSlope;
-        const df = n - 2;
-        pValueTwoTail = jstat.ttest(0, slope, seSlope, 1, 2); // Testing if slope = 0. Here 'mean'=slope, 'popMean'=0, 'sd'=seSlope, n=1 (standard normal approx? No, t-dist).
-        // Wait, jstat.ttest uses n for df=n-1? 
-        // jStat.ttest(val, mean, sd, n, sides) => t = (val - mean) / (sd / sqrt(n))
-        // We have t = slope / seSlope.
-        // If we set val=slope, mean=0, sd=seSlope, n=1 => t = slope/seSlope. 
-        // But df would be n-1 = 0? 
-        // So jstat.ttest might not work directly for regression slope t-test where df = n-2.
-        // We'll stick to manual t calculation for regression.
-        pValueTwoTail = 2 * (1 - jstat.studentt.cdf(Math.abs(t), df));
+      seSlope = Math.sqrt(mse / sxx);
+      t = slope / seSlope;
+      const df = n - 2;
+      pValueTwoTail = 2 * (1 - jstat.studentt.cdf(Math.abs(t), df));
     }
-    
+
     // Confidence Interval for Slope
     let lowerCISlope = null;
     let upperCISlope = null;
     if (mse > 1e-10) {
-        const df = n - 2;
-        const tCrit = jstat.studentt.inv(1 - alpha / 2, df);
-        const marginOfError = tCrit * seSlope;
-        lowerCISlope = slope - marginOfError;
-        upperCISlope = slope + marginOfError;
+      const df = n - 2;
+      const tCrit = jstat.studentt.inv(1 - alpha / 2, df);
+      const marginOfError = tCrit * seSlope;
+      lowerCISlope = slope - marginOfError;
+      upperCISlope = slope + marginOfError;
     }
 
     return {
+      a: intercept,
+      b: slope,
       slope,
       intercept,
       r,

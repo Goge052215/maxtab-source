@@ -5,7 +5,7 @@
     <div class="top-bar">
       <div class="title-container">
         <text class="title">{{ i18n.pages.hypothesis.linear_regression }}</text>
-        <text class="subtitle">{{ i18n.pages.hypothesis.input_mode }}</text>
+        <text class="subtitle">{{ i18n.pages.hypothesis.data_hint }}</text>
       </div>
     </div>
 
@@ -55,59 +55,6 @@
             </div>
           </div>
 
-          <div class="result-section" if="{{ !showKeyboard && hasResult }}">
-            <text class="result-title">{{ i18n.common.calculation_result }}</text>
-            
-            <div class="menu-list-item">
-              <div class="menu-item">
-                <text class="menu-label">{{ i18n.pages.hypothesis.slope }} (b1)</text>
-                <text class="menu-value result-number">{{ resultSlope }}</text>
-              </div>
-            </div>
-            
-            <div class="menu-list-item">
-              <div class="menu-item">
-                <text class="menu-label">{{ i18n.pages.hypothesis.intercept }} (b0)</text>
-                <text class="menu-value result-number">{{ resultIntercept }}</text>
-              </div>
-            </div>
-
-            <div class="menu-list-item">
-              <div class="menu-item">
-                <text class="menu-label">{{ i18n.pages.hypothesis.correlation }}</text>
-                <text class="menu-value result-number">{{ resultR }}</text>
-              </div>
-            </div>
-
-            <div class="menu-list-item">
-              <div class="menu-item">
-                <text class="menu-label">{{ i18n.pages.hypothesis.r_squared }}</text>
-                <text class="menu-value result-number">{{ resultRSquared }}</text>
-              </div>
-            </div>
-
-            <div class="menu-list-item">
-              <div class="menu-item">
-                <text class="menu-label">{{ i18n.pages.hypothesis.p_value }} (Slope)</text>
-                <text class="menu-value result-number">{{ pValue }}</text>
-              </div>
-            </div>
-
-            <div class="menu-list-item" if="{{ lowerCISlope !== null }}">
-              <div class="menu-item">
-                <text class="menu-label">Slope 95% CI</text>
-                <text class="menu-value small-text result-number">[{{ lowerCISlope }}, {{ upperCISlope }}]</text>
-              </div>
-            </div>
-
-            <div class="menu-list-item highlight">
-              <div class="menu-item">
-                <text class="menu-label">{{ i18n.pages.hypothesis.conclusion }} (α=0.05)</text>
-                <text class="menu-value small-text result-number">{{ conclusion }}</text>
-              </div>
-            </div>
-          </div>
-
           <div class="error-message" if="{{ !!errorMessage }}">
             <text class="error-text">{{ errorMessage }}</text>
           </div>
@@ -123,6 +70,7 @@
             hide="{{!showKeyboard}}"
             keyboardtype="NUMERIC"
             maxlength="{{10}}"
+            allownegative="{{true}}"
             vibratemode="{{vibratemode}}"
             screentype="{{screentype}}"
             @visibility-change="onVisibilityChange"
@@ -155,19 +103,9 @@ export default {
     currentArrayField: '', // 'x' or 'y'
     inputBuffer: '',
     originalValue: null,
+    completingInput: false,
     
-    // Results
-    hasResult: false,
-    resultSlope: "-",
-    resultIntercept: "-",
-    resultR: "-",
-    resultRSquared: "-",
-    pValue: "-",
-    lowerCISlope: null,
-    upperCISlope: null,
-    conclusion: "",
     errorMessage: "",
-    alpha: 0.05,
 
     i18n: i18nService.getLocaleStrings(),
     vibratemode: "short",
@@ -209,11 +147,13 @@ export default {
 
   addRow() {
     this.dataArray.push({ x: null, y: null })
+    this.invalidateResult()
   },
 
   removeRow() {
     if (this.dataArray.length > 3) {
       this.dataArray.pop()
+      this.invalidateResult()
     }
   },
 
@@ -231,6 +171,9 @@ export default {
   /** @param {any} e */
   onVisibilityChange(e) {
     if (!e.detail.visible) {
+      if (this.completingInput) {
+        return
+      }
       this.showKeyboard = false
       this.inputBuffer = ''
       this.forceUpdateSafe()
@@ -251,6 +194,7 @@ export default {
         const field = /** @type {'x'|'y'} */ (this.currentArrayField)
         item[field] = null
         this.dataArray.splice(this.currentArrayIndex, 1, item)
+        this.invalidateResult()
       }
     }
     this.forceUpdateSafe()
@@ -259,6 +203,7 @@ export default {
   /** @param {any} e */
   onComplete(e) {
     if (e.detail && e.detail.isCompleteButton) {
+      this.completingInput = true
       this.onFinish()
       return
     }
@@ -300,26 +245,47 @@ export default {
       const field = /** @type {'x'|'y'} */ (this.currentArrayField)
       item[field] = value
       this.dataArray.splice(this.currentArrayIndex, 1, item)
+      this.invalidateResult()
     }
   },
 
+  invalidateResult() {
+    this.errorMessage = ""
+  },
+
+  formatNumber(value) {
+    if (!Number.isFinite(value)) {
+      return "-"
+    }
+
+    const absValue = Math.abs(value)
+    if (absValue !== 0 && (absValue >= 1000000 || absValue < 0.0001)) {
+      return value.toExponential(4)
+    }
+
+    return value.toFixed(4)
+  },
+
   onFinish() {
-    if (this.inputBuffer === '' && this.originalValue !== undefined) {
+    if (this.currentArrayIndex >= 0) {
       const item = this.dataArray[this.currentArrayIndex]
       const field = /** @type {'x'|'y'} */ (this.currentArrayField)
-      item[field] = this.originalValue
-      this.dataArray.splice(this.currentArrayIndex, 1, item)
+      const hasCommittedValue = item[field] !== null && item[field] !== undefined
+      if (this.inputBuffer === '' && !hasCommittedValue && this.originalValue !== undefined) {
+        item[field] = this.originalValue
+        this.dataArray.splice(this.currentArrayIndex, 1, item)
+      }
     }
-    
+
     this.showKeyboard = false
     this.inputBuffer = ''
+    this.completingInput = false
     this.forceUpdateSafe()
   },
 
   calculate() {
     try {
       this.errorMessage = ""
-      this.hasResult = false
 
       const x = []
       const y = []
@@ -333,41 +299,37 @@ export default {
       }
 
       if (x.length < 3) {
-        this.errorMessage = "Need at least 3 pairs of data"
+        this.errorMessage = this.i18n.pages.hypothesis.min_pairs_error
         return
       }
 
       const result = HypothesisEngine.linearRegression(x, y)
 
       if (result.error) {
-        this.errorMessage = this.i18n.common.error_failed + ": " + result.error
+        this.errorMessage = this.i18n.common.error_failed + ": " + (result.message || result.error)
         return
       }
 
-      this.resultSlope = result.slope.toFixed(4)
-      this.resultIntercept = result.intercept.toFixed(4)
-      this.resultR = result.r.toFixed(4)
-      this.resultRSquared = result.rSquared.toFixed(4)
-      this.pValue = result.pValueTwoTail.toFixed(4)
-      
-      if (result.lowerCISlope !== null && result.upperCISlope !== null) {
-        this.lowerCISlope = result.lowerCISlope.toFixed(4)
-        this.upperCISlope = result.upperCISlope.toFixed(4)
-      } else {
-        this.lowerCISlope = null
-        this.upperCISlope = null
-      }
+      const resultA = this.formatNumber(result.a)
+      const resultB = this.formatNumber(result.b)
+      const resultR = this.formatNumber(result.r)
+      const bAbs = this.formatNumber(Math.abs(result.b))
+      const sign = result.b >= 0 ? '+' : '-'
+      const resultEquation = `Y = ${resultA} ${sign} ${bAbs}X`
 
-      if (result.pValueTwoTail < this.alpha) {
-        this.conclusion = this.i18n.pages.hypothesis.reject
-      } else {
-        this.conclusion = this.i18n.pages.hypothesis.fail_to_reject
-      }
-
-      this.hasResult = true
+      router.push({
+        uri: 'pages/hypothesis/linear_regression_result',
+        params: {
+          title: this.i18n.pages.hypothesis.linear_regression,
+          equation: resultEquation,
+          coefficientA: resultA,
+          coefficientB: resultB,
+          coefficientR: resultR,
+          pointCount: String(x.length)
+        }
+      })
     } catch (e) {
       this.errorMessage = "Calculation Error: " + (e.message || e)
-      this.hasResult = false
     }
   }
 }
@@ -480,69 +442,6 @@ export default {
   font-weight: bold;
 }
 
-.result-section {
-  margin-top: 20px;
-  background-color: #1a1a1a;
-  border-radius: 12px;
-  padding: 15px;
-  border: 1px solid #333333;
-  flex-direction: column;
-}
-
-.result-title {
-  font-size: 24px;
-  color: #00ff88;
-  font-weight: bold;
-  margin-bottom: 15px;
-  text-align: center;
-  width: 100%;
-}
-
-.menu-list-item {
-  margin-bottom: 20px;
-}
-
-.menu-item {
-  display: flex;
-  min-height: 95px;
-  width: 100%;
-  background-color: #222222;
-  border-radius: 12px;
-  padding: 15px 20px;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  border: 1px solid #333333;
-}
-
-.menu-label {
-  font-size: 24px;
-  color: #ffffff;
-}
-
-.menu-value {
-  font-size: 24px;
-  color: #ffffff;
-  font-weight: bold;
-  text-align: center;
-}
-
-.menu-value.result-number {
-  font-size: 30px;
-}
-
-.menu-value.small-text {
-  font-size: 20px;
-}
-
-.menu-value.small-text.result-number {
-  font-size: 24px;
-}
-
-.menu-list-item.highlight .menu-item {
-  border-color: #444444;
-}
-
 .error-message {
   padding: 20px;
   background-color: #331111;
@@ -598,7 +497,7 @@ export default {
 .table-cell-id {
   width: 10%;
   color: #aaaaaa;
-  font-size: 24px;
+  font-size: 22px;
   text-align: center;
 }
 
