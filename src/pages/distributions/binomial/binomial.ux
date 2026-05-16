@@ -56,18 +56,19 @@
             </div>
           </div>
 
-          <input-method
-            if="{{ showKeyboard }}"
-            hide="{{!showKeyboard}}"
-            keyboardtype="NUMERIC"
-            maxlength={{10}}
-            vibratemode="{{vibratemode}}"
-            screentype="{{screentype}}"
-            @visibility-change="onVisibilityChange"
-            @key-down="onKeyDown"
-            @delete="onDelete"
-            @complete="onComplete"
-          ></input-method>
+          <div class="keyboard-page" style="flex-direction: column;" if="{{ showKeyboard }}">
+            <input-method
+              hide="{{!showKeyboard}}"
+              keyboardtype="NUMERIC"
+              maxlength="{{10}}"
+              vibratemode="{{vibratemode}}"
+              screentype="{{screentype}}"
+              @visibility-change="onVisibilityChange"
+              @key-down="onKeyDown"
+              @delete="onDelete"
+              @complete="onComplete"
+            ></input-method>
+          </div>
         </div>
 
       </div>
@@ -80,6 +81,21 @@ import router from "@system.router"
 import { DistributionCalculator } from "../../../common/distribution_engine"
 import { globalState } from "../../../common/global_state.js"
 import i18nService from "../../../common/i18n"
+
+/** @param {any} vm */
+const forceUpdate = (vm) => {
+  if (vm && typeof vm.$forceUpdate === 'function') {
+    vm.$forceUpdate()
+  }
+}
+
+/** @param {any} vm @param {string} text */
+const setTitleBar = (vm, text) => {
+  if (vm && vm.$page && typeof vm.$page.setTitleBar === 'function') {
+    vm.$page.setTitleBar({ text })
+  }
+}
+
 
 export default {
   private: {
@@ -115,14 +131,15 @@ export default {
   refreshI18n() {
     this.currentLang = i18nService.getCurrentLang()
     this.i18n = i18nService.getLocaleStrings(this.currentLang)
-    this.$page.setTitleBar({ text: i18nService.t('distributions.binomial.title', this.currentLang) })
-    this.$forceUpdate()
+    setTitleBar(this, i18nService.t('distributions.binomial.title', this.currentLang))
+    forceUpdate(this)
   },
 
   goBack() {
     router.back()
   },
 
+  /** @param {any} event */
   handleSwipe(event) {
     if (event.direction === 'right') {
       this.goBack()
@@ -145,10 +162,11 @@ export default {
         this.k = inputValue || 0
       }
       
-      this.$forceUpdate()
+      forceUpdate(this)
     }
   },
 
+  /** @param {'n'|'p'|'k'} inputType */
   selectInput(inputType) {
     let parameterName = ''
     if (inputType === 'n') parameterName = this.i18n.params.n
@@ -160,22 +178,24 @@ export default {
     this.inputBuffer = ''  // Start with empty buffer for new input
     
     // Store original value for cancel functionality
-    this.originalValue = this[inputType]
+      this.originalValue = this[inputType]
     
     this.showKeyboard = true
-    this.$forceUpdate()
+    forceUpdate(this)
   },
 
+  /** @param {any} evt */
   onVisibilityChange(evt) {
     if (!evt.detail.visible) {
       this.showKeyboard = false
       this.inputBuffer = ''
       this.currentParam = ''
       this.currentParamName = ''
-      this.$forceUpdate()
+      forceUpdate(this)
     }
   },
 
+  /** @param {any} evt */
   onKeyDown(evt) {
     // Key down events are handled by the component
   },
@@ -193,9 +213,10 @@ export default {
       else if (this.currentParam === 'k') this.k = 5
     }
     
-    this.$forceUpdate()
+    forceUpdate(this)
   },
 
+  /** @param {any} evt */
   onComplete(evt) {
     if (evt.detail && evt.detail.isCompleteButton) {
       this.onFinish()
@@ -218,7 +239,7 @@ export default {
     if (char === '-' && this.inputBuffer.length === 0 && allowNegative) {
       this.inputBuffer = char
       this.updateParameterFromBuffer()
-      this.$forceUpdate()
+      forceUpdate(this)
       return
     }
 
@@ -237,7 +258,7 @@ export default {
     
     // Update parameter directly as user types
     this.updateParameterFromBuffer()
-    this.$forceUpdate()
+    forceUpdate(this)
   },
 
 
@@ -247,16 +268,17 @@ export default {
     this.inputBuffer = '';
     this.currentParam = '';
     this.currentParamName = '';
-    this.$forceUpdate();
+    forceUpdate(this)
   },
 
   onFinish() {
     // Check if this was a cancel action (no input buffer means cancel)
     if (this.inputBuffer === '' && this.originalValue !== undefined) {
       // Restore original value on cancel
-      this[this.currentParam] = this.originalValue;
+      const currentParam = /** @type {'n'|'p'|'k'} */ (this.currentParam)
+      this[currentParam] = this.originalValue
     }
-    this.hideKeyboard();
+    this.hideKeyboard()
   },
 
   updateParameterFromBuffer() {
@@ -266,19 +288,20 @@ export default {
     if (isNaN(value)) return
     
     // Update the parameter value with proper type conversion
-    if (this.currentParam === 'n' || this.currentParam === 'k') {
+    const currentParam = /** @type {'n'|'p'|'k'} */ (this.currentParam)
+    if (currentParam === 'n' || currentParam === 'k') {
       // For integer parameters, only accept whole numbers
       const intValue = Math.floor(Math.abs(value))
-      this[this.currentParam] = intValue
-    } else if (this.currentParam === 'p') {
+      this[currentParam] = intValue
+    } else if (currentParam === 'p') {
       // For probability, allow decimals but clamp to [0,1]
       // Always store as number, but handle display formatting in the template
-      this[this.currentParam] = Math.max(0, Math.min(1, value))
+      this[currentParam] = Math.max(0, Math.min(1, value))
     }
     
     // Additional validation
-    if (this.currentParam === 'n' && this.n <= 0) this.n = 1
-    if (this.currentParam === 'k' && this.k > this.n) this.k = this.n
+    if (currentParam === 'n' && this.n <= 0) this.n = 1
+    if (currentParam === 'k' && this.k > this.n) this.k = this.n
     
     this.hasResult = false
     this.errorMessage = ""
@@ -290,7 +313,7 @@ export default {
     this.inputBuffer = ''
     this.currentParam = ''
     this.currentParamName = ''
-    this.$forceUpdate()
+    forceUpdate(this)
   },
 
 
@@ -364,13 +387,12 @@ export default {
 .bottom-section {
   margin-top: 6px;
   margin-bottom: 50px;
-  display: flex;
   justify-content: center;
   align-items: center;
 }
 
 .back-btn {
-  width: 80%;
+  width: 100%;
   height: 70px;
   background-color: #333333;
   border-radius: 12px;
@@ -476,7 +498,7 @@ export default {
 
 .keyboard-page {
   width: 100%;
-  height: 480px;
+  height: 270px;
   position: fixed;
   top: 0;
   left: 0;

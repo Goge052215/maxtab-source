@@ -42,6 +42,7 @@
 </template>
 
 <script>
+// @ts-nocheck
 import vibrator from "@system.vibrator";
 import device from '@system.device'
 import { SimpleInputMethod } from "./assets/dicUtil.js";
@@ -62,6 +63,18 @@ export default {
     },
     screentype: {
       default: "pill-shaped",
+    },
+    "onvisibility-change": {
+      default: null,
+    },
+    "onkey-down": {
+      default: null,
+    },
+    ondelete: {
+      default: null,
+    },
+    oncomplete: {
+      default: null,
     },
   },
   data: {
@@ -111,8 +124,15 @@ export default {
     this.$watch("hide", "watchHidePropsChange");
     this.$watch("maxlength", "watchMaxLengthPropsChange");
   },
+  forwardEvent(propName, emitName, payload) {
+    const handler = this[propName];
+    if (typeof handler === "function") {
+      handler(payload);
+    }
+    this.$emit(emitName, payload);
+  },
   addAllTxt(txt) {
-    this.$emit("complete", { content: txt });
+    this.forwardEvent("oncomplete", "complete", { content: txt });
   },
 
   onBtnClick(sign) {
@@ -167,7 +187,7 @@ export default {
     if (this.waitingIndex >= 0) {
       this.clearWaiting();
     } else {
-      this.$emit("delete", {});
+      this.forwardEvent("ondelete", "delete", {});
     }
   },
   handleSelectAction(sign) {
@@ -227,7 +247,7 @@ export default {
   },
 
   onSelect(num) {
-    this.$emit("keyDown", { content: num });
+    this.forwardEvent("onkey-down", "keyDown", { content: num });
     if (this.keyboardtype === "T9" && this.screentype !== "pill-shaped") {
       this.onBtnClick(num);
       return;
@@ -236,8 +256,8 @@ export default {
     
     // Handle "√" as complete button
     if (num === "√") {
-      this.$emit("visibilityChange", { visible: false });  // Tell parent to hide keyboard
-      this.$emit("complete", { isCompleteButton: true });
+      this.forwardEvent("onvisibility-change", "visibilityChange", { visible: false });  // Tell parent to hide keyboard
+      this.forwardEvent("oncomplete", "complete", { isCompleteButton: true });
       return;
     }
     
@@ -268,7 +288,7 @@ export default {
     this.clearWaiting();
   },
   watchHidePropsChange(newV) {
-    this.$emit("visibilityChange", { visible: newV });
+    this.forwardEvent("onvisibility-change", "visibilityChange", { visible: newV });
   },
   watchMaxLengthPropsChange() {
     // maxlength property change handler - kept for compatibility

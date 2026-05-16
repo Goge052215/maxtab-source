@@ -23,6 +23,20 @@
   import router from "@system.router";
   import i18nService from "../../common/i18n";
 
+  /** @param {any} vm */
+  const forceUpdate = (vm) => {
+    if (vm && typeof vm.$forceUpdate === 'function') {
+      vm.$forceUpdate()
+    }
+  }
+
+  /** @param {any} vm @param {string} text */
+  const setTitleBar = (vm, text) => {
+    if (vm && vm.$page && typeof vm.$page.setTitleBar === 'function') {
+      vm.$page.setTitleBar({ text })
+    }
+  }
+
   export default {
     private: {
       distributionName: "",
@@ -43,22 +57,23 @@
     },
 
     refreshI18n() {
-      this.currentLang = i18n.getCurrentLang()
+      this.currentLang = i18nService.getCurrentLang()
       this.i18n = i18nService.getLocaleStrings(this.currentLang)
       if (!this.distributionName) {
         this.distributionName = i18nService.t('pages.detail_continuous.title', this.currentLang)
       }
-      this.$forceUpdate()
+      forceUpdate(this)
     },
 
     onReady() {
-      this.$page.setTitleBar({ text: this.distributionName || i18nService.t('pages.detail_continuous.title', this.currentLang) });
+      setTitleBar(this, this.distributionName || i18nService.t('pages.detail_continuous.title', this.currentLang))
     },
 
     goBack() {
       router.back();
     },
 
+    /** @param {any} event */
     handleSwipe(event) {
       if (event.direction === 'right') {
         this.goBack()

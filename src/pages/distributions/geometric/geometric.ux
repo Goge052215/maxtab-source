@@ -47,7 +47,7 @@
             <input-method
               hide="{{!showKeyboard}}"
               keyboardtype="NUMERIC"
-              maxlength="10"
+              maxlength="{{10}}"
               vibratemode="{{vibratemode}}"
               screentype="{{screentype}}"
               @visibility-change="onVisibilityChange"
@@ -73,6 +73,21 @@ import router from "@system.router"
 import { DistributionCalculator } from "../../../common/distribution_engine"
 import { globalState } from "../../../common/global_state.js"
 import i18nService from "../../../common/i18n"
+
+/** @param {any} vm */
+const forceUpdate = (vm) => {
+  if (vm && typeof vm.$forceUpdate === 'function') {
+    vm.$forceUpdate()
+  }
+}
+
+/** @param {any} vm @param {string} text */
+const setTitleBar = (vm, text) => {
+  if (vm && vm.$page && typeof vm.$page.setTitleBar === 'function') {
+    vm.$page.setTitleBar({ text })
+  }
+}
+
 
 export default {
   private: {
@@ -107,8 +122,8 @@ export default {
   refreshI18n() {
     this.currentLang = i18nService.getCurrentLang()
     this.i18n = i18nService.getLocaleStrings(this.currentLang)
-    this.$page.setTitleBar({ text: i18nService.t('distributions.geometric.title', this.currentLang) })
-    this.$forceUpdate()
+    setTitleBar(this, i18nService.t('distributions.geometric.title', this.currentLang))
+    forceUpdate(this)
   },
 
   importFromCalculator() {
@@ -126,7 +141,7 @@ export default {
         this.k = inputValue || 3
       }
       
-      this.$forceUpdate()
+      forceUpdate(this)
     }
   },
 
@@ -134,12 +149,14 @@ export default {
     router.back()
   },
 
+  /** @param {any} event */
   handleSwipe(event) {
     if (event.direction === 'right') {
       this.goBack()
     }
   },
 
+  /** @param {'p'|'k'} inputType */
   selectInput(inputType) {
     let parameterName = ''
     if (inputType === 'p') parameterName = this.i18n.params.p
@@ -153,19 +170,21 @@ export default {
     this.originalValue = this[inputType]
     
     this.showKeyboard = true
-    this.$forceUpdate()
+    forceUpdate(this)
   },
 
+  /** @param {any} evt */
   onVisibilityChange(evt) {
     if (!evt.detail.visible) {
       this.showKeyboard = false
       this.inputBuffer = ''
       this.currentParam = ''
       this.currentParamName = ''
-      this.$forceUpdate()
+      forceUpdate(this)
     }
   },
 
+  /** @param {any} evt */
   onKeyDown(evt) {
     // Key down events are handled by the component
   },
@@ -182,9 +201,10 @@ export default {
       else if (this.currentParam === 'k') this.k = 3
     }
     
-    this.$forceUpdate()
+    forceUpdate(this)
   },
 
+  /** @param {any} evt */
   onComplete(evt) {
     if (evt.detail && evt.detail.isCompleteButton) {
       this.onFinish()
@@ -207,7 +227,7 @@ export default {
     if (char === '-' && this.inputBuffer.length === 0 && allowNegative) {
       this.inputBuffer = char
       this.updateParameterFromBuffer()
-      this.$forceUpdate()
+      forceUpdate(this)
       return
     }
 
@@ -226,7 +246,7 @@ export default {
     
     // Update parameter directly as user types
     this.updateParameterFromBuffer()
-    this.$forceUpdate()
+    forceUpdate(this)
   },
 
   hideKeyboard() {
@@ -234,7 +254,7 @@ export default {
     this.inputBuffer = '';
     this.currentParam = '';
     this.currentParamName = '';
-    this.$forceUpdate();
+    forceUpdate(this)
   },
 
   onFinish() {
@@ -272,7 +292,7 @@ export default {
     this.inputBuffer = ''
     this.currentParam = ''
     this.currentParamName = ''
-    this.$forceUpdate()
+    forceUpdate(this)
   },
 
   calculate() {
@@ -337,12 +357,11 @@ export default {
 .bottom-section {
   margin-top: 6px;
   margin-bottom: 50px;
-  display: flex;
   justify-content: center;
   align-items: center;
 }
 .back-btn {
-  width: 80%;
+  width: 100%;
   height: 70px;
   background-color: #333333;
   border-radius: 12px;
@@ -414,7 +433,7 @@ export default {
 
 .keyboard-page {
   width: 100%;
-  height: 480px;
+  height: 270px;
   position: fixed;
   top: 0;
   left: 0;
