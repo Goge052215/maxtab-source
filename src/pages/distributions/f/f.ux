@@ -317,7 +317,7 @@ export default {
 }
 
 .back-btn {
-  width: 100%;
+  width: 80%;
   height: 70px;
   background-color: #333333;
   border-radius: 12px;
