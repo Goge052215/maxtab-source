@@ -3,6 +3,7 @@ import {
   STAT_SQRT_2PI, 
   ABRAMOWITZ_STEGUN_COEFF, 
   ABRAMOWITZ_STEGUN_CONST } from './constants.js';
+import { registerRuntimeCleanup } from './cache/runtime_cleanup.js'
 
 const DISTRIBUTION_TYPES = {
   DIST_NORMAL: 0,
@@ -43,13 +44,17 @@ class CalculationResult {
   }
 }
 
-import LRUCache from './lru_cache.js'
+import CacheService from './cache/cache.js'
 
 const memoCache = {
-  logFactorial: new LRUCache(500),
-  logGamma: new LRUCache(500),
-  logCombination: new LRUCache(500)
+  logFactorial: new CacheService({ namespace: 'logFactorial', capacityPages: 500 }),
+  logGamma: new CacheService({ namespace: 'logGamma', capacityPages: 500 }),
+  logCombination: new CacheService({ namespace: 'logCombination', capacityPages: 500 })
 }
+
+let memoCacheCleanupInterval = null
+let memoCacheDestroyed = false
+let unregisterMemoCacheCleanup = () => {}
 
 const resultPool = {
   pool: [],
@@ -82,7 +87,7 @@ const resultPool = {
 }
 
 // Periodic cleanup
-setInterval(() => {
+memoCacheCleanupInterval = setInterval(() => {
   // Clear caches
   if (memoCache.logFactorial.size > 300) {
     memoCache.logFactorial.clear()
@@ -99,6 +104,26 @@ setInterval(() => {
     resultPool.cleanup()
   }
 }, 30000)
+
+function destroyMemoCache() {
+  if (memoCacheDestroyed) {
+    return
+  }
+  memoCacheDestroyed = true
+  unregisterMemoCacheCleanup()
+
+  if (memoCacheCleanupInterval) {
+    clearInterval(memoCacheCleanupInterval)
+    memoCacheCleanupInterval = null
+  }
+
+  memoCache.logFactorial.destroy()
+  memoCache.logGamma.destroy()
+  memoCache.logCombination.destroy()
+  resultPool.cleanup()
+}
+
+unregisterMemoCacheCleanup = registerRuntimeCleanup(destroyMemoCache)
 
 class DistributionCalculator {
   static createResult(success = false, pdfResult = 0, cdfResult = 0, errorMessage = null, chartData = null) {
@@ -451,4 +476,4 @@ class DistributionCalculator {
   }
 }
 
-export { DistributionCalculator, CalculationResult, DISTRIBUTION_TYPES }
+export { DistributionCalculator, CalculationResult, DISTRIBUTION_TYPES, destroyMemoCache }

@@ -13,3 +13,6 @@
 demo
 avd
 .vela
+.tmp
+.tmp-home
+/src/common/cache

@@ -1,10 +1,17 @@
 <script>
 import { globalState } from './common/global_state.js'
 import { memoryMonitor } from './common/memory_monitor.js'
+import { runRuntimeCleanup } from './common/cache/runtime_cleanup.js'
 import i18n from './common/i18n'
 import storage from '@system.storage'
 
+const runtimeGlobal = /** @type {any} */ (typeof globalThis !== 'undefined' ? globalThis : {})
+
 export default {
+  private: {
+    memoryCleanupInterval: null
+  },
+
   onCreate() {
     storage.get({
       key: 'app_language',
@@ -37,15 +44,15 @@ export default {
       )
       
       // Cleanup callbacks
-      memoryMonitor.onMemoryWarning((usage) => {
+      memoryMonitor.onMemoryWarning(/** @param {any} usage */ (usage) => {
         this.performLightCleanup()
       })
       
-      memoryMonitor.onMemoryCleanup((usage) => {
+      memoryMonitor.onMemoryCleanup(/** @param {any} usage */ (usage) => {
         this.performGlobalMemoryCleanup()
       })
       
-      memoryMonitor.onMemoryCritical((usage) => {
+      memoryMonitor.onMemoryCritical(/** @param {any} usage */ (usage) => {
         this.performAggressiveCleanup()
       })
       
@@ -55,8 +62,8 @@ export default {
       }, 60000)
       
       // Listen for low memory warnings if available
-      if (typeof system !== 'undefined' && system.onLowMemory) {
-        system.onLowMemory(() => {
+      if (runtimeGlobal.system && typeof runtimeGlobal.system.onLowMemory === 'function') {
+        runtimeGlobal.system.onLowMemory(() => {
           this.performAggressiveCleanup()
         })
       }
@@ -111,17 +118,21 @@ export default {
       
       // Clear any large data structures
       if (typeof window !== 'undefined') {
+        const runtimeWindow = /** @type {any} */ (window)
         // Clear any window-level caches
-        Object.keys(window).forEach(key => {
+        Object.keys(runtimeWindow).forEach(key => {
           if (key.startsWith('cache_') || key.startsWith('_cache')) {
-            delete window[key]
+            delete runtimeWindow[key]
           }
         })
       }
       
       // Trigger input method cleanup if available
-      if (typeof window !== 'undefined' && window.SimpleInputMethod) {
-        window.SimpleInputMethod.cleanup()
+      if (typeof window !== 'undefined') {
+        const runtimeWindow = /** @type {any} */ (window)
+        if (runtimeWindow.SimpleInputMethod && typeof runtimeWindow.SimpleInputMethod.cleanup === 'function') {
+          runtimeWindow.SimpleInputMethod.cleanup()
+        }
       }
       
       // Multiple GC attempts for aggressive cleanup
@@ -148,6 +159,9 @@ export default {
       
       // Final cleanup
       this.performAggressiveCleanup()
+
+      // Release resources registered by runtime modules that were actually loaded.
+      runRuntimeCleanup()
       
       // Destroy global state
       if (globalState && typeof globalState.destroy === 'function') {

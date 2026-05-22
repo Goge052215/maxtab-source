@@ -65,19 +65,20 @@
             </div>
           </div>
           
-          <input-method
-            if="{{ showKeyboard }}"
-            hide="{{!showKeyboard}}"
-            keyboardtype="NUMERIC"
-            maxlength="{{10}}"
-            allownegative="{{true}}"
-            vibratemode="{{vibratemode}}"
-            screentype="{{screentype}}"
-            @visibility-change="onVisibilityChange"
-            @key-down="onKeyDown"
-            @delete="onDelete"
-            @complete="onComplete"
-          ></input-method>
+          <div if="{{ showKeyboard }}">
+            <input-method
+              hide="{{!showKeyboard}}"
+              keyboardtype="NUMERIC"
+              maxlength="{{10}}"
+              allownegative="{{true}}"
+              vibratemode="{{vibratemode}}"
+              screentype="{{screentype}}"
+              @visibility-change="onVisibilityChange"
+              @key-down="onKeyDown"
+              @delete="onDelete"
+              @complete="onComplete"
+            ></input-method>
+          </div>
         </div>
       </div>
     </scroll>
@@ -180,6 +181,7 @@ export default {
     }
   },
 
+  /** @param {any} e */
   onKeyDown(e) {
     // Log key
   },
@@ -253,6 +255,7 @@ export default {
     this.errorMessage = ""
   },
 
+  /** @param {any} value */
   formatNumber(value) {
     if (!Number.isFinite(value)) {
       return "-"
@@ -329,7 +332,8 @@ export default {
         }
       })
     } catch (e) {
-      this.errorMessage = "Calculation Error: " + (e.message || e)
+      const error = /** @type {any} */ (e)
+      this.errorMessage = "Calculation Error: " + (error && error.message ? error.message : error)
     }
   }
 }
