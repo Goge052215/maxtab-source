@@ -16,3 +16,4 @@ avd
 .tmp
 .tmp-home
 # /src/common/cache
+.DS_store
